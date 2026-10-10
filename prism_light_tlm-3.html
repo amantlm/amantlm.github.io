@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>प्रिज्म और सात रंग | Digital TLM</title>
+<style>
+:root{--bg:#07111f;--panel:#101e32;--line:#243853;--text:#edf6ff;--muted:#a8bdd4;--cyan:#60eaff;--gold:#ffd66b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#18365a 0,#07111f 55%);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif}
+header{padding:24px 16px 12px;text-align:center}header .eyebrow{color:var(--cyan);font-weight:800;letter-spacing:2px;font-size:.78rem}h1{margin:7px 0;font-size:clamp(1.6rem,4vw,2.7rem)}header p{color:var(--muted);margin:0 auto;max-width:720px}
+main{max-width:1150px;margin:auto;padding:14px;display:grid;gap:14px}.scene-card,.panel{background:linear-gradient(145deg,#12243aee,#0b1728f5);border:1px solid var(--line);border-radius:20px;box-shadow:0 15px 40px #0003;overflow:hidden}
+.scene-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}.live{font-size:.78rem;color:#8fffd2}.scene-wrap{position:relative;padding:4px 6px 0}svg{display:block;width:100%;height:auto;min-height:240px;touch-action:pan-y} .beam{stroke:#fff7a8;stroke-width:7;stroke-linecap:round;filter:url(#glow);stroke-dasharray:15 9;animation:travel .65s linear infinite;opacity:1}
+.beam.off{opacity:0;animation:none}
+.beam-core{stroke:#ffffff;stroke-width:2.5;stroke-linecap:round;filter:url(#glow);pointer-events:none}
+.beam-core.off{opacity:0}
+.laser-aura{fill:#ff5b67;opacity:0;filter:url(#glow)}
+.laser-aura.on{opacity:1;animation:pulse .8s ease-in-out infinite}.ray{stroke-width:4;stroke-linecap:round;filter:url(#rayGlow);opacity:0;transition:opacity .5s}.ray.show{opacity:1}.ray-label{font-size:13px;fill:#eaf6ff;font-weight:700}.prism{fill:#8fe9ff24;stroke:#a8f4ff;stroke-width:3;filter:url(#glassGlow)}.sun-glow{fill:#ffdf75;opacity:.12}.controls{padding:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.btn{border:1px solid #375371;background:#162a43;color:var(--text);padding:12px 14px;border-radius:12px;font-weight:750;cursor:pointer;min-height:46px}.btn:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}.btn.primary{background:linear-gradient(135deg,#ffcf55,#ff8e46);color:#1a1a1a;border:0}.btn.active{border-color:var(--cyan);box-shadow:0 0 0 2px #60eaff25 inset}.range-row{padding:0 16px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.9rem}.range-row input{accent-color:var(--cyan);flex:1;min-width:130px}.below{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}.panel{padding:18px}.panel h2{font-size:1.15rem;margin:0 0 10px}.panel p{color:var(--muted);line-height:1.7;margin:8px 0}.colors{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}.color-chip{height:12px;border-radius:99px}.color-name{font-size:.75rem;text-align:center;color:#dbe9f9;margin-top:6px}.fact{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #263a53}.fact:last-child{border:0}.num{display:grid;place-items:center;flex:0 0 28px;height:28px;border-radius:9px;background:#203b59;color:var(--cyan);font-weight:900}.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.quiz-options button{text-align:left}.feedback{min-height:24px;font-weight:700;margin-top:10px}.footer{text-align:center;color:#8da5bf;padding:12px 16px 28px;font-size:.8rem}
+@keyframes travel{to{stroke-dashoffset:-40}}@keyframes pulse{50%{opacity:.65}}
+@media(max-width:720px){.controls{grid-template-columns:1fr 1fr}.below{grid-template-columns:1fr}.scene-head{align-items:flex-start}.ray-label{font-size:11px}.colors{gap:3px}.color-name{font-size:.65rem}svg{min-height:210px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">INTERACTIVE SCIENCE LAB • DIGITAL TLM</div><h1>✨ प्रिज्म से सात रंगों का जादू</h1><p>प्रकाश किरण को चालू करें, प्रिज्म पर पड़ते देखें और सफेद प्रकाश के सात रंगों में बँटने का प्रयोग स्वयं करें।</p></header>
+<main>
+<section class="scene-card" aria-label="प्रकाश का इंटरैक्टिव प्रयोग">
+ <div class="scene-head"><strong>🔬 प्रयोगशाला: प्रकाश का विक्षेपण</strong><span class="live" id="status" aria-live="polite">● प्रयोग तैयार है</span></div>
+ <div class="scene-wrap">
+ <svg id="scene" viewBox="0 0 900 440" role="img" aria-label="बाईं ओर लेजर, बीच में त्रिकोणीय प्रिज्म और दाईं ओर सात रंगों की किरणें">
+ <defs>
+  <linearGradient id="bgGrid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#142c46"/><stop offset="1" stop-color="#081321"/></linearGradient>
+  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="rayGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="glassGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d5ffff" stop-opacity=".32"/><stop offset=".5" stop-color="#6be6ff" stop-opacity=".08"/><stop offset="1" stop-color="#7eabff" stop-opacity=".27"/></linearGradient>
+  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#3c6280" stroke-opacity=".16" stroke-width="1"/></pattern>
+ </defs>
+ <rect width="900" height="440" rx="16" fill="url(#bgGrid)"/><rect width="900" height="440" rx="16" fill="url(#grid)"/>
+ <circle class="sun-glow" cx="72" cy="220" r="58"/>
+ <g id="laserUnit"><rect x="28" y="187" width="112" height="66" rx="12" fill="#182c43" stroke="#55718f" stroke-width="2"/><rect x="40" y="198" width="63" height="44" rx="7" fill="#0a1422" stroke="#314a67"/><circle cx="51" cy="220" r="5" fill="#ff6969"/><circle id="laserAura" class="laser-aura" cx="139" cy="220" r="13"/><circle id="laserDot" cx="139" cy="220" r="5" fill="#ff6c79"/><rect x="113" y="207" width="20" height="26" rx="4" fill="#304b69"/><text x="84" y="275" text-anchor="middle" fill="#b7cce0" font-size="13">लेज़र स्रोत</text></g>
+ <path id="incoming" class="beam off" d="M140 220 L382 220"/><path id="incomingCore" class="beam-core off" d="M140 220 L382 220"/>
+ <path id="insideBeam" class="beam off" d="M382 220 L490 244"/><path id="insideCore" class="beam-core off" d="M382 220 L490 244"/>
+ <g id="pathGuides" opacity="0">
+   <path d="M140 220H382" stroke="#fff8b5" stroke-width="1.5" stroke-dasharray="5 6" opacity=".8"/>
+   <path d="M382 220V285" stroke="#a8c9e6" stroke-width="1.5" stroke-dasharray="4 5" opacity=".65"/>
+   <path d="M382 220 A38 38 0 0 1 418 232" fill="none" stroke="#ffd66b" stroke-width="2"/>
+   <text x="395" y="207" fill="#ffe39a" font-size="13" font-weight="700">आपतन</text>
+   <text x="188" y="205" fill="#fff7b0" font-size="13" font-weight="700">सफेद प्रकाश का पथ</text>
+   <text x="470" y="225" fill="#c6efff" font-size="12">अपवर्तन</text>
+   <path d="M520 205L560 180" stroke="#a8c9e6" stroke-width="1.5" stroke-dasharray="4 4"/>
+   <text x="564" y="178" fill="#c6d9ef" font-size="12">रंग अलग-अलग कोणों पर मुड़ते हैं</text>
+ </g>
+ <g id="prismGroup"><polygon class="prism" fill="url(#glass)" points="430,125 350,285 510,285"/><path d="M430 125L430 285" stroke="#e0ffff" stroke-opacity=".22" stroke-width="2"/><text x="430" y="310" text-anchor="middle" fill="#bfefff" font-size="15" font-weight="700">काँच का प्रिज्म</text></g>
+ <g id="spectrum">
+  <path class="ray" data-ray="0" stroke="#ff3434" d="M490 244 L820 104"/><path class="ray" data-ray="1" stroke="#ff8b2b" d="M490 244 L820 136"/>
+  <path class="ray" data-ray="2" stroke="#ffe34d" d="M490 244 L820 168"/><path class="ray" data-ray="3" stroke="#48e36c" d="M490 244 L820 200"/>
+  <path class="ray" data-ray="4" stroke="#3ee5f0" d="M490 244 L820 232"/><path class="ray" data-ray="5" stroke="#4285ff" d="M490 244 L820 264"/><path class="ray" data-ray="6" stroke="#b56bff" d="M490 244 L820 296"/>
+  <text class="ray-label" x="830" y="108">लाल</text><text class="ray-label" x="830" y="140">नारंगी</text><text class="ray-label" x="830" y="172">पीला</text><text class="ray-label" x="830" y="204">हरा</text><text class="ray-label" x="830" y="236">नीला-हरा</text><text class="ray-label" x="830" y="268">नीला</text><text class="ray-label" x="830" y="300">बैंगनी</text>
+ </g>
+ <g id="screen"><rect x="805" y="76" width="7" height="238" rx="3" fill="#b5d8ee" opacity=".35"/><text x="800" y="345" text-anchor="middle" fill="#9fb8d1" font-size="12">रंग-पट्टी</text></g>
+ <text x="34" y="36" fill="#8ca8c6" font-size="13">सफेद प्रकाश</text><path d="M35 48H135" stroke="#a4bed9" stroke-opacity=".35"/>
+ <text x="585" y="390" text-anchor="middle" fill="#8ca8c6" font-size="13">प्रकाश का विक्षेपण (Dispersion)</text>
+ <text x="450" y="420" text-anchor="middle" fill="#58728e" font-size="11">यह एक शैक्षिक सिमुलेशन है — वास्तविक किरणों का पथ सरल रूप में दिखाया गया है।</text>
+ </svg>
+ </div>
+ <div class="controls">
+  <button class="btn primary" id="laserBtn">🔴 लेज़र चालू करें</button>
+  <button class="btn" id="prismBtn">🔺 प्रिज्म हटाएँ</button>
+  <button class="btn" id="whiteBtn">📐 प्रकाश-पथ / कोण दिखाएँ</button>
+  <button class="btn" id="resetBtn">↻ फिर से शुरू</button>
+ </div>
+ <div class="range-row"><label for="angle">प्रिज्म का कोण बदलें</label><input id="angle" type="range" min="-12" max="12" value="0"><span id="angleVal">0°</span><label><input id="slowMode" type="checkbox"> धीमा प्रदर्शन</label></div>
+</section>
+<div class="below">
+ <section class="panel"><h2>🌈 सात रंगों का स्पेक्ट्रम</h2><p>सफेद प्रकाश प्रिज्म से गुजरने पर अलग-अलग रंगों में बँट जाता है। इस घटना को <b>प्रकाश का विक्षेपण</b> कहते हैं।</p>
+ <div class="colors">
+  <div><div class="color-chip" style="background:#ff3434"></div><div class="color-name">लाल</div></div><div><div class="color-chip" style="background:#ff8b2b"></div><div class="color-name">नारंगी</div></div><div><div class="color-chip" style="background:#ffe34d"></div><div class="color-name">पीला</div></div><div><div class="color-chip" style="background:#48e36c"></div><div class="color-name">हरा</div></div><div><div class="color-chip" style="background:#3ee5f0"></div><div class="color-name">नीला-हरा</div></div><div><div class="color-chip" style="background:#4285ff"></div><div class="color-name">नीला</div></div><div><div class="color-chip" style="background:#b56bff"></div><div class="color-name">बैंगनी</div></div>
+ </div>
+ <div class="fact"><span class="num">1</span><div><b>प्रिज्म क्या करता है?</b><p>प्रिज्म प्रकाश की दिशा बदलता है और अलग-अलग तरंगदैर्ध्य के रंग अलग-अलग कोणों पर मुड़ते हैं।</p></div></div>
+ <div class="fact"><span class="num">2</span><div><b>कौन अधिक मुड़ता है?</b><p>बैंगनी रंग सामान्यतः सबसे अधिक और लाल रंग सबसे कम विचलित होता है।</p></div></div>
+ </section>
+ <section class="panel"><h2>🧠 अब आपकी बारी!</h2><p id="question">प्रश्न 1: प्रिज्म से सफेद प्रकाश गुजरने पर क्या होता है?</p>
+ <div class="quiz-options" id="quizOptions"><button class="btn" data-correct="false">प्रकाश गायब हो जाता है</button><button class="btn" data-correct="true">सात रंगों में बँटता है</button><button class="btn" data-correct="false">केवल लाल रंग बनता है</button><button class="btn" data-correct="false">कोई बदलाव नहीं होता</button></div><div class="feedback" id="feedback" aria-live="polite"></div><button class="btn" id="nextQuiz" style="margin-top:8px;width:100%">अगला प्रश्न →</button>
+ </section>
+</div>
+</main>
+<div class="footer">Digital TLM • विज्ञान को देखकर, समझकर और करके सीखें<br><strong style="display:inline-block;margin-top:8px;color:#c8d9eb">Creator: Aman Singhal</strong></div>
+<script>
+const laserAura=document.getElementById('laserAura'), laserDot=document.getElementById('laserDot'), incomingCore=document.getElementById('incomingCore'), insideBeam=document.getElementById('insideBeam'), insideCore=document.getElementById('insideCore'), pathGuides=document.getElementById('pathGuides'); const laserBtn=document.getElementById('laserBtn'), prismBtn=document.getElementById('prismBtn'), whiteBtn=document.getElementById('whiteBtn'), resetBtn=document.getElementById('resetBtn'), incoming=document.getElementById('incoming'), rays=[...document.querySelectorAll('.ray')], prismGroup=document.getElementById('prismGroup'), angle=document.getElementById('angle'), angleVal=document.getElementById('angleVal'), statusEl=document.getElementById('status'), labels=[...document.querySelectorAll('.ray-label')];
+let laserOn=false, prismOn=true, guidesOn=false;
+function render(){
+ incoming.classList.toggle('off',!laserOn);
+ incomingCore.classList.toggle('off',!laserOn);
+ insideBeam.classList.toggle('off',!laserOn||!prismOn);
+ insideCore.classList.toggle('off',!laserOn||!prismOn);
+ laserAura.classList.toggle('on',laserOn);
+ laserDot.setAttribute('fill',laserOn?'#fff5b0':'#ff6c79');
+ rays.forEach(r=>r.classList.toggle('show',laserOn&&prismOn));
+ labels.forEach(l=>l.style.opacity=(laserOn&&prismOn)?1:0.45);
+ prismGroup.style.opacity=prismOn?1:.22;
+ prismGroup.style.filter=prismOn?'none':'grayscale(1)';
+ pathGuides.setAttribute('opacity',guidesOn?1:0);
+ laserBtn.textContent=laserOn?'⏹ लेज़र बंद करें':'🔴 लेज़र चालू करें';
+ laserBtn.classList.toggle('active',laserOn);
+ prismBtn.textContent=prismOn?'🔺 प्रिज्म हटाएँ':'🔺 प्रिज्म लगाएँ';
+ whiteBtn.classList.toggle('active',guidesOn);
+ whiteBtn.textContent=guidesOn?'📐 पथ / कोण छिपाएँ':'📐 प्रकाश-पथ / कोण दिखाएँ';
+ incoming.style.stroke='';
+ statusEl.textContent=!laserOn?'● लेज़र बंद है':!prismOn?'● प्रिज्म हटाया है: किरण सीधी जा रही है':guidesOn?'● प्रकाश का पथ और कोण दिख रहे हैं':'● सात रंग बन रहे हैं';
+}
+laserBtn.addEventListener('click',()=>{laserOn=!laserOn;render()});
+prismBtn.addEventListener('click',()=>{prismOn=!prismOn;render()});
+whiteBtn.addEventListener('click',()=>{guidesOn=!guidesOn;render();});
+resetBtn.addEventListener('click',()=>{laserOn=false;prismOn=true;guidesOn=false;angle.value=0;angleVal.textContent='0°';prismGroup.setAttribute('transform','');rays.forEach((r,i)=>{const ys=[104,136,168,200,232,264,296];r.setAttribute('d',`M490 244 L820 ${ys[i]}`)});whiteBtn.textContent='📐 प्रकाश-पथ / कोण दिखाएँ';incoming.style.stroke='';incomingCore.style.opacity='';whiteBtn.textContent='📐 प्रकाश-पथ / कोण दिखाएँ';render()});
+angle.addEventListener('input',()=>{let v=Number(angle.value);angleVal.textContent=(v>0?'+':'')+v+'°';prismGroup.setAttribute('transform',`rotate(${v} 430 220)`);insideBeam.setAttribute('d',`M382 220 L${490+v*0.5} ${244-v*0.5}`);insideCore.setAttribute('d',`M382 220 L${490+v*0.5} ${244-v*0.5}`);rays.forEach((r,i)=>{const ys=[104,136,168,200,232,264,296];r.setAttribute('d',`M${490+v*0.5} ${244-v*0.5} L820 ${ys[i]+v*1.5}`)});});
+document.getElementById('slowMode').addEventListener('change',e=>{incoming.style.animationDuration=e.target.checked?'3s':'1s';rays.forEach(x=>x.style.transitionDuration=e.target.checked?'1.6s':'.5s')});
+const quiz=[{q:'प्रश्न 1: प्रिज्म से सफेद प्रकाश गुजरने पर क्या होता है?',a:['प्रकाश गायब हो जाता है','सात रंगों में बँटता है','केवल लाल रंग बनता है','कोई बदलाव नहीं होता'],correct:1,why:'सही! सफेद प्रकाश का सात रंगों में बँटना विक्षेपण कहलाता है।'},{q:'प्रश्न 2: सामान्यतः सबसे अधिक कौन-सा रंग मुड़ता है?',a:['लाल','पीला','बैंगनी','हरा'],correct:2,why:'बिल्कुल! बैंगनी रंग का विचलन सबसे अधिक होता है।'},{q:'प्रश्न 3: लाल रंग का विचलन कैसा होता है?',a:['सबसे कम','सबसे अधिक','शून्य हमेशा','बैंगनी जितना'],correct:0,why:'सही! लाल रंग सामान्यतः सबसे कम विचलित होता है।'}];let qi=0;
+function loadQuiz(){document.getElementById('question').textContent=quiz[qi].q;let box=document.getElementById('quizOptions');box.innerHTML='';quiz[qi].a.forEach((a,i)=>{let b=document.createElement('button');b.className='btn';b.textContent=a;b.addEventListener('click',()=>{let fb=document.getElementById('feedback');if(i===quiz[qi].correct){fb.textContent=quiz[qi].why;fb.style.color='#8fffd2';[...box.children].forEach(x=>x.disabled=true)}else{fb.textContent='फिर से सोचिए! किरणों को ध्यान से देखें।';fb.style.color='#ffd66b'}});box.appendChild(b)});document.getElementById('feedback').textContent='';}
+document.getElementById('nextQuiz').addEventListener('click',()=>{qi=(qi+1)%quiz.length;loadQuiz()});loadQuiz();render();
+</script>
+</body></html>
