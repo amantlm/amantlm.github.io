@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔦 Torch Circuit TLM — Electric Circuit Simulator</title>
+<style>
+  :root{
+    --bg1:#0f2027; --bg2:#203a43; --bg3:#2c5364;
+    --panel:#ffffff; --ink:#1b2a33; --accent:#ff9f1c; --accent2:#2ec4b6;
+    --wire:#8fa3ad; --live:#ffd23f; --danger:#e63946; --ok:#2ec4b6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:"Segoe UI", "Noto Sans Devanagari", "Nirmala UI", Roboto, sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+    min-height:100vh; color:var(--ink); padding:14px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+  /* ---------- Header ---------- */
+  header{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+    border-radius:18px;padding:12px 18px;backdrop-filter:blur(6px);margin-bottom:14px;
+  }
+  h1{font-size:clamp(1.05rem,2.6vw,1.55rem);color:#fff;font-weight:700;letter-spacing:.3px;}
+  h1 small{display:block;font-weight:400;font-size:.62em;opacity:.75;}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .btn{
+    border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:999px;
+    padding:10px 20px;transition:transform .15s, box-shadow .15s, background .2s;
+    font-family:inherit;
+  }
+  .btn:active{transform:scale(.95);}
+  .btn-lang{background:linear-gradient(135deg,#ffd23f,#ff9f1c);color:#3a2500;box-shadow:0 4px 14px rgba(255,159,28,.45);}
+  .btn-lang:hover{transform:translateY(-2px);}
+  .btn-reset{background:linear-gradient(135deg,#e63946,#c1121f);color:#fff;box-shadow:0 4px 14px rgba(230,57,70,.4);}
+  .btn-reset:hover{transform:translateY(-2px);}
+  /* ---------- Status banner ---------- */
+  #status{
+    border-radius:16px;padding:12px 18px;font-weight:700;text-align:center;font-size:clamp(.95rem,2.2vw,1.15rem);
+    margin-bottom:14px;transition:background .3s,color .3s;letter-spacing:.2px;
+  }
+  #status.bad{background:rgba(230,57,70,.18);color:#ffb3b9;border:1px solid rgba(230,57,70,.5);}
+  #status.good{background:rgba(255,210,63,.15);color:#ffe08a;border:1px solid rgba(255,210,63,.5);}
+  #status.lit{background:rgba(46,196,182,.2);color:#7ef0e4;border:1px solid rgba(46,196,182,.6);
+    animation:bannerPulse 1.6s ease-in-out infinite;}
+  #status.danger{background:rgba(230,57,70,.3);color:#ffd0d4;border:2px solid var(--danger);
+    animation:dangerBlink .7s step-end infinite;}
+  @keyframes bannerPulse{0%,100%{box-shadow:0 0 0 rgba(255,210,63,0);}50%{box-shadow:0 0 22px rgba(255,210,63,.55);}}
+  @keyframes dangerBlink{50%{background:rgba(230,57,70,.45);}}
+  /* ---------- Main panel ---------- */
+  main{background:var(--panel);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.35);
+    padding:14px;display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:900px){main{grid-template-columns:1.65fr 1fr;}}
+  .board-title{font-size:.85rem;font-weight:700;color:#5b6b75;text-transform:uppercase;letter-spacing:1px;margin:2px 4px 6px;}
+  svg#circuit{width:100%;height:auto;display:block;border-radius:16px;
+    background:
+      radial-gradient(circle at 50% 40%, #f4f9fb 0%, #e3edf2 70%, #d5e4ec 100%);
+    border:2px solid #c9d8e0;touch-action:manipulation;}
+  /* ---------- SVG pieces ---------- */
+  .slot{fill:rgba(46,196,182,.07);stroke:#9fc4cf;stroke-width:2;stroke-dasharray:7 6;}
+  .component-label{font-size:17px;font-weight:700;fill:#31525f;text-anchor:middle;}
+  .component-sub{font-size:11.5px;fill:#6a8590;text-anchor:middle;}
+  .terminal{cursor:pointer;}
+  .terminal circle.core{fill:#33454f;stroke:#fff;stroke-width:2.5;}
+  .terminal circle.halo{fill:none;stroke:var(--accent2);stroke-width:2;opacity:0;}
+  .terminal:hover circle.core{fill:var(--accent2);}
+  .terminal.selected circle.halo{opacity:1;animation:haloPulse 1s ease-in-out infinite;}
+  .terminal.selected circle.core{fill:var(--accent);}
+  .terminal.needs circle.halo{opacity:.9;stroke:var(--danger);animation:haloPulse .8s ease-in-out infinite;}
+  @keyframes haloPulse{0%,100%{stroke-width:2;}50%{stroke-width:5;}}
+  .wire{fill:none;stroke:var(--wire);stroke-width:6;stroke-linecap:round;cursor:pointer;opacity:.95;
+    transition:stroke .3s;}
+  .wire:hover{stroke:var(--danger);}
+  .wire.live{stroke:var(--live);stroke-dasharray:14 10;filter:drop-shadow(0 0 6px rgba(255,210,63,.9));
+    animation:flow 1s linear infinite;}
+  @keyframes flow{to{stroke-dashoffset:-24;}}
+  .wire-hint{font-size:10.5px;fill:#8496a0;text-anchor:middle;opacity:0;transition:opacity .2s;}
+  .wire:hover + .wire-hint{opacity:1;}
+  /* Bulb glow */
+  .bulb-glass{fill:#f8fbfd;stroke:#8aa2ad;stroke-width:4;transition:fill .3s;}
+  .filament{stroke:#9aa7ad;stroke-width:4;fill:none;stroke-linecap:round;transition:stroke .3s;}
+  .bulb.lit .bulb-glass{fill:#ffe27a;}
+  .bulb.lit .filament{stroke:#ff8c00;}
+  .bulb .halo{opacity:0;transition:opacity .35s;}
+  .bulb.lit .halo{opacity:1;animation:glowPulse 1.8s ease-in-out infinite;}
+  @keyframes glowPulse{0%,100%{opacity:.75;}50%{opacity:1;}}
+  .bulb .rays line{opacity:0;}
+  .bulb.lit .rays line{opacity:1;animation:raySpin 6s linear infinite;transform-origin:850px 300px;}
+  @keyframes raySpin{to{transform:rotate(360deg);}}
+  /* Switch lever */
+  #lever{transform-origin:400px 520px;transition:transform .35s cubic-bezier(.34,1.56,.64,1);cursor:pointer;}
+  #lever.open{transform:rotate(-32deg);}
+  #lever:hover{filter:brightness(1.15);}
+  /* ---------- Side panel ---------- */
+  aside{background:#f7fbfc;border-radius:16px;border:2px solid #d9e7ee;padding:16px;}
+  aside h2{font-size:1.02rem;color:#23424e;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  ol.steps{margin-left:20px;display:grid;gap:9px;font-size:.92rem;color:#3b5560;line-height:1.45;}
+  ol.steps li::marker{color:var(--accent);font-weight:800;}
+  .fact{margin-top:14px;background:linear-gradient(135deg,#e0f7f4,#d3ecff);border-radius:12px;
+    padding:12px 14px;font-size:.87rem;color:#264653;border-left:5px solid var(--accent2);line-height:1.5;}
+  .fact b{color:#0b6b62;}
+  .score{margin-top:12px;font-size:.85rem;font-weight:700;color:#5b6b75;}
+  .score span{color:var(--accent);font-size:1.05rem;}
+  
+  /* ---------- Quiz Section Styles ---------- */
+  .quiz-section{
+    margin-top:20px;background:#f7fbfc;border-radius:16px;border:2px solid #d9e7ee;padding:18px;
+  }
+  .quiz-section h2{font-size:1.1rem;color:#23424e;margin-bottom:12px;}
+  .question-card{background:#fff;border-radius:10px;padding:14px 16px;margin-bottom:12px;border:1px solid #c9d8e0;}
+  .question-card p{font-weight:600;color:#1b2a33;margin-bottom:10px;font-size:.95rem;}
+  .options-grid{display:grid;gap:8px;}
+  .option-btn{
+    background:#f1f5f8;border:1px solid #cbd5e1;padding:8px 12px;border-radius:6px;
+    cursor:pointer;text-align:left;font-size:.9rem;font-weight:500;color:#334155;transition:all .2s;
+  }
+  .option-btn:hover{background:#e2e8f0;}
+  .option-btn.correct{background:#dcfce7;border-color:#22c55e;color:#15803d;font-weight:600;}
+  .option-btn.wrong{background:#fee2e2;border-color:#ef4444;color:#b91c1c;}
+  .feedback{margin-top:6px;font-size:.85rem;font-weight:600;}
+
+  footer{color:rgba(255,255,255,.8);text-align:center;font-size:.85rem;margin-top:16px;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span data-en="🔦 Simple Electric Torch — Circuit Lab" data-hi="🔦 सरल बिजली की टॉर्च — परिपथ प्रयोगशाला">🔦 Simple Electric Torch — Circuit Lab</span>
+      <small data-en="Teaching-Learning Material • Closed Circuits & Conduction" data-hi="अध्यापन-अधिगम सामग्री • बंद परिपथ और चालकता">Teaching-Learning Material • Closed Circuits & Conduction</small>
+    </h1>
+    <div class="controls">
+      <button class="btn btn-lang" id="langBtn">🇮🇳 हिन्दी</button>
+      <button class="btn btn-reset" id="resetBtn">🔄 <span data-en="Reset" data-hi="रीसेट">Reset</span></button>
+    </div>
+  </header>
+
+  <div id="status" class="bad"></div>
+
+  <main>
+    <section>
+      <div class="board-title" data-en="🔧 Workbench — click two terminals to connect a wire" data-hi="🔧 वर्कबेंच — तार जोड़ने के लिए दो टर्मिनलों पर क्लिक करें">🔧 Workbench — click two terminals to connect a wire</div>
+      <svg id="circuit" viewBox="0 0 1000 600" aria-label="Circuit workbench">
+        <defs>
+          <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffd23f" stop-opacity=".85"/>
+            <stop offset="45%" stop-color="#ffb703" stop-opacity=".38"/>
+            <stop offset="100%" stop-color="#ffb703" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <g id="wiresLayer"></g>
+
+        <!-- ======== BATTERY ======== -->
+        <g>
+          <rect class="slot" x="60" y="180" width="180" height="240" rx="28"/>
+          <text class="component-label" x="150" y="165" data-en="Dry Cell" data-hi="सूखी सेल">Dry Cell</text>
+          <!-- battery body -->
+          <rect x="125" y="230" width="50" height="140" rx="10" fill="#22333c"/>
+          <rect x="132" y="240" width="36" height="120" rx="6" fill="#2ec4b6" opacity=".25"/>
+          <rect x="138" y="210" width="24" height="22" rx="4" fill="#c9a227"/>
+          <text x="150" y="298" text-anchor="middle" font-size="26" font-weight="800" fill="#ffd23f">+</text>
+          <text x="150" y="360" text-anchor="middle" font-size="26" font-weight="800" fill="#cfd8dc">−</text>
+          <text class="component-sub" x="150" y="398" data-en="1.5 V" data-hi="1.5 वोल्ट">1.5 V</text>
+          <!-- terminals -->
+          <g class="terminal" id="t_bp" data-comp="battery" data-name="B+">
+            <circle class="halo" cx="150" cy="205" r="15"/><circle class="core" cx="150" cy="205" r="9"/>
+          </g>
+          <g class="terminal" id="t_bn" data-comp="battery" data-name="B−">
+            <circle class="halo" cx="150" cy="395" r="15"/><circle class="core" cx="150" cy="395" r="9"/>
+          </g>
+          <text class="component-sub" x="196" y="209" data-en="+ terminal" data-hi="+ सिरा">+ terminal</text>
+          <text class="component-sub" x="196" y="399" data-en="− terminal" data-hi="− सिरा">− terminal</text>
+        </g>
+
+        <!-- ======== BULB ======== -->
+        <g>
+          <rect class="slot" x="740" y="180" width="220" height="240" rx="28"/>
+          <text class="component-label" x="850" y="165" data-en="Torch Bulb" data-hi="टॉर्च का बल्ब">Torch Bulb</text>
+          <g class="bulb" id="bulb">
+            <circle class="halo" cx="850" cy="300" r="105" fill="url(#glowGrad)"/>
+            <g class="rays" stroke="#ffbf00" stroke-width="5" stroke-linecap="round">
+              <line x1="850" y1="176" x2="850" y2="196"/>
+              <line x1="950" y1="215" x2="936" y2="229"/>
+              <line x1="985" y1="300" x2="965" y2="300"/>
+              <line x1="950" y1="385" x2="936" y2="371"/>
+              <line x1="750" y1="385" x2="764" y2="371"/>
+              <line x1="715" y1="300" x2="735" y2="300"/>
+              <line x1="750" y1="215" x2="764" y2="229"/>
+            </g>
+            <circle class="bulb-glass" cx="850" cy="300" r="62"/>
+            <path class="filament" d="M832 332 Q838 300 850 296 Q862 300 868 332"/>
+            <rect x="838" y="332" width="24" height="30" rx="4" fill="#90a4ae"/>
+          </g>
+          <g class="terminal" id="t_l1" data-comp="bulb" data-name="L1">
+            <circle class="halo" cx="850" cy="205" r="15"/><circle class="core" cx="850" cy="205" r="9"/>
+          </g>
+          <g class="terminal" id="t_l2" data-comp="bulb" data-name="L2">
+            <circle class="halo" cx="850" cy="395" r="15"/><circle class="core" cx="850" cy="395" r="9"/>
+          </g>
+          <text class="component-sub" x="850" y="428" data-en="two contacts" data-hi="दो सिरे">two contacts</text>
+        </g>
+
+        <!-- ======== SWITCH ======== -->
+        <g>
+          <rect class="slot" x="320" y="450" width="360" height="120" rx="28"/>
+          <text class="component-label" x="500" y="440" data-en="Switch" data-hi="स्विच">Switch</text>
+          <rect x="360" y="508" width="280" height="24" rx="12" fill="#b0bec5"/>
+          <!-- lever -->
+          <g id="lever" class="open">
+            <rect x="400" y="507" width="200" height="10" rx="5" fill="#e63946"/>
+            <circle cx="405" cy="512" r="16" fill="#c1121f" stroke="#fff" stroke-width="3"/>
+            <circle cx="595" cy="512" r="13" fill="#ffd23f" stroke="#fff" stroke-width="3"/>
+          </g>
+          <text class="component-sub" x="500" y="566" id="switchLabel"></text>
+          <g class="terminal" id="t_s1" data-comp="switch" data-name="S1">
+            <circle class="halo" cx="400" cy="520" r="15"/><circle class="core" cx="400" cy="520" r="9"/>
+          </g>
+          <g class="terminal" id="t_s2" data-comp="switch" data-name="S2">
+            <circle class="halo" cx="600" cy="520" r="15"/><circle class="core" cx="600" cy="520" r="9"/>
+          </g>
+        </g>
+      </svg>
+    </section>
+
+    <aside>
+      <h2>📋 <span data-en="How to Use" data-hi="कैसे प्रयोग करें">How to Use</span></h2>
+      <ol class="steps">
+        <li data-en="Click any metal terminal — it will glow orange. Then click a terminal of a DIFFERENT component to draw a wire." data-hi="किसी भी धातु के टर्मिनल पर क्लिक करें — वह नारंगी चमकेगा। फिर किसी अन्य उपकरण के टर्मिनल पर क्लिक करके तार बनाएं।">Click any metal terminal — it will glow orange. Then click a terminal of a DIFFERENT component to draw a wire.</li>
+        <li data-en="Connect the Cell and Bulb correctly (+ to L1 and - to L2) to make it glow!" data-hi="बल्ब जलाने के लिए सेल और बल्ब को सही दिशा में जोड़ें (+ से L1 और - से L2)!">Connect the Cell and Bulb correctly (+ to L1 and - to L2) to make it glow!</li>
+        <li data-en="Click the red switch lever to turn it ON." data-hi="स्विच चालू करने के लिए लाल लीवर पर क्लिक करें।">Click the red switch lever to turn it ON.</li>
+        <li data-en="If the connections are correct, the bulb glows! 🔥 Click a wire to remove it and try again." data-hi="यदि कनेक्शन सही हैं, तो बल्ब जल उठेगा! 🔥 तार हटाने के लिए उस पर क्लिक करें और फिर से प्रयास करें।">If the connections are correct, the bulb glows! 🔥 Click a wire to remove it and try again.</li>
+      </ol>
+      <div class="fact">
+        <b data-en="💡 Did you know? " data-hi="💡 क्या आप जानते हैं? ">💡 Did you know? </b>
+        <span data-en="For the bulb to glow properly in this experiment, terminals must match correctly (+ to + and - to -)." data-hi="इस प्रयोग में बल्ब को जलाने के लिए सही सिरों का मेल होना आवश्यक है (+ से + और - से -)।">For the bulb to glow properly in this experiment, terminals must match correctly (+ to + and - to -).</span>
+      </div>
+      <div class="score"><span data-en="Wires connected:" data-hi="जुड़े हुए तार:">Wires connected:</span> <span id="wireCount">0</span> / 3</div>
+    </aside>
+  </main>
+
+  <!-- Interactive Quiz Section -->
+  <div class="quiz-section">
+    <h2>📝 अभ्यास क्विज़ (Interactive Practice Quiz)</h2>
+    
+    <div class="question-card" id="q1">
+      <p>1. विद्युत धारा के प्रवाह के लिए परिपथ (Circuit) का होना आवश्यक है:</p>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkAnswer('q1', 0, 1, 'सही उत्तर! विद्युत धारा केवल बंद परिपथ में ही बहती है।')">A) खुला परिपथ (Open Circuit)</button>
+        <button class="option-btn" onclick="checkAnswer('q1', 1, 1, 'सही उत्तर! विद्युत धारा केवल बंद परिपथ में ही बहती है।')">B) बंद परिपथ (Closed Circuit)</button>
+        <button class="option-btn" onclick="checkAnswer('q1', 2, 1, 'गलत उत्तर।')">C) कोई भी परिपथ नहीं</button>
+        <button class="option-btn" onclick="checkAnswer('q1', 3, 1, 'गलत उत्तर।')">D) केवल तार</button>
+      </div>
+      <div class="feedback" id="feedback-q1"></div>
+    </div>
+
+    <div class="question-card" id="q2">
+      <p>2. टॉर्च के बल्ब में चमकने वाला पतला तार क्या कहलाता है?</p>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkAnswer('q2', 0, 1, 'गलत उत्तर।')">A) टर्मिनल (Terminal)</button>
+        <button class="option-btn" onclick="checkAnswer('q2', 1, 1, 'सही उत्तर! इसे तंतु या फिलामेंट कहते हैं।')">B) फिलामेंट या तंतु (Filament)</button>
+        <button class="option-btn" onclick="checkAnswer('q2', 2, 1, 'गलत उत्तर।')">C) स्विच (Switch)</button>
+        <button class="option-btn" onclick="checkAnswer('q2', 3, 1, 'गलत उत्तर।')">D) सेल का आधार (Base)</button>
+      </div>
+      <div class="feedback" id="feedback-q2"></div>
+    </div>
+
+    <div class="question-card" id="q3">
+      <p>3. विद्युत परिपथ में स्विच का मुख्य कार्य क्या है?</p>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkAnswer('q3', 0, 1, 'गलत उत्तर।')">A) वोल्टेज बढ़ाना</button>
+        <button class="option-btn" onclick="checkAnswer('q3', 1, 1, 'सही उत्तर! स्विच परिपथ को जोड़ता या तोड़ता है।')">B) परिपथ को जोड़ना या तोड़ना (Make or Break the circuit)</button>
+        <button class="option-btn" onclick="checkAnswer('q3', 2, 1, 'गलत उत्तर।')">C) बैटरी चार्ज करना</button>
+        <button class="option-btn" onclick="checkAnswer('q3', 3, 1, 'गलत उत्तर।')">D) बल्ब को ठंडा करना</button>
+      </div>
+      <div class="feedback" id="feedback-q3"></div>
+    </div>
+
+    <div class="question-card" id="q4">
+      <p>4. जब बैटरी के दोनों सिरों को बिना किसी उपकरण (बल्ब आदि) के सीधे जोड़ दिया जाता है, तो उसे क्या कहते हैं?</p>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkAnswer('q4', 0, 1, 'सही उत्तर! इसे शॉर्ट सर्किट कहते हैं।')">A) शॉर्ट सर्किट (Short Circuit)</button>
+        <button class="option-btn" onclick="checkAnswer('q4', 1, 1, 'गलत उत्तर।')">B) सही परिपथ</button>
+        <button class="option-btn" onclick="checkAnswer('q4', 2, 1, 'गलत उत्तर।')">C) स्विच ऑन</button>
+        <button class="option-btn" onclick="checkAnswer('q4', 3, 1, 'गलत उत्तर।')">D) ओपन सर्किट</button>
+      </div>
+      <div class="feedback" id="feedback-q4"></div>
+    </div>
+
+    <div class="question-card" id="q5">
+      <p>5. सूखी सेल (Dry Cell) में कितने टर्मिनल होते हैं?</p>
+      <div class="options-grid">
+        <button class="option-btn" onclick="checkAnswer('q5', 0, 1, 'गलत उत्तर।')">A) एक (+)</button>
+        <button class="option-btn" onclick="checkAnswer('q5', 1, 1, 'सही उत्तर! इसमें दो टर्मिनल (+ और −) होते हैं।')">B) दो (+ और −)</button>
+        <button class="option-btn" onclick="checkAnswer('q5', 2, 1, 'गलत उत्तर।')">C) तीन</button>
+        <button class="option-btn" onclick="checkAnswer('q5', 3, 1, 'गलत उत्तर।')">D) कोई नहीं</button>
+      </div>
+      <div class="feedback" id="feedback-q5"></div>
+    </div>
+  </div>
+
+  <footer>Created by Aman Singhal</footer>
+</div>
+
+<script>
+  function checkAnswer(questionId, selectedIndex, correctIndex, message) {
+    const card = document.getElementById(questionId);
+    const buttons = card.querySelectorAll('.option-btn');
+    const feedback = document.getElementById('feedback-' + questionId);
+
+    buttons.forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === correctIndex) {
+        btn.classList.add('correct');
+      } else if (idx === selectedIndex) {
+        btn.classList.add('wrong');
+      }
+    });
+
+    if (selectedIndex === correctIndex) {
+      feedback.style.color = '#15803d';
+      feedback.textContent = "✔ " + message;
+    } else {
+      feedback.style.color = '#b91c1c';
+      feedback.textContent = "✖ गलत! सही उत्तर विकल्प " + String.fromCharCode(65 + correctIndex) + " है।";
+    }
+  }
+
+  (function(){
+    const T = {
+      t_bp:{x:150,y:205}, t_bn:{x:150,y:395},
+      t_l1:{x:850,y:205}, t_l2:{x:850,y:395},
+      t_s1:{x:400,y:520}, t_s2:{x:600,y:520}
+    };
+    const ALL = Object.keys(T);
+    let wires = [];
+    let selected = null;
+    let switchOn = false;
+    let lang = 'en';
+
+    const I18N = {
+      en:{
+        incomplete:"⚠️ Circuit Incomplete — connect Cell and Bulb correctly (+ to L1, - to L2)",
+        ready:"✅ Circuit Complete! Now turn the switch ON (if using switch) 👆",
+        lit:"🔥 TORCH IS ON! Current is flowing correctly through the circuit!",
+        short:"⚡ SHORT CIRCUIT! Check your wire connections!",
+        remove:"click to remove",
+        on:"SWITCH: ON", off:"SWITCH: OFF"
+      },
+      hi:{
+        incomplete:"⚠️ परिपथ अधूरा है — सेल और बल्ब को सही टर्मिनलों से जोड़ें (+ से L1, - से L2)",
+        ready:"✅ परिपथ पूरा हो गया! अब स्विच चालू करें (यदि स्विच का उपयोग कर रहे हैं) 👆",
+        lit:"🔥 टॉर्च जल रही है! परिपथ में धारा सही ढंग से प्रवाहित हो रही है!",
+        short:"⚡ शॉर्ट सर्किट! अपने तारों के कनेक्शन की जाँच करें!",
+        remove:"हटाने के लिए क्लिक करें",
+        on:"स्विच: चालू", off:"स्विच: बंद"
+      }
+    };
+
+    const wiresLayer = document.getElementById('wiresLayer');
+    const statusEl = document.getElementById('status');
+    const bulb = document.getElementById('bulb');
+    const lever = document.getElementById('lever');
+    const countEl = document.getElementById('wireCount');
+    const switchLabel = document.getElementById('switchLabel');
+
+    function t(id){return document.getElementById(id);}
+
+    function parentFind(parent, x){ while(parent[x]!==x){ parent[x]=parent[parent[x]]; x=parent[x]; } return x; }
+    function same(parent,a,b){ return parentFind(parent,a)===parentFind(parent,b); }
+
+    function buildGraph(sw){
+      const parent = {}; ALL.forEach(k=>parent[k]=k);
+      const uni=(a,b)=>{ parent[parentFind(parent,a)] = parentFind(parent,b); };
+      wires.forEach(w=>uni(w.a,w.b));
+      if(sw) uni('t_s1','t_s2');
+      return parent;
+    }
+
+    // Strict matching: B+ must connect to L1 and B- must connect to L2 (No cross/opposite connection allowed to glow)
+    function isClosedNow(){
+      if(wires.length < 2) return false;
+      
+      // Check if switch is involved and ON if wires use switch
+      const p = buildGraph(switchOn);
+      
+      // Direct check for strict straight matching (B+ to L1 and B- to L2)
+      const hasPositiveMatch = (same(p, 't_bp', 't_l1'));
+      const hasNegativeMatch = (same(p, 't_bn', 't_l2'));
+      
+      // Ensure cross connections do NOT work
+      const hasCrossPositive = same(p, 't_bp', 't_l2');
+      const hasCrossNegative = same(p, 't_bn', 't_l1');
+
+      if(hasCrossPositive || hasCrossNegative) {
+        // If crossed, it should not be considered a valid glowing circuit
+        return false;
+      }
+
+      return hasPositiveMatch && hasNegativeMatch;
+    }
+
+    function isShort(){
+      const p = buildGraph(switchOn);
+      return same(p, 't_bp', 't_bn') && wires.length > 0 && !isClosedNow();
+    }
+
+    function drawWire(w){
+      const p1=T[w.a], p2=T[w.b];
+      const mx=(p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
+      const dx=p2.x-p1.x, dy=p2.y-p1.y;
+      const len=Math.hypot(dx,dy)||1;
+      const off = Math.min(60, len*0.18);
+      const cx = mx - dy/len*off, cy = my + dx/len*off;
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d','M '+p1.x+' '+p1.y+' Q '+cx+' '+cy+' '+p2.x+' '+p2.y);
+      path.setAttribute('class','wire');
+      path.addEventListener('click',()=>{ wires = wires.filter(x=>x!==w); render(); });
+      wiresLayer.appendChild(path);
+      const hint = document.createElementNS('http://www.w3.org/2000/svg','text');
+      hint.setAttribute('class','wire-hint');
+      hint.setAttribute('x',cx); hint.setAttribute('y',cy-10);
+      hint.textContent = I18N[lang].remove;
+      wiresLayer.appendChild(hint);
+    }
+
+    function render(){
+      wiresLayer.innerHTML='';
+      const closed = isClosedNow();
+      const short = isShort();
+      wires.forEach(drawWire);
+      wiresLayer.querySelectorAll('.wire').forEach(p=>{
+        if(closed && !short) p.classList.add('live');
+      });
+      bulb.classList.toggle('lit', closed && !short);
+      countEl.textContent = wires.length;
+
+      let cls,msg;
+      if(short){ cls='danger'; msg=I18N[lang].short; }
+      else if(closed){ cls='lit'; msg=I18N[lang].lit; }
+      else { cls='bad'; msg=I18N[lang].incomplete; }
+      statusEl.className = cls; statusEl.textContent = msg;
+
+      document.querySelectorAll('.terminal').forEach(g=>g.classList.remove('needs'));
+      if(!closed && !short){
+        const p = buildGraph(switchOn);
+        const r = parentFind(p,'t_bp');
+        ALL.forEach(k=>{ if(parentFind(p,k)!==r) t(k).classList.add('needs'); });
+      }
+      switchLabel.textContent = switchOn ? I18N[lang].on : I18N[lang].off;
+      switchLabel.setAttribute('fill', switchOn ? '#0b8a5f' : '#b23a48');
+    }
+
+    document.querySelectorAll('.terminal').forEach(g=>{
+      g.addEventListener('click',()=>{
+        const id=g.id, comp=g.dataset.comp;
+        if(!selected){ selected=id; g.classList.add('selected'); return; }
+        if(selected===id){ selected=null; g.classList.remove('selected'); return; }
+        const selEl=t(selected);
+        if(selEl.dataset.comp===comp){ selEl.classList.remove('selected'); selected=id; g.classList.add('selected'); return; }
+        if(wires.some(w=>(w.a===selected&&w.b===id)||(w.a===id&&w.b===selected))){
+          selEl.classList.remove('selected'); selected=null; return;
+        }
+        wires.push({a:selected,b:id});
+        selEl.classList.remove('selected'); selected=null;
+        render();
+      });
+    });
+
+    lever.addEventListener('click',()=>{
+      switchOn=!switchOn;
+      lever.classList.toggle('open',!switchOn);
+      render();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click',()=>{
+      wires=[]; selected=null; switchOn=false;
+      lever.classList.add('open');
+      document.querySelectorAll('.terminal.selected').forEach(g=>g.classList.remove('selected'));
+      render();
+    });
+
+    document.getElementById('langBtn').addEventListener('click',()=>{
+      lang = lang==='en' ? 'hi' : 'en';
+      document.documentElement.lang = lang;
+      document.getElementById('langBtn').textContent = lang==='en' ? '🇮🇳 हिन्दी' : '🇬🇧 English';
+      document.querySelectorAll('[data-en]').forEach(el=>{ el.textContent = el.dataset[lang]; });
+      render();
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>
