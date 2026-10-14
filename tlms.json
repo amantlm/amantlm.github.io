@@ -98,3 +98,13 @@
     }
   ]
 }
+{
+  "id": "water-cycle",
+  "title": "जल चक्र (Water Cycle)",
+  "category": "science",
+  "grades": "4, 5, 6",
+  "icon": "💧",
+  "file": "water_cycle.html",
+  "description": "वाष्पीकरण, संघनन, वर्षण और संग्रहण की जादुई यात्रा एनीमेशन और क्विज़ के साथ सीखें।"
+}
+
