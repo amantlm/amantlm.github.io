@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#eaf8ff">
+<title>Water Cycle | जल चक्र – Interactive TLM</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap');
+  :root{--ink:#163b59;--blue:#149bd7;--cream:#fffaf0;--green:#38a86b}
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#dff5ff 0%,#fff8e8 100%);color:var(--ink);font-family:'Baloo 2','Noto Sans Devanagari',sans-serif}
+  .font-hi{font-family:'Noto Sans Devanagari','Baloo 2',sans-serif}
+  .glass{background:rgba(255,255,255,.86);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.9);box-shadow:0 12px 34px #2a75931c}
+  .scene{position:relative;isolation:isolate;overflow:hidden;border-radius:28px;min-height:460px;background:linear-gradient(#72cfff 0%,#c6f1ff 55%,#f5fbdb 100%);box-shadow:inset 0 0 0 1px #ffffffa8}
+  .sun{position:absolute;top:8%;left:12%;width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8a6,#ffd43b 58%,#ffab27);box-shadow:0 0 0 12px #ffdf6338,0 0 45px #ffd74d;animation:sunPulse 3s ease-in-out infinite}
+  .sun:before{content:"";position:absolute;inset:-15px;border:5px dotted #ffcc42;border-radius:50%;animation:spin 24s linear infinite}
+  .sunface{position:absolute;inset:0;display:grid;place-items:center;font-size:38px}
+  .cloud{position:absolute;width:150px;height:58px;background:#fff;border-radius:60px;filter:drop-shadow(0 7px 3px #4c94b21c);animation:cloudFloat 7s ease-in-out infinite}
+  .cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}
+  .cloud:before{width:65px;height:65px;left:24px;top:-29px}.cloud:after{width:78px;height:78px;right:17px;top:-38px}
+  .cloud.dark{background:#8aa9c0;filter:drop-shadow(0 6px 2px #31566a30)}
+  .cloud.c1{top:15%;left:44%}.cloud.c2{top:25%;left:62%;transform:scale(1.25);animation-delay:-3s}
+  .sea{position:absolute;bottom:0;left:0;width:100%;height:30%;background:linear-gradient(#4cc9f0,#0789c6);border-radius:50% 50% 0 0 / 13% 13% 0 0}
+  .wave{position:absolute;left:-10%;width:120%;height:32px;border-top:4px solid #d6fbff99;border-radius:50%;animation:wave 5s linear infinite}
+  .wave.w1{top:15%}.wave.w2{top:38%;animation-delay:-2s}.wave.w3{top:65%;animation-delay:-3s}
+  .hill{position:absolute;bottom:22%;right:-4%;width:55%;height:35%;background:linear-gradient(135deg,#9edc80,#3b9d67);clip-path:polygon(0 100%,22% 45%,36% 68%,57% 8%,77% 53%,91% 29%,100% 100%)}
+  .hill2{position:absolute;bottom:22%;right:0;width:42%;height:28%;background:linear-gradient(135deg,#c7e99a,#238c60);clip-path:polygon(0 100%,30% 20%,44% 52%,67% 0,100% 100%)}
+  .snow{position:absolute;right:20%;bottom:47%;width:0;height:0;border-left:35px solid transparent;border-right:35px solid transparent;border-bottom:78px solid #fff;filter:drop-shadow(0 4px 0 #d7eff8)}
+  .snow:after{content:"";position:absolute;top:42px;left:-17px;border-left:17px solid transparent;border-right:17px solid transparent;border-bottom:35px solid #ccecff}
+  .river{position:absolute;bottom:21%;right:15%;width:12%;height:27%;background:linear-gradient(90deg,#36b8e9,#e6fcff,#23a6e0);clip-path:polygon(40% 0,78% 0,54% 30%,100% 55%,69% 100%,18% 100%,43% 58%,0 35%);filter:drop-shadow(0 0 5px #fff)}
+  .vapor{position:absolute;bottom:23%;left:17%;width:12px;height:92px;border-radius:99px;background:linear-gradient(to top,rgba(255,255,255,.02),rgba(255,255,255,.98),rgba(255,255,255,.18));filter:blur(2px);animation:rise 2.5s ease-in infinite;box-shadow:0 0 12px #fff9}
+  .vapor:after{content:"";position:absolute;left:24px;top:16px;width:11px;height:76px;border-radius:99px;background:linear-gradient(to top,rgba(255,255,255,.02),#fff,rgba(255,255,255,.2));animation:rise 2.1s .35s ease-in infinite;box-shadow:0 0 12px #fff9}
+  .vapor:before{content:"";position:absolute;left:-22px;top:26px;width:10px;height:66px;border-radius:99px;background:linear-gradient(to top,rgba(255,255,255,.02),#fff,rgba(255,255,255,.2));animation:rise 2.8s .7s ease-in infinite;box-shadow:0 0 10px #fff9}
+  .vapor-label,.process-label{position:absolute;z-index:3;padding:6px 10px;border-radius:999px;background:#ffffffed;color:#075985;font-size:12px;font-weight:800;box-shadow:0 2px 8px #07598525}
+  .vapor-label{bottom:47%;left:7%}
+  .process-label{top:39%;left:38%;max-width:210px;text-align:center}
+  .condense-puff{position:absolute;top:22%;left:49%;width:115px;height:52px;opacity:0;transition:opacity .4s;background:radial-gradient(ellipse at center,#fff 0%,#fff 42%,#ffffff00 73%);filter:blur(2px);animation:puff 2s ease-in-out infinite}
+  .condense-puff:before,.condense-puff:after{content:"";position:absolute;border-radius:50%;background:#ffffffed}
+  .condense-puff:before{width:43px;height:43px;left:18px;top:-12px}.condense-puff:after{width:55px;height:48px;right:12px;top:-18px}
+  @keyframes puff{50%{transform:translateY(-5px) scale(1.08);opacity:.9}}
+  .rain{position:absolute;top:29%;right:21%;width:110px;height:155px;pointer-events:none;opacity:.95}
+  .drop{position:absolute;width:6px;height:19px;border-radius:50% 50% 65% 65%;background:#ffffff;box-shadow:0 0 4px #fff;animation:rainfall 1s linear infinite}
+  .drop:nth-child(1){left:8%;animation-delay:-.2s}.drop:nth-child(2){left:27%;animation-delay:-.8s}.drop:nth-child(3){left:46%;animation-delay:-.5s}.drop:nth-child(4){left:65%;animation-delay:-.1s}.drop:nth-child(5){left:84%;animation-delay:-.7s}
+  .cycle-arrow{position:absolute;color:#fff;font-size:34px;text-shadow:0 2px 5px #0879a5;animation:bob 2s ease-in-out infinite}
+  .character{position:absolute;bottom:24%;left:4%;z-index:4;animation:characterBob 3s ease-in-out infinite}
+  .speech{position:absolute;left:14%;bottom:48%;z-index:5;max-width:245px;border:3px solid #fff;border-radius:22px 22px 22px 5px;background:#fffef5;padding:12px 15px;font-size:14px;font-weight:700;box-shadow:0 7px 0 #318db326}
+  .step-pill{transition:all .2s ease;border:2px solid transparent}
+  .step-pill.active{transform:translateY(-2px);border-color:#fff;box-shadow:0 7px 0 #0879a51c;background:#e2f7ff;color:#075985}
+  .progress-fill{transition:width .4s ease}
+  @keyframes sunPulse{50%{transform:scale(1.05);box-shadow:0 0 0 18px #ffdf6338,0 0 55px #ffd74d}}
+  @keyframes spin{to{transform:rotate(360deg)}} @keyframes cloudFloat{50%{translate:10px -5px}}
+  @keyframes wave{to{transform:translateX(8%)}} @keyframes rise{0%{transform:translateY(20px);opacity:0}25%{opacity:1}100%{transform:translateY(-105px);opacity:0}}
+  @keyframes rainfall{0%{transform:translateY(-8px);opacity:0}20%{opacity:1}100%{transform:translateY(110px);opacity:0}}
+  @keyframes bob{50%{transform:translateY(-8px)}} @keyframes characterBob{50%{transform:translateY(-7px)}}
+  @media(max-width:640px){.scene{min-height:410px;border-radius:20px}.sun{width:64px;height:64px;left:8%;top:8%}.sunface{font-size:28px}.cloud{transform:scale(.78)}.cloud.c1{left:38%;top:17%}.cloud.c2{left:58%;top:25%;transform:scale(.88)}.speech{left:4%;bottom:53%;max-width:190px;font-size:12px;padding:9px 11px}.character{left:3%;bottom:25%;transform:scale(.86);transform-origin:bottom left}.rain{right:16%;top:31%;transform:scale(.8)}.hill{width:63%}.cycle-arrow{font-size:25px}}
+  @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="max-w-7xl mx-auto px-4 pt-5 pb-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="grid h-14 w-14 place-items-center rounded-2xl bg-white shadow-lg text-3xl">💧</div>
+      <div><p class="text-sm font-bold uppercase tracking-widest text-sky-700">Explore • Learn • Play</p><h1 class="text-3xl sm:text-4xl font-extrabold leading-tight">Water Cycle <span class="text-sky-600 font-hi">जल चक्र</span></h1></div>
+    </div>
+    <div class="flex gap-2">
+      <button id="langBtn" class="rounded-full bg-white px-4 py-2 font-bold shadow text-sky-800 hover:bg-sky-50">हिंदी / EN</button>
+
+    </div>
+  </div>
+  <p class="mt-3 max-w-3xl text-base sm:text-lg text-slate-700 font-medium">पानी की मज़ेदार यात्रा खोजो! Watch water travel from the ocean to the sky and back again.</p>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 pb-8">
+  <div class="grid lg:grid-cols-[1.65fr_1fr] gap-5 items-start">
+    <section class="glass rounded-[28px] p-3 sm:p-4">
+      <div class="flex flex-wrap justify-between items-center gap-2 px-1 pb-3">
+        <div><span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-800">🌍 प्रकृति की कहानी</span><p id="sceneHint" class="mt-1 text-sm text-slate-600">किसी भी चरण पर टैप करके सीखें</p></div>
+        <span id="stepCounter" class="rounded-full bg-sky-100 px-3 py-1 text-sm font-extrabold text-sky-800">चरण 1 / 4</span>
+      </div>
+      <div class="scene" id="scene" aria-label="Animated water cycle landscape">
+        <div class="sun"><div class="sunface">☀️</div></div>
+        <div class="cloud c1"></div><div class="cloud c2 dark" id="rainCloud"></div>
+        <div class="hill"></div><div class="hill2"></div><div class="snow"></div><div class="river"></div>
+        <div class="sea"><div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div></div>
+        <div id="vapors"><div class="vapor"></div><div class="vapor" style="left:23%;animation-delay:-1.2s"></div><div class="vapor" style="left:29%;animation-delay:-.4s"></div><div class="vapor-label" id="vaporLabel">💨 जलवाष्प ऊपर उठती है</div></div>
+        <div class="condense-puff" id="condensePuff"></div>
+        <div class="process-label" id="processLabel">☁️ जलवाष्प ठंडी होकर बादल बनाती है</div>
+        <div class="rain" id="rain"><i class="drop"></i><i class="drop"></i><i class="drop"></i><i class="drop"></i><i class="drop"></i><i class="drop" style="left:18%;animation-delay:-.3s"></i><i class="drop" style="left:38%;animation-delay:-.6s"></i><i class="drop" style="left:58%;animation-delay:-.9s"></i><i class="drop" style="left:78%;animation-delay:-.4s"></i></div>
+        <span class="cycle-arrow" style="top:34%;left:35%">↗</span><span class="cycle-arrow" style="top:51%;right:12%;animation-delay:-.7s">↓</span><span class="cycle-arrow" style="bottom:13%;right:39%;animation-delay:-1.1s">↙</span>
+        <div class="speech font-hi" id="speechBubble">नमस्ते दोस्तों! चलो जल चक्र सीखते हैं।</div>
+        <div class="character" aria-label="चिंकी वैज्ञानिक चिड़िया">
+          <svg width="118" height="142" viewBox="0 0 118 142" role="img" aria-label="Friendly scientist bird character">
+            <ellipse cx="59" cy="132" rx="34" ry="7" fill="#1c759144"/>
+            <path d="M43 22 Q33 2 51 13 L60 24 Q72 2 83 14 L76 31" fill="#1689c8" stroke="#126d9c" stroke-width="2"/>
+            <ellipse cx="59" cy="65" rx="42" ry="44" fill="#26a9e7" stroke="#0877ad" stroke-width="3"/>
+            <ellipse cx="43" cy="57" rx="15" ry="19" fill="white"/><ellipse cx="75" cy="57" rx="15" ry="19" fill="white"/>
+            <ellipse cx="47" cy="60" rx="7" ry="10" fill="#163b59"/><ellipse cx="71" cy="60" rx="7" ry="10" fill="#163b59"/>
+            <circle cx="49" cy="56" r="3" fill="white"/><circle cx="73" cy="56" r="3" fill="white"/>
+            <path d="M48 76 Q59 67 72 76 Q61 95 48 76" fill="#ff9f1c" stroke="#d87913" stroke-width="2"/>
+            <path d="M29 91 Q59 79 88 92 L82 121 Q59 131 35 121Z" fill="#fff" stroke="#b7e8fb" stroke-width="2"/>
+            <path d="M51 88 L59 99 L67 88" fill="#d9f4ff"/><path d="M59 99 L59 122" stroke="#7cb9d2" stroke-width="2"/>
+            <path d="M23 98 Q8 85 10 75 Q27 80 36 97" fill="#1689c8" stroke="#0877ad" stroke-width="2"/>
+            <path d="M88 98 Q104 84 108 75 Q91 79 81 98" fill="#1689c8" stroke="#0877ad" stroke-width="2"/>
+            <path d="M44 122 L38 133 M72 122 L78 133" stroke="#e88b21" stroke-width="4" stroke-linecap="round"/>
+            <path d="M29 134 L42 134 M72 134 L86 134" stroke="#e88b21" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="82" cy="105" r="7" fill="#ffcb45" stroke="#df9c1c" stroke-width="1.5"/><text x="82" y="109" font-size="10" text-anchor="middle" fill="#80500a" font-weight="bold">i</text>
+          </svg>
+        </div>
+        <div class="absolute right-3 bottom-3 rounded-full bg-white/85 px-3 py-1 text-xs font-bold text-sky-900 shadow">🐦 चिंकी • आपका छोटा वैज्ञानिक</div>
+      </div>
+      <div class="mt-4 flex flex-wrap gap-2 justify-between items-center">
+        <button id="prevBtn" class="rounded-full bg-white px-5 py-3 font-extrabold text-sky-800 shadow hover:-translate-y-0.5 disabled:opacity-40">← पिछला</button>
+        <div class="flex gap-2"><button id="playBtn" class="rounded-full bg-emerald-500 px-5 py-3 font-extrabold text-white shadow hover:bg-emerald-600">▶ कहानी चलाओ</button><button id="nextBtn" class="rounded-full bg-sky-600 px-5 py-3 font-extrabold text-white shadow hover:bg-sky-700">अगला →</button></div>
+      </div>
+      <div class="mt-4 h-2 overflow-hidden rounded-full bg-sky-100"><div id="progress" class="progress-fill h-full rounded-full bg-gradient-to-r from-sky-400 to-emerald-400" style="width:25%"></div></div>
+    </section>
+
+    <aside class="space-y-4">
+      <section class="glass rounded-[28px] p-4 sm:p-5">
+        <h2 class="text-xl font-extrabold">🧭 जल चक्र के चरण <span class="font-hi text-slate-500 text-sm">/ Steps</span></h2>
+        <div id="steps" class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+          <button data-step="0" class="step-pill active flex items-center gap-3 rounded-2xl bg-white p-3 text-left shadow-sm"><span class="grid h-11 w-11 place-items-center rounded-xl bg-amber-100 text-2xl">☀️</span><span><b class="block">वाष्पीकरण</b><small class="text-slate-500">Evaporation</small></span></button>
+          <button data-step="1" class="step-pill flex items-center gap-3 rounded-2xl bg-white p-3 text-left shadow-sm"><span class="grid h-11 w-11 place-items-center rounded-xl bg-sky-100 text-2xl">☁️</span><span><b class="block">संघनन</b><small class="text-slate-500">Condensation</small></span></button>
+          <button data-step="2" class="step-pill flex items-center gap-3 rounded-2xl bg-white p-3 text-left shadow-sm"><span class="grid h-11 w-11 place-items-center rounded-xl bg-indigo-100 text-2xl">🌧️</span><span><b class="block">वर्षण</b><small class="text-slate-500">Precipitation</small></span></button>
+          <button data-step="3" class="step-pill flex items-center gap-3 rounded-2xl bg-white p-3 text-left shadow-sm"><span class="grid h-11 w-11 place-items-center rounded-xl bg-emerald-100 text-2xl">🌊</span><span><b class="block">संग्रहण</b><small class="text-slate-500">Collection</small></span></button>
+        </div>
+      </section>
+      <section class="rounded-[28px] bg-gradient-to-br from-amber-100 to-orange-50 p-5 shadow-sm border border-white">
+        <div class="flex items-center gap-2"><span class="text-3xl">🧑‍🔬</span><h2 class="text-xl font-extrabold">चिंकी समझाएगा!</h2></div>
+        <h3 id="stepTitle" class="mt-3 text-2xl font-extrabold text-sky-900">1. वाष्पीकरण</h3>
+        <p id="stepText" class="font-hi mt-2 leading-relaxed text-slate-700">सूरज की गर्मी से नदी, झील और समुद्र का पानी गर्म होकर जलवाष्प बनता है और ऊपर उठता है।</p>
+        <p id="stepEnglish" class="mt-2 text-sm italic text-slate-600">The Sun warms water and turns it into invisible water vapour.</p>
+      </section>
+      <section class="glass rounded-[28px] p-5">
+        <h2 class="text-lg font-extrabold">💡 मज़ेदार तथ्य</h2>
+        <p id="fact" class="mt-2 font-hi text-slate-700">जलवाष्प आमतौर पर दिखाई नहीं देती—भाप जैसा सफेद धुआँ छोटे पानी की बूंदों से बनता है।</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="mt-5 grid sm:grid-cols-3 gap-3">
+    <div class="glass rounded-2xl p-4 flex gap-3 items-center"><span class="text-3xl">🌞</span><div><b>ऊर्जा का स्रोत</b><p class="text-sm text-slate-600">The Sun powers the cycle.</p></div></div>
+    <div class="glass rounded-2xl p-4 flex gap-3 items-center"><span class="text-3xl">♻️</span><div><b>पानी घूमता रहता है</b><p class="text-sm text-slate-600">Water is continually recycled.</p></div></div>
+    <div class="glass rounded-2xl p-4 flex gap-3 items-center"><span class="text-3xl">🌱</span><div><b>पानी बचाएँ</b><p class="text-sm text-slate-600">Every drop matters!</p></div></div>
+  </section>
+
+<section id="quizSection" class="mt-6 glass rounded-[28px] p-5 sm:p-6">
+ <div class="flex flex-wrap items-center justify-between gap-3">
+  <div><p class="text-sm font-extrabold uppercase tracking-widest text-emerald-700">🧠 Think & Answer / सोचो और जवाब दो</p><h2 id="quizHeading" class="text-2xl sm:text-3xl font-extrabold">जल चक्र क्विज़</h2><p id="quizIntro" class="mt-1 text-slate-600">सही जवाब चुनकर अपना ज्ञान जाँचो।</p></div>
+  <div class="rounded-2xl bg-emerald-100 px-4 py-3 text-center"><div id="scoreLabel" class="text-sm font-bold text-emerald-800">स्कोर</div><div class="text-3xl font-extrabold text-emerald-900"><span id="quizScore">0</span><span class="text-lg"> / 5</span></div></div>
+ </div>
+ <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-100"><div id="quizProgress" class="h-full rounded-full bg-emerald-400 transition-all" style="width:0%"></div></div>
+ <div class="mt-5 rounded-2xl bg-white/90 p-4 sm:p-5">
+  <div class="flex items-center justify-between gap-2"><span id="quizQuestionNumber" class="rounded-full bg-sky-100 px-3 py-1 text-sm font-extrabold text-sky-800">प्रश्न 1 / 5</span><span id="quizInstruction" class="text-sm text-slate-500">एक विकल्प चुनें</span></div>
+  <h3 id="quizQuestion" class="mt-4 text-xl font-extrabold">सूरज पानी को गर्म करता है तो क्या होता है?</h3>
+  <div id="quizOptions" class="mt-4 grid gap-2 sm:grid-cols-2"></div>
+  <p id="quizFeedback" class="mt-4 hidden rounded-xl p-3 font-bold" aria-live="polite"></p>
+  <div class="mt-5 flex flex-wrap justify-between gap-2"><button id="quizRestart" class="rounded-full bg-slate-100 px-5 py-3 font-extrabold">↻ फिर से क्विज़</button><button id="quizNext" class="rounded-full bg-emerald-600 px-5 py-3 font-extrabold text-white" disabled>अगला प्रश्न →</button></div>
+ </div>
+ <div id="quizResult" class="mt-4 hidden rounded-2xl bg-gradient-to-r from-emerald-100 to-sky-100 p-5 text-center"><div class="text-4xl">🏆</div><h3 id="quizResultTitle" class="mt-2 text-2xl font-extrabold">शानदार कोशिश!</h3><p id="quizResultText" class="mt-1 text-slate-700"></p><button id="quizPlayAgain" class="mt-4 rounded-full bg-sky-600 px-5 py-3 font-extrabold text-white">फिर से खेलें</button></div>
+</section>
+
+  <footer class="mt-7 rounded-2xl bg-sky-950 px-4 py-4 text-center text-white">
+    <p class="font-extrabold">💧 Water Cycle — A Never-Ending Journey</p>
+    <p class="mt-1 text-sm text-sky-200">Learn with wonder • सीखो, समझो और खोजो</p>
+    <p class="mt-3 text-sm font-bold">Created by Aman Singhal</p>
+  </footer>
+</main>
+<script>
+const data=[
+ {title:'1. वाष्पीकरण (Evaporation)',hi:'सूरज की गर्मी से नदी, झील और समुद्र का पानी गर्म होकर जलवाष्प बनता है और ऊपर उठता है।',en:'The Sun warms water and turns it into invisible water vapour.',speech:'नमस्ते दोस्तों! सूरज पानी को गर्म करता है। पानी जलवाष्प बनकर ऊपर उठता है। इसे वाष्पीकरण कहते हैं!',fact:'जलवाष्प आमतौर पर दिखाई नहीं देती—भाप जैसा सफेद धुआँ छोटे पानी की बूंदों से बनता है।'},
+ {title:'2. संघनन (Condensation)',hi:'ऊपर की ठंडी हवा में जलवाष्प ठंडी होकर बहुत छोटी पानी की बूंदों में बदलती है। ये बूंदें मिलकर बादल बनाती हैं।',en:'Water vapour cools into tiny droplets that gather to form clouds.',speech:'वाह! ऊपर हवा ठंडी है। जलवाष्प छोटी-छोटी बूंदों में बदलती है और बादल बनते हैं। इसे संघनन कहते हैं!',fact:'बादल लाखों छोटी पानी की बूंदों या बर्फ़ के क्रिस्टलों से बने होते हैं।'},
+ {title:'3. वर्षण (Precipitation)',hi:'जब बादल की बूंदें बड़ी और भारी हो जाती हैं, तो पानी बारिश के रूप में धरती पर गिरता है। बहुत ठंड में बर्फ़ भी गिर सकती है।',en:'When droplets become heavy, water falls as rain, snow or hail.',speech:'बादल की बूंदें बड़ी और भारी हो गईं! अब पानी बारिश बनकर नीचे गिरता है। इसे वर्षण कहते हैं!',fact:'वर्षण बारिश, बर्फ़ या ओलों के रूप में हो सकता है।'},
+ {title:'4. संग्रहण (Collection)',hi:'बारिश का पानी नदियों, झीलों और समुद्र में इकट्ठा होता है। कुछ पानी मिट्टी में रिसता है। फिर सूरज इसे गर्म करता है और चक्र दोबारा शुरू होता है।',en:'Water collects in rivers, lakes and oceans; some soaks into the ground.',speech:'बारिश का पानी नदी और समुद्र में लौट आया! कुछ पानी मिट्टी में भी जाता है। सूरज फिर इसे गर्म करेगा—जल चक्र चलता रहेगा!',fact:'पौधे भी पत्तियों से जलवाष्प छोड़ते हैं। इस प्रक्रिया को वाष्पोत्सर्जन कहते हैं।'}
+];
+let current=0, sound=true, playing=false, timer=null, english=false;
+const $=id=>document.getElementById(id);
+function speak(text){} 
+function render(){
+ const d=data[current];
+ $('stepCounter').textContent=`चरण ${current+1} / 4`;
+ $('stepTitle').textContent=english?['1. Evaporation','2. Condensation','3. Precipitation','4. Collection'][current]:d.title;
+ $('stepText').textContent=english?d.en:d.hi;
+ $('stepEnglish').textContent=english?['Heat from the Sun changes liquid water into water vapour.','Water vapour cools and condenses into tiny droplets, forming clouds.','Water falls from clouds as rain, snow or hail.','Water returns to rivers, lakes and oceans, ready to begin again.'][current]:d.en;
+ $('speechBubble').textContent=english?['Hello explorers! The Sun warms water and invisible water vapour rises.','High in the cool air, water vapour turns into tiny droplets and forms clouds.','When cloud droplets grow heavy, rain falls back to Earth.','Water gathers in rivers, lakes and oceans. Then the cycle begins again!'][current]:d.speech;
+ $('fact').textContent=english?['Water vapour is invisible. White mist is made of tiny droplets.','Clouds are made of tiny water droplets or ice crystals.','Precipitation can fall as rain, snow or hail.','Plants also release water vapour from their leaves. This is called transpiration.'][current]:d.fact;
+ $('progress').style.width=((current+1)*25)+'%';
+ $('prevBtn').disabled=current===0;
+ $('nextBtn').textContent=current===3?'फिर से शुरू ↻':'अगला →';
+ document.querySelectorAll('[data-step]').forEach(b=>b.classList.toggle('active',Number(b.dataset.step)===current));
+ $('rain').style.opacity=current===2?'1':'.04';
+ $('rain').style.transform=current===2?'scale(1.12)':'scale(.8)';
+ $('rainCloud').classList.toggle('dark',current>=2);
+ $('vapors').style.opacity=current===0?'1':'.16';
+ $('condensePuff').style.opacity=current===1?'1':'.04';
+ $('processLabel').style.opacity=current===1?'1':'.3';
+ $('vaporLabel').style.opacity=current===0?'1':'.2';
+ $('vaporLabel').textContent=english?'💨 Water vapour rises':'💨 जलवाष्प ऊपर उठती है';
+ $('processLabel').textContent=english?'☁️ Vapour cools and forms clouds':'☁️ जलवाष्प ठंडी होकर बादल बनाती है';
+ $('sceneHint').textContent=english?['The Sun warms water','Cooling vapour forms clouds','Clouds release rain','Water gathers again'][current]:['सूरज पानी को गर्म करता है','ठंडक से बादल बनते हैं','बादल पानी बरसाते हैं','पानी फिर से इकट्ठा होता है'][current];
+}
+function go(n, autoSpeak=true){current=(n+4)%4;render();if(autoSpeak)speak(data[current].speech)}
+function stop(){playing=false;clearInterval(timer);timer=null;$('playBtn').textContent=english?'▶ Play story':'▶ कहानी चलाओ'}
+$('prevBtn').addEventListener('click',()=>{stop();go(current-1)});
+$('nextBtn').addEventListener('click',()=>{if(current===3){stop();go(0)}else go(current+1);});
+document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{stop();go(Number(b.dataset.step))}));
+
+$('playBtn').addEventListener('click',()=>{
+ if(playing){stop();if('speechSynthesis'in window)speechSynthesis.cancel();return}
+ playing=true;$('playBtn').textContent=english?'⏸ Pause':'⏸ रोकें';go(current);
+ timer=setInterval(()=>{if(current>=3){stop();return}go(current+1)},6500);
+});
+$('langBtn').addEventListener('click',()=>{
+ english=!english;
+ quizEnglish=english;
+ document.documentElement.lang=english?'en':'hi';
+ $('langBtn').textContent=english?'🌐 English / हिंदी':'🌐 हिंदी / English';
+ document.querySelector('header p.max-w-3xl').textContent=english?'Explore the journey of water: evaporation, condensation, precipitation and collection.':'पानी की मज़ेदार यात्रा खोजो! वाष्पीकरण, संघनन, वर्षण और संग्रहण को एनिमेशन में देखो।';
+ const names=english?['Evaporation','Condensation','Precipitation','Collection']:['वाष्पीकरण','संघनन','वर्षण','संग्रहण'];
+ document.querySelectorAll('[data-step]').forEach((b,i)=>{b.querySelector('b').textContent=names[i];});
+ $('prevBtn').textContent=english?'← Previous':'← पिछला';
+ $('nextBtn').textContent=english?(current===3?'Restart ↻':'Next →'):(current===3?'फिर से शुरू ↻':'अगला →');
+ $('playBtn').textContent=playing?(english?'⏸ Pause':'⏸ रोकें'):(english?'▶ Play story':'▶ कहानी चलाओ');
+ render();
+ if(typeof quizRender==='function')quizRender();
+});
+render();
+
+const quizData=[
+{q:'सूरज पानी को गर्म करता है तो क्या होता है?',e:'What happens when the Sun heats water?',o:['पानी जम जाता है','पानी जलवाष्प बनकर ऊपर उठता है','बादल गायब हो जाते हैं','बारिश रुक जाती है'],oe:['Water freezes','Water vapour rises','Clouds disappear','Rain stops'],a:1,h:'इसे वाष्पीकरण कहते हैं। सूरज की गर्मी पानी को जलवाष्प में बदलती है।',he:'This is evaporation. Heat changes liquid water into water vapour.'},
+{q:'जलवाष्प के ठंडा होकर बादल बनाने की प्रक्रिया क्या है?',e:'What is the process of water vapour cooling to form clouds?',o:['वर्षण','संग्रहण','संघनन','पिघलना'],oe:['Precipitation','Collection','Condensation','Melting'],a:2,h:'ठंडी हवा में जलवाष्प छोटी बूंदों में बदलती है। इसे संघनन कहते हैं।',he:'Water vapour cools into tiny droplets. This is condensation.'},
+{q:'बादलों से पानी नीचे गिरने को क्या कहते हैं?',e:'What is water falling from clouds called?',o:['वाष्पीकरण','वर्षण','संघनन','वाष्पोत्सर्जन'],oe:['Evaporation','Precipitation','Condensation','Transpiration'],a:1,h:'बारिश, बर्फ़ या ओलों के रूप में पानी गिरना वर्षण है।',he:'Rain, snow or hail falling from clouds is precipitation.'},
+{q:'बारिश का पानी कहाँ इकट्ठा हो सकता है?',e:'Where can rainwater collect?',o:['नदियों और झीलों में','केवल सूरज पर','केवल बादलों में','कहीं नहीं'],oe:['In rivers and lakes','Only on the Sun','Only in clouds','Nowhere'],a:0,h:'पानी नदी, झील और समुद्र में इकट्ठा होता है। कुछ पानी मिट्टी में भी रिसता है।',he:'Water collects in rivers, lakes and oceans. Some seeps into the ground.'},
+{q:'जल चक्र को चलाने वाली मुख्य ऊर्जा कहाँ से आती है?',e:'Where does the main energy driving the water cycle come from?',o:['चाँद','तारे','सूरज','पहाड़'],oe:['The Moon','Stars','The Sun','Mountains'],a:2,h:'सूरज की ऊर्जा पानी को गर्म करती है और जल चक्र को चलाती है।',he:'The Sun’s energy warms water and drives the water cycle.'}
+];
+let qi=0, qs=0, qa=false, quizEnglish=false;
+function quizRender(){
+ const q=quizData[qi], options=quizEnglish?q.oe:q.o;
+ document.getElementById('quizQuestionNumber').textContent=quizEnglish?`Question ${qi+1} / 5`:`प्रश्न ${qi+1} / 5`;
+ document.getElementById('quizQuestion').textContent=quizEnglish?q.e:q.q;
+ document.getElementById('quizInstruction').textContent=quizEnglish?'Choose one answer':'एक विकल्प चुनें';
+ document.getElementById('quizOptions').innerHTML='';
+ const fb=document.getElementById('quizFeedback');fb.className='mt-4 hidden rounded-xl p-3 font-bold';fb.textContent='';
+ document.getElementById('quizNext').disabled=true;document.getElementById('quizNext').textContent=quizEnglish?'Next question →':'अगला प्रश्न →';qa=false;
+ options.forEach((opt,i)=>{const b=document.createElement('button');b.type='button';b.className='quiz-option rounded-2xl border-2 border-slate-100 bg-white p-4 text-left font-bold hover:border-sky-300 hover:bg-sky-50';b.textContent=String.fromCharCode(65+i)+'. '+opt;b.onclick=()=>quizAnswer(i);document.getElementById('quizOptions').appendChild(b);});
+ document.getElementById('quizScore').textContent=qs;document.getElementById('quizProgress').style.width=(qi/5*100)+'%';document.getElementById('quizResult').classList.add('hidden');document.getElementById('quizNext').classList.remove('hidden');
+}
+function quizAnswer(choice){
+ if(qa)return;qa=true;const q=quizData[qi],ok=choice===q.a;if(ok)qs++;
+ document.querySelectorAll('.quiz-option').forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('border-emerald-400','bg-emerald-50');else if(i===choice)b.classList.add('border-rose-400','bg-rose-50');});
+ const fb=document.getElementById('quizFeedback');fb.className='mt-4 rounded-xl p-3 font-bold '+(ok?'bg-emerald-100 text-emerald-900':'bg-rose-100 text-rose-900');
+ fb.textContent=(ok?(quizEnglish?'✅ Correct! ':'✅ सही जवाब! '):(quizEnglish?'❌ Correct answer: ':'❌ सही उत्तर: ')+(quizEnglish?q.oe[q.a]:q.o[q.a])+'. ')+(quizEnglish?q.he:q.h);
+ document.getElementById('quizScore').textContent=qs;document.getElementById('quizProgress').style.width=((qi+1)/5*100)+'%';document.getElementById('quizNext').disabled=false;document.getElementById('quizNext').textContent=qi===4?(quizEnglish?'See result 🏆':'परिणाम देखें 🏆'):(quizEnglish?'Next question →':'अगला प्रश्न →');
+}
+function quizNext(){
+ if(!qa)return;
+ if(qi<4){qi++;quizRender();return;}
+ document.getElementById('quizOptions').innerHTML='';document.getElementById('quizQuestion').textContent=quizEnglish?'Quiz complete!':'क्विज़ पूरा हुआ!';document.getElementById('quizFeedback').classList.add('hidden');document.getElementById('quizNext').classList.add('hidden');document.getElementById('quizResult').classList.remove('hidden');
+ document.getElementById('quizResultTitle').textContent=qs>=4?(quizEnglish?'Excellent work! 🌟':'बहुत बढ़िया! 🌟'):(quizEnglish?'Good effort! 💪':'अच्छी कोशिश! 💪');
+ document.getElementById('quizResultText').textContent=quizEnglish?`You scored ${qs} out of 5. ${qs===5?'Perfect score!':'Review the steps and try again to improve your score.'}`:`आपने 5 में से ${qs} अंक पाए। ${qs===5?'शानदार! सभी उत्तर सही हैं।':'चरणों को दोहराएँ और फिर कोशिश करें।'}`;
+}
+function quizReset(){qi=0;qs=0;quizRender();}
+document.getElementById('quizNext').addEventListener('click',quizNext);document.getElementById('quizRestart').addEventListener('click',quizReset);document.getElementById('quizPlayAgain').addEventListener('click',quizReset);
+
+quizRender();
+</script>
+</body>
+</html>
