@@ -49,7 +49,7 @@
       "btn_en": "Start journey"
     },
     {
-      "id": "abacus",
+      "id": "interactive-abacus",
       "title_hi": "इंटरैक्टिव अबेकस",
       "title_en": "Interactive Abacus",
       "subject": "math",
@@ -95,16 +95,22 @@
       "link": "circuit_lab.html",
       "btn_hi": "परिपथ बनाएँ",
       "btn_en": "Build a circuit"
+    },
+    {
+      "id": "water-cycle",
+      "title_hi": "जल चक्र",
+      "title_en": "Water Cycle",
+      "subject": "science",
+      "grade": "4,5,6",
+      "search": "water cycle जल चक्र वाष्पीकरण संघनन वर्षण संग्रहण evaporation condensation precipitation science विज्ञान",
+      "icon": "💧",
+      "glow": "#146c94",
+      "classTag": "CLASS 4–6",
+      "desc_hi": "वाष्पीकरण, संघनन, वर्षण और संग्रहण की जादुई यात्रा एनिमेशन और क्विज़ के साथ सीखो।",
+      "desc_en": "Explore the journey of water: evaporation, condensation, precipitation, and collection with animation and quiz.",
+      "link": "water_cycle.html",
+      "btn_hi": "यात्रा देखें",
+      "btn_en": "Explore cycle"
     }
   ]
 }
-{
-  "id": "water-cycle",
-  "title": "जल चक्र (Water Cycle)",
-  "category": "science",
-  "grade": "4, 5, 6",
-  "icon": "💧",
-  "file": "water_cycle.html",
-  "description": "वाष्पीकरण, संघनन, वर्षण और संग्रहण की जादुई यात्रा एनीमेशन और क्विज़ के साथ सीखें।"
-}
-
