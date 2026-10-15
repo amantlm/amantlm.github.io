@@ -119,7 +119,7 @@
   "description_hi": "बेलन को 3D से 2D जाल में खोलकर सूत्र समझें, पानी भरें और 5 प्रश्नों का लाइव टेस्ट दें।",
   "description_en": "Unfold 3D cylinder into 2D net to derive formulas, fill water, and take a 5-question live test.",
   "category": "कक्षा 8 • क्षेत्रमिति (Class 8 • Mensuration)",
-  "file_url": "cylinder-tlm.html",
+  "link": "cylinder-tlm.html",
   "badge": "लोकप्रिय TLM",
   "author": "Aman Singhal"
    }
