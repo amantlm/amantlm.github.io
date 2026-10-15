@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Virtual Maths Lab - Aman Singhal</title>
+  <title>Cylinder Interactive Digital TLM - Aman Singhal</title>
   <style>
     :root {
       --primary: #1d4ed8;
       --secondary: #1e3a8a;
-      --bg: #f8fafc;
+      --accent-rect: #3b82f6;
+      --accent-circle: #f59e0b;
+      --water: #06b6d4;
+      --bg: #f1f5f9;
       --card: #ffffff;
       --text: #0f172a;
     }
@@ -23,106 +26,411 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      padding: 20px;
-      line-height: 1.6;
+      padding: 16px;
+      line-height: 1.5;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1240px;
       margin: 0 auto;
     }
 
     header {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
-      padding: 30px;
-      border-radius: 16px;
-      text-align: center;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 15px rgba(29, 78, 216, 0.25);
-    }
-
-    header h1 {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-
-    header p {
-      font-size: 1.05rem;
-      opacity: 0.9;
-    }
-
-    .section-title {
-      font-size: 1.3rem;
-      margin-bottom: 16px;
-      color: var(--secondary);
-      border-left: 4px solid var(--primary);
-      padding-left: 10px;
-    }
-
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .tlm-card {
-      background: var(--card);
+      padding: 16px 24px;
       border-radius: 14px;
-      padding: 24px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e2e8f0;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: 0.3s ease;
-    }
-
-    .tlm-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-      border-color: var(--primary);
-    }
-
-    .tlm-card h3 {
-      font-size: 1.2rem;
-      color: var(--primary);
-      margin-bottom: 10px;
-    }
-
-    .tlm-card p {
-      font-size: 0.92rem;
-      color: #475569;
       margin-bottom: 16px;
-    }
-
-    .card-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #64748b;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 4px 14px rgba(29, 78, 216, 0.25);
     }
 
-    .badge {
+    .header-left h1 {
+      font-size: 1.45rem;
+      margin-bottom: 2px;
+    }
+
+    .header-left p {
+      font-size: 0.9rem;
+      opacity: 0.92;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .top-btn {
+      background: rgba(255, 255, 255, 0.18);
+      color: white;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .top-btn:hover {
+      background: rgba(255, 255, 255, 0.32);
+    }
+
+    .lang-btn {
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      font-weight: 700;
+    }
+
+    .lang-btn:hover {
+      background: #fbbf24;
+    }
+
+    /* Mode Selector Tabs */
+    .type-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .type-btn {
+      flex: 1;
+      min-width: 165px;
+      padding: 11px 12px;
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #334155;
+      transition: 0.2s;
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    .type-btn.active {
+      border-color: var(--primary);
       background: #eff6ff;
       color: var(--primary);
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid #bfdbfe;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
     }
 
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 920px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      background: #f8fafc;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #cbd5e1;
+    }
+
+    canvas {
+      width: 100%;
+      height: 460px;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .control-group {
+      margin-bottom: 12px;
+      background: #f8fafc;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      margin-bottom: 5px;
+      font-size: 0.88rem;
+    }
+
+    .val-badge {
+      background: var(--primary);
+      color: white;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .val-badge.water-badge {
+      background: #0891b2;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+      accent-color: var(--primary);
+      height: 6px;
+    }
+
+    #waterSlider {
+      accent-color: #0891b2;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    button.action-btn {
+      flex: 1;
+      padding: 9px 11px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.88rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--secondary);
+    }
+
+    .btn-outline {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .btn-outline:hover {
+      background: #cbd5e1;
+    }
+
+    .formula-box {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .formula-box.water-box {
+      background: #ecfeff;
+      border-left-color: #0891b2;
+    }
+
+    .formula-box h3 {
+      font-size: 0.92rem;
+      color: var(--secondary);
+      margin-bottom: 3px;
+    }
+
+    .formula-math {
+      font-size: 0.88rem;
+      background: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #bfdbfe;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Visual Area Ratio Bar */
+    .ratio-bar-wrap {
+      margin-top: 8px;
+    }
+    .ratio-bar {
+      height: 10px;
+      width: 100%;
+      background: #fed7aa;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+    }
+    .ratio-csa {
+      background: #3b82f6;
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .ratio-base {
+      background: #f59e0b;
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .ratio-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      margin-top: 3px;
+      font-weight: 600;
+    }
+
+    .highlight-orange { color: #d97706; font-weight: 700; }
+    .highlight-blue { color: #2563eb; font-weight: 700; }
+    .highlight-cyan { color: #0891b2; font-weight: 700; }
+
+    .concept-note {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-top: 12px;
+    }
+
+    /* 5-Step Objective Quiz Section */
+    .quiz-card {
+      margin-top: 18px;
+      background: linear-gradient(to right, #ffffff, #f8fafc);
+      border: 2px solid #bfdbfe;
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .score-pill {
+      background: #dcfce7;
+      color: #166534;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid #86efac;
+    }
+
+    .quiz-question {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 12px;
+      background: #eff6ff;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 650px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-btn {
+      background: white;
+      border: 2px solid #cbd5e1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      text-align: left;
+      color: #334155;
+      transition: 0.2s;
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .option-btn.correct {
+      background: #dcfce7 !important;
+      border-color: #16a34a !important;
+      color: #166534 !important;
+    }
+
+    .option-btn.wrong {
+      background: #fee2e2 !important;
+      border-color: #dc2626 !important;
+      color: #991b1b !important;
+    }
+
+    .quiz-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .quiz-feedback {
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    /* Creator Footer */
     footer.creator-footer {
-      margin-top: 30px;
+      margin-top: 22px;
       background: linear-gradient(135deg, #0f172a, #1e293b);
       color: #f8fafc;
       text-align: center;
       padding: 16px 20px;
       border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -133,6 +441,7 @@
     .creator-name {
       font-size: 1.05rem;
       font-weight: 700;
+      letter-spacing: 0.4px;
     }
 
     .creator-name span {
@@ -144,6 +453,7 @@
       background: rgba(255, 255, 255, 0.12);
       padding: 4px 12px;
       border-radius: 20px;
+      color: #e2e8f0;
     }
   </style>
 </head>
@@ -151,47 +461,740 @@
 
 <div class="container">
   <header>
-    <h1>🧮 वर्चुअल मैथ्स लैब (Virtual Maths Lab)</h1>
-    <p>कक्षा 6 से 8 के लिए इंटरएक्टिव डिजिटल शिक्षण-अधिगम सामग्री (Digital TLM)</p>
+    <div class="header-left">
+      <h1 id="hdrTitle">बेलन (Cylinder) : इंटरएक्टिव 3D लैब और 2D जाल (Net)</h1>
+      <p id="hdrSub">प्रकार चुनें, बेलन को खोलकर सूत्र समझें और पानी भरकर आयतन (Volume) का परीक्षण करें</p>
+    </div>
+    <div class="header-actions">
+      <button class="top-btn lang-btn" id="langBtn" onclick="toggleLanguage()">🌐 English</button>
+      <button class="top-btn" id="homeBtn" onclick="goHome()">🏠 होमपेज</button>
+    </div>
   </header>
 
-  <h2 class="section-title">उपलब्ध डिजिटल TLM प्रोजेक्ट्स</h2>
+  <!-- Cylinder Type Selector -->
+  <div class="type-selector">
+    <button class="type-btn active" id="typeClosed" onclick="setCylinderType('closed')">
+      🥫 बंद बेलन (Closed Tank)<br><small>दोनों तरफ ढक्कन (2 वृत्त)</small>
+    </button>
+    <button class="type-btn" id="typeOpenTop" onclick="setCylinderType('openTop')">
+      🥛 खुला गिलास (Open Top)<br><small>केवल नीचे का आधार (1 वृत्त)</small>
+    </button>
+    <button class="type-btn" id="typePipe" onclick="setCylinderType('pipe')">
+      🧻 खोखला पाइप (Hollow Pipe)<br><small>कोई ढक्कन नहीं (0 वृत्त)</small>
+    </button>
+    <button class="type-btn" id="typePaper" onclick="triggerPaperRoll()">
+      📄 कागज़ मोड़ो प्रयोग (22×7 cm)<br><small>आयत से बेलन कैसे बनता है?</small>
+    </button>
+  </div>
 
-  <div class="cards-grid">
-    <!-- Cylinder TLM Card -->
-    <a href="cylinder-tlm.html" class="tlm-card">
-      <div>
-        <h3>🥫 बेलन (Cylinder) 3D & 2D Net लैब</h3>
-        <p>बेलन को 3D से 2D जाल में खोलकर सूत्र (CSA, TSA, Volume) समझें, पानी भरें और 5 प्रश्नों का लाइव टेस्ट दें।</p>
+  <div class="main-grid">
+    <!-- Left Column: Visual Canvas -->
+    <div class="card">
+      <div class="canvas-wrapper">
+        <canvas id="tlmCanvas" width="640" height="460"></canvas>
       </div>
-      <div class="card-footer">
-        <span class="badge">कक्षा 8 • क्षेत्रमिति</span>
-        <span>खोलें »</span>
-      </div>
-    </a>
 
-    <!-- Future Placeholder Card -->
-    <div class="tlm-card" style="opacity: 0.7; background: #f8fafc;">
-      <div>
-        <h3>📐 शंकु और गोला (Cone & Sphere)</h3>
-        <p>जल्द ही उपलब्ध होगा — 3D विज़ुअलाइज़ेशन और आयतन तुलना मॉडल।</p>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="dot" style="background: #3b82f6;"></span>
+          <span id="legCSA">वक्र पृष्ठ (CSA = 2πrh)</span>
+        </div>
+        <div class="legend-item">
+          <span class="dot" style="background: #f59e0b;"></span>
+          <span id="legBase">वृत्ताकार आधार (πr²)</span>
+        </div>
+        <div class="legend-item">
+          <span class="dot" style="background: #ef4444;"></span>
+          <span id="legCircum">परिधि = आयत की लंबाई (2πr)</span>
+        </div>
+        <div class="legend-item">
+          <span class="dot" style="background: #06b6d4;"></span>
+          <span id="legWater">भरा हुआ पानी (Volume)</span>
+        </div>
       </div>
-      <div class="card-footer">
-        <span class="badge" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">जल्द आ रहा है</span>
-        <span>शीघ्र</span>
+
+      <div class="concept-note" id="dynamicNote"></div>
+    </div>
+
+    <!-- Right Column: Controls & Live Formulas -->
+    <div class="card">
+      <div class="btn-row">
+        <button class="action-btn btn-primary" id="toggleAnimBtn" onclick="animateUnfold()">▶ बेलन को खोलें (Unfold Net)</button>
+        <button class="action-btn btn-outline" id="piPresetBtn" onclick="setPi7Radius()">🎯 r = 3.5, h = 7</button>
+        <button class="action-btn btn-outline" id="resetBtn" onclick="resetValues()">↺ रीसेट</button>
+      </div>
+
+      <!-- Unfold Slider -->
+      <div class="control-group">
+        <div class="control-header">
+          <span id="lblUnfold">1. 3D से 2D जाल में खोलें (Unfold Net)</span>
+          <span class="val-badge" id="unfoldVal">0%</span>
+        </div>
+        <input type="range" id="unfoldSlider" min="0" max="100" value="0">
+      </div>
+
+      <!-- Water Level Slider -->
+      <div class="control-group">
+        <div class="control-header">
+          <span id="lblWater">2. 💧 बेलन में पानी भरें (Water Level - आयतन)</span>
+          <span class="val-badge water-badge" id="waterVal">0%</span>
+        </div>
+        <input type="range" id="waterSlider" min="0" max="100" value="0">
+      </div>
+
+      <!-- Radius & Height Sliders -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="control-group">
+          <div class="control-header">
+            <span id="lblRadius">त्रिज्या (r)</span>
+            <span class="val-badge"><span id="rVal">3.5</span> cm</span>
+          </div>
+          <input type="range" id="rSlider" min="1.5" max="5" step="0.5" value="3.5">
+        </div>
+
+        <div class="control-group">
+          <div class="control-header">
+            <span id="lblHeight">ऊँचाई (h)</span>
+            <span class="val-badge"><span id="hVal">7</span> cm</span>
+          </div>
+          <input type="range" id="hSlider" min="3" max="10" step="0.5" value="7">
+        </div>
+      </div>
+
+      <!-- Live Calculations -->
+      <div class="formula-box">
+        <h3 id="csaTitle">1. वक्र पृष्ठीय क्षेत्रफल (Curved Surface Area - CSA)</h3>
+        <small id="csaDesc">आधार की परिधि (<span class="highlight-orange">2πr</span>) × ऊँचाई (h):</small>
+        <div class="formula-math" id="csaFormula"></div>
+      </div>
+
+      <div class="formula-box">
+        <h3 id="tsaTitle">2. संपूर्ण पृष्ठीय क्षेत्रफल (Total Surface Area - TSA)</h3>
+        <small id="tsaDesc">वक्र पृष्ठ + 2 वृत्ताकार सिरों का क्षेत्रफल:</small>
+        <div class="formula-math" id="tsaFormula"></div>
+        <!-- Live Visual Ratio Bar -->
+        <div class="ratio-bar-wrap">
+          <div class="ratio-bar">
+            <div class="ratio-csa" id="barCSA" style="width: 67%;"></div>
+            <div class="ratio-base" id="barBase" style="width: 33%;"></div>
+          </div>
+          <div class="ratio-labels">
+            <span style="color:#2563eb;" id="labelCSA">वक्र पृष्ठ: 67%</span>
+            <span style="color:#d97706;" id="labelBase">वृत्ताकार आधार: 33%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="formula-box water-box" style="margin-bottom: 0;">
+        <h3 id="volTitle">3. आयतन और धारिता (Volume & Capacity)</h3>
+        <small id="volDesc">कुल आयतन = πr²h | <span class="highlight-cyan">1 cm³ = 1 mL</span>:</small>
+        <div class="formula-math" id="volFormula"></div>
       </div>
     </div>
   </div>
 
+  <!-- 5-Step Objective Quiz Section -->
+  <div class="card quiz-card">
+    <div class="quiz-header">
+      <h3 id="quizHdr">🧠 लाइव क्लासरूम टेस्ट (प्रश्न 1 / 5)</h3>
+      <span class="score-pill" id="quizScoreBadge">🏆 स्कोर: 0</span>
+    </div>
+    
+    <div class="quiz-question" id="quizQuestionText">प्रश्न लोड हो रहा है...</div>
+    
+    <!-- 4 Objective Options Grid -->
+    <div class="options-grid" id="optionsGrid"></div>
+    
+    <div class="quiz-footer-row">
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="action-btn btn-primary" id="nextQBtn" style="display:none; flex: 0 0 auto;" onclick="nextQuestion()">अगला प्रश्न »</button>
+    </div>
+  </div>
+
+  <!-- Creator Credit Footer -->
   <footer class="creator-footer">
     <div class="creator-name">
       Created by <span>Aman Singhal</span>
     </div>
-    <div class="footer-tag">
-      Digital TLM Portal
+    <div class="footer-tag" id="footerTag">
+      Interactive Mathematics Digital TLM
     </div>
   </footer>
 </div>
+
+<script>
+  const HOME_URL = "index.html";
+
+  function goHome() {
+    if (document.referrer && document.referrer !== window.location.href) {
+      window.history.back();
+    } else {
+      window.location.href = HOME_URL;
+    }
+  }
+
+  const canvas = document.getElementById('tlmCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const unfoldSlider = document.getElementById('unfoldSlider');
+  const waterSlider = document.getElementById('waterSlider');
+  const rSlider = document.getElementById('rSlider');
+  const hSlider = document.getElementById('hSlider');
+
+  const unfoldVal = document.getElementById('unfoldVal');
+  const waterVal = document.getElementById('waterVal');
+  const rVal = document.getElementById('rVal');
+  const hVal = document.getElementById('hVal');
+
+  const csaFormula = document.getElementById('csaFormula');
+  const tsaTitle = document.getElementById('tsaTitle');
+  const tsaDesc = document.getElementById('tsaDesc');
+  const tsaFormula = document.getElementById('tsaFormula');
+  const volFormula = document.getElementById('volFormula');
+  const dynamicNote = document.getElementById('dynamicNote');
+  const toggleAnimBtn = document.getElementById('toggleAnimBtn');
+
+  let lang = 'hi'; // 'hi' or 'en'
+  let cylinderType = 'closed';
+  let isPaperMode = false;
+  let animId = null;
+
+  // 5-Step Quiz State Variables
+  let questionIndex = 0; // 0 to 4 (Total 5 questions)
+  let scoreCorrect = 0;
+  let quizData = [];
+  let isAnsweredCurrent = false;
+
+  function toggleLanguage() {
+    lang = (lang === 'hi') ? 'en' : 'hi';
+    document.getElementById('langBtn').textContent = (lang === 'hi') ? '🌐 English' : '🌐 हिंदी';
+    updateStaticLanguageText();
+    drawScene();
+    renderCurrentQuestion();
+  }
+
+  function updateStaticLanguageText() {
+    const isHi = (lang === 'hi');
+    document.getElementById('hdrTitle').textContent = isHi
+      ? 'बेलन (Cylinder) : इंटरएक्टिव 3D लैब और 2D जाल (Net)'
+      : 'Cylinder : Interactive 3D Lab & 2D Unfolding Net';
+    document.getElementById('hdrSub').textContent = isHi
+      ? 'प्रकार चुनें, बेलन को खोलकर सूत्र समझें और पानी भरकर आयतन (Volume) का परीक्षण करें'
+      : 'Select cylinder type, unfold the 2D net to derive formulas, and fill water to explore volume';
+
+    document.getElementById('homeBtn').textContent = isHi ? '🏠 होमपेज' : '🏠 Homepage';
+
+    document.getElementById('typeClosed').innerHTML = isHi
+      ? '🥫 बंद बेलन (Closed Tank)<br><small>दोनों तरफ ढक्कन (2 वृत्त)</small>'
+      : '🥫 Closed Cylinder<br><small>Both ends closed (2 Circles)</small>';
+    document.getElementById('typeOpenTop').innerHTML = isHi
+      ? '🥛 खुला गिलास (Open Top)<br><small>केवल नीचे का आधार (1 वृत्त)</small>'
+      : '🥛 Open Top Glass<br><small>Only bottom base (1 Circle)</small>';
+    document.getElementById('typePipe').innerHTML = isHi
+      ? '🧻 खोखला पाइप (Hollow Pipe)<br><small>कोई ढक्कन नहीं (0 वृत्त)</small>'
+      : '🧻 Hollow Pipe<br><small>Both ends open (0 Circles)</small>';
+    document.getElementById('typePaper').innerHTML = isHi
+      ? '📄 कागज़ मोड़ो प्रयोग (22×7 cm)<br><small>आयत से बेलन कैसे बनता है?</small>'
+      : '📄 Paper Roll Lab (22×7 cm)<br><small>How a rectangle rolls into a cylinder</small>';
+
+    document.getElementById('legCSA').textContent = isHi ? 'वक्र पृष्ठ (CSA = 2πrh)' : 'Curved Surface (CSA = 2πrh)';
+    document.getElementById('legBase').textContent = isHi ? 'वृत्ताकार आधार (πr²)' : 'Circular Base (πr²)';
+    document.getElementById('legCircum').textContent = isHi ? 'परिधि = आयत की लंबाई (2πr)' : 'Circumference = Rect Length (2πr)';
+    document.getElementById('legWater').textContent = isHi ? 'भरा हुआ पानी (Volume)' : 'Water Filled (Volume)';
+
+    document.getElementById('resetBtn').textContent = isHi ? '↺ रीसेट' : '↺ Reset';
+    document.getElementById('lblUnfold').textContent = isHi ? '1. 3D से 2D जाल में खोलें (Unfold Net)' : '1. Unfold 3D Cylinder into 2D Net';
+    document.getElementById('lblWater').textContent = isHi ? '2. 💧 बेलन में पानी भरें (Water Level - आयतन)' : '2. 💧 Fill Water in Cylinder (Volume)';
+    document.getElementById('lblRadius').textContent = isHi ? 'त्रिज्या (Radius r)' : 'Radius (r)';
+    document.getElementById('lblHeight').textContent = isHi ? 'ऊँचाई (Height h)' : 'Height (h)';
+
+    document.getElementById('csaTitle').textContent = isHi ? '1. वक्र पृष्ठीय क्षेत्रफल (Curved Surface Area - CSA)' : '1. Curved Surface Area (CSA)';
+    document.getElementById('csaDesc').innerHTML = isHi ? 'आधार की परिधि (<span class="highlight-orange">2πr</span>) × ऊँचाई (h):' : 'Base Circumference (<span class="highlight-orange">2πr</span>) × Height (h):';
+
+    document.getElementById('volTitle').textContent = isHi ? '3. आयतन और धारिता (Volume & Capacity)' : '3. Volume & Liquid Capacity';
+    document.getElementById('volDesc').innerHTML = isHi ? 'कुल आयतन = πr²h | <span class="highlight-cyan">1 cm³ = 1 mL</span>:' : 'Total Volume = πr²h | <span class="highlight-cyan">1 cm³ = 1 mL</span>:';
+
+    document.getElementById('quizScoreBadge').textContent = isHi ? `🏆 स्कोर: ${scoreCorrect} / 5` : `🏆 Score: ${scoreCorrect} / 5`;
+    document.getElementById('nextQBtn').textContent = isHi ? 'अगला प्रश्न »' : 'Next Question »';
+  }
+
+  function setCylinderType(type) {
+    cylinderType = type;
+    isPaperMode = false;
+    document.getElementById('typeClosed').classList.toggle('active', type === 'closed');
+    document.getElementById('typeOpenTop').classList.toggle('active', type === 'openTop');
+    document.getElementById('typePipe').classList.toggle('active', type === 'pipe');
+    document.getElementById('typePaper').classList.remove('active');
+
+    if (type === 'pipe') {
+      waterSlider.value = 0;
+    }
+    drawScene();
+  }
+
+  function triggerPaperRoll() {
+    cylinderType = 'pipe';
+    isPaperMode = true;
+    document.getElementById('typeClosed').classList.remove('active');
+    document.getElementById('typeOpenTop').classList.remove('active');
+    document.getElementById('typePipe').classList.remove('active');
+    document.getElementById('typePaper').classList.add('active');
+    rSlider.value = 3.5;
+    hSlider.value = 7;
+    unfoldSlider.value = 100;
+    waterSlider.value = 0;
+    drawScene();
+  }
+
+  function setPi7Radius() {
+    rSlider.value = 3.5;
+    hSlider.value = 7;
+    drawScene();
+  }
+
+  function drawScene() {
+    const isHi = (lang === 'hi');
+    const u = parseFloat(unfoldSlider.value) / 100;
+    let w = parseFloat(waterSlider.value) / 100;
+    const r = parseFloat(rSlider.value);
+    const h = parseFloat(hSlider.value);
+    const tiltFactor = 0.35;
+
+    if (u > 0.05 && w > 0) {
+      w = 0;
+      waterSlider.value = 0;
+    }
+
+    unfoldVal.textContent = Math.round(u * 100) + '%';
+    waterVal.textContent = Math.round(w * 100) + '%';
+    rVal.textContent = r;
+    hVal.textContent = h;
+
+    const pi = 22 / 7;
+    const circum = 2 * pi * r;
+    const csa = circum * h;
+    const circleArea = pi * r * r;
+
+    let numCircles = 2;
+    if (cylinderType === 'openTop') numCircles = 1;
+    if (cylinderType === 'pipe') numCircles = 0;
+
+    const baseTotal = numCircles * circleArea;
+    const tsa = csa + baseTotal;
+    const totalVol = circleArea * h;
+    const waterVol = totalVol * w;
+
+    const csaPercent = tsa > 0 ? Math.round((csa / tsa) * 100) : 100;
+    const basePercent = 100 - csaPercent;
+    document.getElementById('barCSA').style.width = csaPercent + '%';
+    document.getElementById('barBase').style.width = basePercent + '%';
+    document.getElementById('labelCSA').textContent = isHi ? `वक्र पृष्ठ: ${csaPercent}%` : `Curved Area: ${csaPercent}%`;
+    document.getElementById('labelBase').textContent = isHi ? `वृत्ताकार आधार (${numCircles}): ${basePercent}%` : `Circular Base (${numCircles}): ${basePercent}%`;
+
+    csaFormula.innerHTML = `CSA = <span class="highlight-blue">2πrh</span> = 2 × (22/7) × ${r} × ${h} = <strong>${csa.toFixed(1)} cm²</strong>`;
+
+    if (cylinderType === 'closed') {
+      tsaTitle.textContent = isHi ? '2. संपूर्ण पृष्ठीय क्षेत्रफल (बंद बेलन - 2 ढक्कन)' : '2. Total Surface Area (Closed - 2 Bases)';
+      tsaDesc.innerHTML = isHi ? `वक्र पृष्ठ (<span class="highlight-blue">2πrh</span>) + 2 आधार (<span class="highlight-orange">2πr²</span>):` : `Curved Surface (<span class="highlight-blue">2πrh</span>) + 2 Bases (<span class="highlight-orange">2πr²</span>):`;
+      tsaFormula.innerHTML = `TSA = ${csa.toFixed(1)} + 2(${circleArea.toFixed(1)}) = <strong>${tsa.toFixed(1)} cm²</strong>`;
+    } else if (cylinderType === 'openTop') {
+      tsaTitle.textContent = isHi ? '2. कुल पृष्ठीय क्षेत्रफल (खुला गिलास - 1 आधार)' : '2. Surface Area (Open Top Glass - 1 Base)';
+      tsaDesc.innerHTML = isHi ? `वक्र पृष्ठ (<span class="highlight-blue">2πrh</span>) + केवल निचला आधार (<span class="highlight-orange">πr²</span>):` : `Curved Surface (<span class="highlight-blue">2πrh</span>) + 1 Bottom Base (<span class="highlight-orange">πr²</span>):`;
+      tsaFormula.innerHTML = `Area = ${csa.toFixed(1)} + ${circleArea.toFixed(1)} = <strong>${tsa.toFixed(1)} cm²</strong>`;
+    } else {
+      tsaTitle.textContent = isHi ? '2. कुल पृष्ठीय क्षेत्रफल (खोखला पाइप - 0 ढक्कन)' : '2. Surface Area (Hollow Pipe - 0 Bases)';
+      tsaDesc.innerHTML = isHi ? `कोई वृत्ताकार ढक्कन नहीं है, इसलिए TSA = CSA:` : `No circular ends, so Total Area = CSA:`;
+      tsaFormula.innerHTML = `Area = 2πrh + 0 = <strong>${csa.toFixed(1)} cm²</strong>`;
+    }
+
+    if (w > 0) {
+      volFormula.innerHTML = isHi ? `भरा पानी (${Math.round(w*100)}%) = <strong>${waterVol.toFixed(1)} cm³ (${waterVol.toFixed(0)} mL)</strong> | कुल क्षमता: ${totalVol.toFixed(1)} cm³` : `Water Filled (${Math.round(w*100)}%) = <strong>${waterVol.toFixed(1)} cm³ (${waterVol.toFixed(0)} mL)</strong> | Max: ${totalVol.toFixed(1)} cm³`;
+    } else {
+      volFormula.innerHTML = isHi ? `कुल आयतन (V) = πr²h = ${circleArea.toFixed(1)} × ${h} = <strong>${totalVol.toFixed(1)} cm³ (${totalVol.toFixed(0)} mL)</strong>` : `Total Volume (V) = πr²h = ${circleArea.toFixed(1)} × ${h} = <strong>${totalVol.toFixed(1)} cm³ (${totalVol.toFixed(0)} mL)</strong>`;
+    }
+
+    if (isPaperMode && u === 1) {
+      dynamicNote.innerHTML = isHi ? `📄 <strong>कागज़ मोड़ो प्रयोग:</strong> यह <strong>22 cm × 7 cm</strong> की एक आयताकार शीट है। अब <strong>"वापस 3D बेलन बनाएं"</strong> बटन दबाएं और देखें कि 22 cm भुजा मुड़कर <strong>r = 3.5 cm</strong> का वृत्त कैसे बनाती है!` : `📄 <strong>Paper Roll Experiment:</strong> This is a <strong>22 cm × 7 cm</strong> rectangular sheet. Click <strong>"Fold Back to 3D"</strong> to see how the 22 cm edge rolls into a circle of radius <strong>r = 3.5 cm</strong>!`;
+    } else if (w > 0) {
+      dynamicNote.innerHTML = isHi ? `💧 <strong>आयतन प्रयोग:</strong> पानी की ऊँचाई <strong>${(h * w).toFixed(1)} cm</strong> है। आधार का क्षेत्रफल (${circleArea.toFixed(1)} cm²) × पानी की ऊँचाई = <strong>${waterVol.toFixed(1)} mL</strong> पानी।` : `💧 <strong>Volume Experiment:</strong> Water height is <strong>${(h * w).toFixed(1)} cm</strong>. Base Area (${circleArea.toFixed(1)} cm²) × Water Height = <strong>${waterVol.toFixed(1)} mL</strong> liquid.`;
+    } else if (u === 0) {
+      const typeNameHi = cylinderType === 'closed' ? 'बंद बेलन' : cylinderType === 'openTop' ? 'ऊपर से खुला गिलास' : 'खोखला पाइप';
+      const typeNameEn = cylinderType === 'closed' ? 'Closed Cylinder' : cylinderType === 'openTop' ? 'Open-Top Glass' : 'Hollow Pipe';
+      dynamicNote.innerHTML = isHi ? `💡 <strong>3D अवस्था:</strong> अभी <strong>${typeNameHi}</strong> दिख रहा है। इसे खोलने के लिए 'Unfold' बटन या स्लाइडर चलाएं!` : `💡 <strong>3D View:</strong> Currently showing a <strong>${typeNameEn}</strong>. Use the 'Unfold' button or slider to see its 2D Net!`;
+    } else {
+      dynamicNote.innerHTML = isHi ? `✅ <strong>2D जाल (Net):</strong> साफ़ दिख रहा है कि इस बेलन में <strong>1 आयत (लंबाई ${circum.toFixed(1)} cm)</strong> और <strong>${numCircles} वृत्त</strong> शामिल हैं।` : `✅ <strong>2D Net Ready:</strong> Notice how the cylinder unrolls into <strong>1 Rectangle (length ${circum.toFixed(1)} cm)</strong> and <strong>${numCircles} Circle(s)</strong>.`;
+    }
+
+    toggleAnimBtn.textContent = (u < 0.5) ? (isHi ? '▶ बेलन को खोलें (Unfold Net)' : '▶ Unfold Cylinder Net') : (isHi ? '◀ वापस 3D बेलन बनाएं' : '◀ Fold Back to 3D');
+
+    // Canvas Draw
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 28) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 28) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const scale = 15;
+
+    const R_px = r * scale;
+    const H_px = h * scale;
+    const fullWidth_px = 2 * Math.PI * R_px;
+
+    const currentWidth = (2 * R_px) * (1 - u) + fullWidth_px * u;
+    const perspectiveRy = R_px * tiltFactor * (1 - u);
+
+    const topY = cy - H_px / 2;
+    const botY = cy + H_px / 2;
+    const leftX = cx - currentWidth / 2;
+    const rightX = cx + currentWidth / 2;
+
+    const bodyGrad = ctx.createLinearGradient(leftX, cy, rightX, cy);
+    if (w > 0) {
+      bodyGrad.addColorStop(0, 'rgba(148, 163, 184, 0.35)');
+      bodyGrad.addColorStop(0.5, 'rgba(226, 232, 240, 0.5)');
+      bodyGrad.addColorStop(1, 'rgba(100, 116, 139, 0.35)');
+    } else if (u < 0.9) {
+      bodyGrad.addColorStop(0, '#1d4ed8');
+      bodyGrad.addColorStop(0.35, '#60a5fa');
+      bodyGrad.addColorStop(0.7, '#3b82f6');
+      bodyGrad.addColorStop(1, '#1e3a8a');
+    } else {
+      bodyGrad.addColorStop(0, '#3b82f6');
+      bodyGrad.addColorStop(1, '#2563eb');
+    }
+
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.moveTo(leftX, topY);
+    ctx.lineTo(rightX, topY);
+    ctx.lineTo(rightX, botY);
+    ctx.ellipse(cx, botY, currentWidth / 2, perspectiveRy, 0, 0, Math.PI, false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.stroke();
+
+    if (w > 0 && u < 0.05 && cylinderType !== 'pipe') {
+      const waterH_px = H_px * w;
+      const waterTopY = botY - waterH_px;
+
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.75)';
+      ctx.beginPath();
+      ctx.moveTo(leftX, waterTopY);
+      ctx.lineTo(rightX, waterTopY);
+      ctx.lineTo(rightX, botY);
+      ctx.ellipse(cx, botY, R_px, perspectiveRy, 0, 0, Math.PI, false);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(34, 211, 238, 0.9)';
+      ctx.beginPath();
+      ctx.ellipse(cx, waterTopY, R_px, perspectiveRy, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#0891b2';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(leftX, topY);
+    ctx.lineTo(rightX, topY);
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    const topCircleCenterY = topY - (R_px * u);
+    const botCircleCenterY = botY + (R_px * u);
+    const circleRy = (R_px * tiltFactor) * (1 - u) + R_px * u;
+
+    if (cylinderType !== 'pipe' && u > 0.02) {
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.9)';
+      ctx.beginPath();
+      ctx.ellipse(cx, botCircleCenterY, R_px, circleRy, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#b45309';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx, botCircleCenterY);
+      ctx.lineTo(cx + R_px, botCircleCenterY);
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    if (cylinderType === 'closed') {
+      ctx.fillStyle = w > 0 ? 'rgba(245, 158, 11, 0.45)' : '#f59e0b';
+      ctx.beginPath();
+      ctx.ellipse(cx, topCircleCenterY, R_px, circleRy, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ef4444';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx, topCircleCenterY);
+      ctx.lineTo(cx + R_px, topCircleCenterY);
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`r = ${r} cm`, cx + R_px / 2, topCircleCenterY - 6);
+    } else if (u < 0.2) {
+      ctx.fillStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.ellipse(cx, topY, R_px, perspectiveRy, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#475569';
+      ctx.stroke();
+
+      ctx.fillStyle = '#334155';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(isHi ? 'खुला सिरा (Open)' : 'Open End', cx, topY + 4);
+    }
+
+    ctx.fillStyle = '#1e3a8a';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`h = ${h} cm`, rightX + 16, cy + 5);
+
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(rightX + 10, topY);
+    ctx.lineTo(rightX + 10, botY);
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    if (u > 0.5) {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText(isHi ? `वक्र पृष्ठ (आयत) = 2πrh = ${csa.toFixed(1)} cm²` : `Curved Area = 2πrh = ${csa.toFixed(1)} cm²`, cx, cy);
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText(isHi ? `← आयत की लंबाई = परिधि (2πr = ${circum.toFixed(1)} cm) →` : `← Rect Length = Circumference (2πr = ${circum.toFixed(1)} cm) →`, cx, topY + 22);
+    } else if (w > 0) {
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText(isHi ? `पानी = ${waterVol.toFixed(0)} mL` : `Water = ${waterVol.toFixed(0)} mL`, cx, botY - (H_px * w) / 2 + 5);
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText(isHi ? `3D बेलन` : `3D Cylinder`, cx, cy);
+    }
+  }
+
+  function animateUnfold() {
+    if (animId) cancelAnimationFrame(animId);
+    waterSlider.value = 0;
+    const current = parseFloat(unfoldSlider.value);
+    const target = current < 50 ? 100 : 0;
+    const step = target === 100 ? 2 : -2;
+
+    function tick() {
+      let val = parseFloat(unfoldSlider.value) + step;
+      if ((step > 0 && val >= 100) || (step < 0 && val <= 0)) {
+        unfoldSlider.value = target;
+        drawScene();
+        animId = null;
+        return;
+      }
+      unfoldSlider.value = val;
+      drawScene();
+      animId = requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  function resetValues() {
+    if (animId) cancelAnimationFrame(animId);
+    unfoldSlider.value = 0;
+    waterSlider.value = 0;
+    rSlider.value = 3.5;
+    hSlider.value = 7;
+    setCylinderType('closed');
+  }
+
+  // Generate Exactly 5 Quiz Questions
+  function initQuizData() {
+    const rOptions = [3.5, 7, 10.5];
+    const hOptions = [5, 10, 12];
+    quizData = [];
+
+    for (let i = 0; i < 5; i++) {
+      const qR = rOptions[Math.floor(Math.random() * rOptions.length)];
+      const qH = hOptions[Math.floor(Math.random() * hOptions.length)];
+      const qTypes = ['csa', 'tsa', 'openTop', 'vol'];
+      const picked = qTypes[Math.floor(Math.random() * qTypes.length)];
+
+      const pi = 22 / 7;
+      const csa = 2 * pi * qR * qH;
+      const base = pi * qR * qR;
+      let correctVal = 0;
+
+      if (picked === 'csa') correctVal = Math.round(csa);
+      else if (picked === 'tsa') correctVal = Math.round(csa + 2 * base);
+      else if (picked === 'openTop') correctVal = Math.round(csa + base);
+      else correctVal = Math.round(base * qH);
+
+      let opts = [correctVal];
+      while (opts.length < 4) {
+        let offset = (Math.floor(Math.random() * 4) + 1) * (Math.random() > 0.5 ? 12 : -12);
+        let wrongVal = correctVal + offset;
+        if (wrongVal > 0 && !opts.includes(wrongVal)) {
+          opts.push(wrongVal);
+        }
+      }
+      opts.sort(() => Math.random() - 0.5);
+
+      quizData.push({ qR, qH, picked, correctVal, options: opts });
+    }
+  }
+
+  function renderCurrentQuestion() {
+    const isHi = (lang === 'hi');
+    const badge = document.getElementById('quizScoreBadge');
+    badge.textContent = isHi ? `🏆 स्कोर: ${scoreCorrect} / 5` : `🏆 Score: ${scoreCorrect} / 5`;
+
+    if (questionIndex >= 5) {
+      // Quiz Finished - Show Final Summary
+      document.getElementById('quizHdr').textContent = isHi ? '🏆 टेस्ट समाप्त हुआ!' : '🏆 Test Completed!';
+      document.getElementById('quizQuestionText').innerHTML = isHi
+        ? `शानदार प्रयास! आपका कुल स्कोर <strong>${scoreCorrect} / 5</strong> रहा है।`
+        : `Great effort! Your final score is <strong>${scoreCorrect} / 5</strong>.`;
+      
+      const grid = document.getElementById('optionsGrid');
+      grid.innerHTML = '';
+      document.getElementById('quizFeedback').textContent = '';
+      
+      const nextBtn = document.getElementById('nextQBtn');
+      nextBtn.style.display = 'inline-block';
+      nextBtn.textContent = isHi ? '🔄 फिर से टेस्ट दें' : '🔄 Restart Test';
+      nextBtn.onclick = restartQuiz;
+      return;
+    }
+
+    document.getElementById('quizHdr').textContent = isHi ? `🧠 लाइव क्लासरूम टेस्ट (प्रश्न ${questionIndex + 1} / 5)` : `🧠 Live Classroom Test (Question ${questionIndex + 1} / 5)`;
+    
+    const currentQ = quizData[questionIndex];
+    const { qR, qH, picked } = currentQ;
+
+    if (picked === 'csa') {
+      document.getElementById('quizQuestionText').innerHTML = isHi
+        ? `प्रश्न ${questionIndex + 1}: एक बेलन की त्रिज्या <strong>r = ${qR} cm</strong> और ऊँचाई <strong>h = ${qH} cm</strong> है। इसका <strong>वक्र पृष्ठीय क्षेत्रफल (CSA)</strong> ज्ञात कीजिए:`
+        : `Q${questionIndex + 1}: Find the <strong>Curved Surface Area (CSA)</strong> of a cylinder with radius <strong>r = ${qR} cm</strong> and height <strong>h = ${qH} cm</strong>:`;
+    } else if (picked === 'tsa') {
+      document.getElementById('quizQuestionText').innerHTML = isHi
+        ? `प्रश्न ${questionIndex + 1}: एक बंद बेलनाकार टैंक की त्रिज्या <strong>r = ${qR} cm</strong> और ऊँचाई <strong>h = ${qH} cm</strong> है। इसका <strong>संपूर्ण पृष्ठीय क्षेत्रफल (TSA)</strong> कितना होगा?`
+        : `Q${questionIndex + 1}: Find the <strong>Total Surface Area (TSA)</strong> of a closed cylindrical tank with radius <strong>r = ${qR} cm</strong> and height <strong>h = ${qH} cm</strong>:`;
+    } else if (picked === 'openTop') {
+      document.getElementById('quizQuestionText').innerHTML = isHi
+        ? `प्रश्न ${questionIndex + 1}: ऊपर से खुले एक बेलनाकार गिलास की त्रिज्या <strong>r = ${qR} cm</strong> और ऊँचाई <strong>h = ${qH} cm</strong> है। इसके कुल पृष्ठ का क्षेत्रफल बताइए:`
+        : `Q${questionIndex + 1}: An open-top cylindrical glass has radius <strong>r = ${qR} cm</strong> and height <strong>h = ${qH} cm</strong>. Find its total surface area:`;
+    } else {
+      document.getElementById('quizQuestionText').innerHTML = isHi
+        ? `प्रश्न ${questionIndex + 1}: यदि किसी बेलन की त्रिज्या <strong>r = ${qR} cm</strong> और ऊँचाई <strong>h = ${qH} cm</strong> हो, तो उसका <strong>आयतन (Volume)</strong> कितना होगा?`
+        : `Q${questionIndex + 1}: Find the <strong>Volume</strong> of a cylinder with radius <strong>r = ${qR} cm</strong> and height <strong>h = ${qH} cm</strong>:`;
+    }
+
+    const grid = document.getElementById('optionsGrid');
+    grid.innerHTML = '';
+    document.getElementById('quizFeedback').textContent = '';
+    document.getElementById('nextQBtn').style.display = 'none';
+
+    currentQ.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = `${opt} ${picked === 'vol' ? 'cm³' : 'cm²'}`;
+      btn.onclick = () => checkObjectiveAnswer(opt, btn);
+      grid.appendChild(btn);
+    });
+  }
+
+  function checkObjectiveAnswer(selectedOpt, clickedBtn) {
+    isAnsweredCurrent = true;
+    const isHi = (lang === 'hi');
+    const fb = document.getElementById('quizFeedback');
+    const currentQ = quizData[questionIndex];
+    const allBtns = document.querySelectorAll('.options-grid .option-btn');
+
+    allBtns.forEach(b => {
+      b.disabled = true;
+      const val = parseInt(b.textContent);
+      if (val === currentQ.correctVal) {
+        b.classList.add('correct');
+      }
+    });
+
+    if (selectedOpt === currentQ.correctVal) {
+      scoreCorrect++;
+      clickedBtn.classList.add('correct');
+      fb.style.color = '#16a34a';
+      fb.textContent = isHi ? '🎉 बिल्कुल सही उत्तर!' : '🎉 Correct Answer!';
+    } else {
+      clickedBtn.classList.add('wrong');
+      fb.style.color = '#dc2626';
+      fb.textContent = isHi ? `❌ गलत! सही उत्तर हरा रंग है (${currentQ.correctVal})।` : `❌ Incorrect! Correct answer highlighted in green (${currentQ.correctVal}).`;
+    }
+
+    document.getElementById('quizScoreBadge').textContent = isHi ? `🏆 स्कोर: ${scoreCorrect} / 5` : `🏆 Score: ${scoreCorrect} / 5`;
+
+    // Show Next Question button
+    const nextBtn = document.getElementById('nextQBtn');
+    nextBtn.style.display = 'inline-block';
+    nextBtn.textContent = isHi ? (questionIndex === 4 ? '🏁 परिणाम देखें »' : 'अगला प्रश्न »') : (questionIndex === 4 ? '🏁 View Result »' : 'Next Question »');
+    nextBtn.onclick = nextQuestion;
+  }
+
+  function nextQuestion() {
+    questionIndex++;
+    renderCurrentQuestion();
+  }
+
+  function restartQuiz() {
+    questionIndex = 0;
+    scoreCorrect = 0;
+    initQuizData();
+    renderCurrentQuestion();
+  }
+
+  unfoldSlider.addEventListener('input', () => {
+    isPaperMode = false;
+    if (parseFloat(unfoldSlider.value) > 5) waterSlider.value = 0;
+    drawScene();
+  });
+
+  waterSlider.addEventListener('input', () => {
+    isPaperMode = false;
+    if (parseFloat(waterSlider.value) > 0) {
+      unfoldSlider.value = 0;
+      if (cylinderType === 'pipe') setCylinderType('openTop');
+    }
+    drawScene();
+  });
+
+  rSlider.addEventListener('input', () => { isPaperMode = false; drawScene(); });
+  hSlider.addEventListener('input', () => { isPaperMode = false; drawScene(); });
+
+  // Initialize
+  updateStaticLanguageText();
+  drawScene();
+  initQuizData();
+  renderCurrentQuestion();
+</script>
 
 </body>
 </html>
