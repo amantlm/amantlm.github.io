@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mind-Reading Game | Aman Singhal</title>
+    <style>
+        :root {
+            --bg-color: #05050a;
+            --card-bg: rgba(15, 15, 30, 0.7);
+            --primary: #00f3ff;
+            --secondary: #bc13fe;
+            --accent: #00ff66;
+            --text: #ffffff;
+            --text-dim: #a0a0c0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Glow Effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.15), transparent 70%);
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -20%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(188, 19, 254, 0.15), transparent 70%);
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px 10px;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .instruction-box {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+        }
+
+        .instruction-box h2 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+
+        .instruction-box p {
+            color: var(--text-dim);
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+
+        /* Grid Cards Screen */
+        .card-grid-container {
+            background: var(--card-bg);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            margin-bottom: 25px;
+            box-shadow: 0 0 25px rgba(188, 19, 254, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .number-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        .number-grid::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 3px;
+        }
+
+        .num-cell {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 8px 4px;
+            font-size: 0.95rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), #0077ff);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.7);
+        }
+
+        .btn-yes {
+            background: linear-gradient(45deg, var(--accent), #00cc44);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+            flex: 1;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.7);
+        }
+
+        .btn-no {
+            background: linear-gradient(45deg, #ff3366, #cc0033);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+            flex: 1;
+        }
+
+        .btn-no:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(255, 51, 102, 0.7);
+        }
+
+        /* Scanning Screen Animation */
+        .scanner-loader {
+            width: 100px;
+            height: 100px;
+            border: 4px solid rgba(0, 243, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .scan-logs {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent);
+            font-size: 1.1rem;
+            min-height: 30px;
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+        }
+
+        /* Result Screen */
+        .result-number {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+            text-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
+            animation: bounce 0.6s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+
+        footer {
+            padding: 15px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+            z-index: 10;
+        }
+
+        footer span {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .number-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧠 AI Mind-Reading Engine</h1>
+        <p class="subtitle">Neural Network Subconscious Decoder</p>
+    </header>
+
+    <div class="container">
+        <!-- Screen 1: Welcome -->
+        <div id="screen-welcome" class="screen active">
+            <div class="instruction-box">
+                <h2>चुनौती के लिए तैयार हैं?</h2>
+                <p>1 से 63 के बीच मन में कोई भी एक संख्या (Number) सोच लीजिए। AI आपके दिमाग की तरंगों को स्कैन करके सही नंबर ढूंढ निकालेगा!</p>
+            </div>
+            <button class="btn btn-primary" onclick="startGame()">दिमाग पढ़ना शुरू करो</button>
+        </div>
+
+        <!-- Screen 2: Question Cards -->
+        <div id="screen-game" class="screen">
+            <div class="card-grid-container">
+                <div class="card-title" id="card-title-text">Card 1</div>
+                <div class="number-grid" id="number-grid">
+                    <!-- Numbers will be injected here -->
+                </div>
+            </div>
+            <div class="instruction-box" style="padding: 15px; margin-bottom: 20px;">
+                <p style="font-size: 1rem;">क्या आपका सोचा हुआ नंबर इस कार्ड में **मौजूद** है?</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-yes" onclick="handleAnswer(true)">हाँ (Yes)</button>
+                <button class="btn btn-no" onclick="handleAnswer(false)">नहीं (No)</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: Scanning Animation -->
+        <div id="screen-scanning" class="screen">
+            <div class="scanner-loader"></div>
+            <div class="scan-logs" id="scan-logs">Neural Pattern Analysis...</div>
+        </div>
+
+        <!-- Screen 4: Result -->
+        <div id="screen-result" class="screen">
+            <div class="instruction-box">
+                <h2>AI ने आपके मन की बात पढ़ ली!</h2>
+                <p>आपने अपने मन में यह संख्या सोची थी:</p>
+            </div>
+            <div class="result-number" id="final-number">0</div>
+            <button class="btn btn-primary" onclick="resetGame()">दोबारा खेलें</button>
+        </div>
+    </div>
+
+    <footer>
+        Created by <span>Aman Singhal</span>
+    </footer>
+
+    <script>
+        let currentCardIndex = 0;
+        let guessedNumber = 0;
+        
+        // 6 Cards based on powers of 2 (1, 2, 4, 8, 16, 32)
+        const cards = [];
+        for (let i = 0; i < 6; i++) {
+            let power = Math.pow(2, i);
+            let nums = [];
+            for (let n = 1; n <= 63; n++) {
+                if ((n & power) !== 0) {
+                    nums.push(n);
+                }
+            }
+            cards.push({ power: power, numbers: nums });
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            currentCardIndex = 0;
+            guessedNumber = 0;
+            displayCard();
+            showScreen('screen-game');
+        }
+
+        function displayCard() {
+            document.getElementById('card-title-text').innerText = `कार्ड नंबर ${currentCardIndex + 1} (प्रारंभ: ${cards[currentCardIndex].power})`;
+            const grid = document.getElementById('number-grid');
+            grid.innerHTML = '';
+            
+            cards[currentCardIndex].numbers.forEach(num => {
+                const cell = document.createElement('div');
+                cell.className = 'num-cell';
+                cell.innerText = num;
+                grid.appendChild(cell);
+            });
+        }
+
+        function handleAnswer(hasNumber) {
+            if (hasNumber) {
+                guessedNumber += cards[currentCardIndex].power;
+            }
+            
+            currentCardIndex++;
+            
+            if (currentCardIndex < cards.length) {
+                displayCard();
+            } else {
+                startScanningSequence();
+            }
+        }
+
+        function startScanningSequence() {
+            showScreen('screen-scanning');
+            const logs = document.getElementById('scan-logs');
+            const messages = [
+                "Scanning Neural Pathways...",
+                "Decoding Subconscious Frequency...",
+                "Analyzing Brainwave Patterns...",
+                "Extracting Number from Memory...",
+                "Success! Result Found."
+            ];
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < messages.length) {
+                    logs.innerText = messages[i];
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('final-number').innerText = guessedNumber;
+                        showScreen('screen-result');
+                    }, 600);
+                }
+            }, 700);
+        }
+
+        function resetGame() {
+            showScreen('screen-welcome');
+        }
+    </script>
+</body>
+</html>
