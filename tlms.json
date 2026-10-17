@@ -123,5 +123,12 @@
   "badge": "लोकप्रिय TLM",
   "author": "Aman Singhal"
    }
+    {
+  "title": "AI Mind-Reading Game",
+  "hindiTitle": "एआई माइंड रीडिंग गेम",
+  "link": "mind_reading.html",
+  "icon": "🧠",
+  "author": "Aman Singhal"
+   }
    ]
    }
