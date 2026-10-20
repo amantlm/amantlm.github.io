@@ -142,7 +142,7 @@
       "classTag": "CLASS 4–8",
       "desc_hi": "समतल वर्ग (2D) और ठोस घन (3D) को समझो—टुकड़े अलग करो, 360° घुमाओ और क्विज़ खेलो।",
       "desc_en": "Explore 2D square area and 3D cube volume: separate pieces, rotate in 3D, and play the quiz.",
-      "link": "square-and-cube-tlm",
+      "link": "square_and_cube_tlm.html",
       "btn_hi": "खोज शुरू करें",
       "btn_en": "Start explore"
     },
