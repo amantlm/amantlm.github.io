@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>प्रकाश संश्लेषण प्रयोगशाला | Interactive Photosynthesis Lab TLM</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Friendly Look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Baloo 2', 'Fredoka', cursive, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    /* Smooth Transitions & Custom Animations */
+    @keyframes floatUp {
+      0% { transform: translateY(0px) scale(0.8); opacity: 0; }
+      50% { opacity: 0.9; }
+      100% { transform: translateY(-90px) scale(1.2); opacity: 0; }
+    }
+    .animate-float-o2 {
+      animation: floatUp 2.5s infinite ease-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.4)); }
+      50% { filter: drop-shadow(0 0 16px rgba(74, 222, 128, 0.9)); }
+    }
+    .plant-active-glow {
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes flowWater {
+      0% { stroke-dashoffset: 60; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .water-flow-active {
+      stroke-dasharray: 6 6;
+      animation: flowWater 1s linear infinite;
+    }
+
+    @keyframes sunRays {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spin-slow {
+      transform-origin: 90px 90px;
+      animation: sunRays 25s linear infinite;
+    }
+
+    /* Modal Backdrop Blur */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.93);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-sky-200 via-sky-100 to-amber-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <!-- Top Navigation & Title Bar -->
+  <header class="w-full bg-white/85 backdrop-blur border-b border-emerald-200 shadow-sm px-4 py-2 sm:px-6">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-2xl shadow-md">
+          🌱
+        </div>
+        <div>
+          <h1 id="appTitle" class="text-xl sm:text-2xl font-bold text-emerald-800 tracking-tight leading-tight">
+            प्रकाश संश्लेषण प्रयोगशाला <span class="text-xs sm:text-sm font-semibold text-emerald-600 block sm:inline sm:ml-1">Photosynthesis Lab TLM</span>
+          </h1>
+          <p id="appSubtitle" class="text-xs text-slate-500 font-medium">कक्षा 4-8 के लिए इंटरैक्टिव विज्ञान TLM (Primary & Upper Primary)</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons & Language Switcher -->
+      <div class="flex items-center flex-wrap gap-2">
+        <!-- Language Switcher Toggle Pill -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-300 shadow-inner">
+          <button id="langHiBtn" class="px-2.5 py-1 text-xs font-bold rounded-xl transition bg-emerald-600 text-white shadow-sm">
+            हिन्दी
+          </button>
+          <button id="langEnBtn" class="px-2.5 py-1 text-xs font-bold rounded-xl transition text-slate-600 hover:text-slate-900">
+            English
+          </button>
+        </div>
+
+        <button id="toggleSoundBtn" class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs sm:text-sm font-bold flex items-center gap-1 shadow-sm transition">
+          <span id="soundIcon">🔊</span> <span id="soundText">ध्वनि ऑन</span>
+        </button>
+        <button id="stomataBtn" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold flex items-center gap-1 shadow-sm transition">
+          <span>🔬</span> <span id="stomataBtnText">पत्ती के अंदर देखें (Stomata)</span>
+        </button>
+        <button id="quizBtn" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold flex items-center gap-1 shadow-sm transition">
+          <span>🎯</span> <span id="quizBtnText">मिनी क्विज़</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Work Area -->
+  <main class="max-w-6xl w-full mx-auto p-3 sm:p-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    
+    <!-- LEFT: Simulation Canvas (7 Columns on large screens) -->
+    <div class="lg:col-span-7 bg-white rounded-3xl p-3 sm:p-4 shadow-xl border-4 border-emerald-100 flex flex-col relative overflow-hidden">
+      
+      <!-- Sky & Plant Visual Container -->
+      <div id="skyBackground" class="relative rounded-2xl overflow-hidden border border-sky-300 transition-colors duration-700 h-[380px] sm:h-[440px] bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100">
+        
+        <!-- Live Status Overlay Pill -->
+        <div class="absolute top-3 left-3 z-20 flex items-center gap-2">
+          <span id="statusBadge" class="px-3 py-1 rounded-full text-xs sm:text-sm font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow flex items-center gap-1">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+            <span id="statusText">सामग्री एकत्रित करें...</span>
+          </span>
+        </div>
+
+        <!-- SVG Graphics -->
+        <svg id="labSvg" class="w-full h-full" viewBox="0 0 500 440" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <!-- Sun Radial Glow -->
+            <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FEF08A" stop-opacity="1"/>
+              <stop offset="60%" stop-color="#FBBF24" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+            </radialGradient>
+
+            <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#15803D" />
+              <stop offset="50%" stop-color="#22C55E" />
+              <stop offset="100%" stop-color="#166534" />
+            </linearGradient>
+
+            <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4ADE80" />
+              <stop offset="100%" stop-color="#15803D" />
+            </linearGradient>
+
+            <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- SUN (Dynamic Light Level) -->
+          <g id="sunGroup" class="transition-opacity duration-700" opacity="1">
+            <!-- Ray Circles -->
+            <circle cx="85" cy="85" r="65" fill="url(#sunGlow)" />
+            <!-- Rotating Sun Rays -->
+            <g class="spin-slow" id="rotatingRays">
+              <path d="M 85,15 L 85,2 M 85,155 L 85,168 M 15,85 L 2,85 M 155,85 L 168,85 M 35,35 L 25,25 M 135,135 L 145,145 M 35,135 L 25,145 M 135,35 L 145,25" stroke="#FBBF24" stroke-width="4" stroke-linecap="round" />
+            </g>
+            <!-- Sun Face -->
+            <circle cx="85" cy="85" r="34" fill="#FBBF24" stroke="#F59E0B" stroke-width="3" />
+            <circle cx="75" cy="80" r="4" fill="#78350F" />
+            <circle cx="95" cy="80" r="4" fill="#78350F" />
+            <path d="M 75,93 Q 85,103 95,93" stroke="#78350F" stroke-width="3" fill="none" stroke-linecap="round" />
+          </g>
+
+          <!-- SUNLIGHT BEAMS TOWARD PLANT -->
+          <g id="sunBeams" class="transition-opacity duration-500" opacity="0.6">
+            <line x1="120" y1="100" x2="230" y2="200" stroke="#FDE047" stroke-width="4" stroke-dasharray="8 6" opacity="0.75" />
+            <line x1="100" y1="120" x2="190" y2="250" stroke="#FDE047" stroke-width="3" stroke-dasharray="6 4" opacity="0.7" />
+            <line x1="130" y1="80" x2="270" y2="180" stroke="#FDE047" stroke-width="3" stroke-dasharray="8 6" opacity="0.6" />
+          </g>
+
+          <!-- CLOUDS (Fade in if Sunlight low) -->
+          <g id="cloudGroup" class="transition-opacity duration-700 pointer-events-none" opacity="0.1">
+            <path d="M 170,70 Q 185,45 220,50 Q 255,45 270,70 Q 290,80 280,105 Q 260,115 180,115 Q 155,100 170,70 Z" fill="#E2E8F0" opacity="0.9" />
+            <path d="M 50,55 Q 65,35 95,40 Q 120,35 130,55 Q 145,65 135,85 Q 120,95 60,95 Q 40,85 50,55 Z" fill="#CBD5E1" opacity="0.85" />
+          </g>
+
+          <!-- SOIL & UNDERGROUND -->
+          <path d="M 0,330 Q 250,325 500,330 L 500,440 L 0,440 Z" fill="#854D0E" />
+          <path d="M 0,330 Q 250,320 500,330 L 500,345 L 0,345 Z" fill="#65A30D" />
+          <!-- Small soil pebble specks -->
+          <circle cx="120" cy="370" r="3" fill="#713F12" />
+          <circle cx="340" cy="380" r="4" fill="#5A320C" />
+          <circle cx="210" cy="410" r="3" fill="#713F12" />
+          <circle cx="290" cy="360" r="2.5" fill="#5A320C" />
+
+          <!-- ROOTS -->
+          <g id="rootsGroup" stroke="#CA8A04" stroke-width="4" stroke-linecap="round" fill="none">
+            <!-- Main Tap Root -->
+            <path id="tapRoot" d="M 250,330 Q 248,370 245,420" />
+            <!-- Branch Roots -->
+            <path d="M 249,345 Q 220,365 195,385" stroke-width="3" />
+            <path d="M 249,360 Q 280,380 305,400" stroke-width="3" />
+            <path d="M 247,385 Q 225,400 200,418" stroke-width="2.5" />
+            <path d="M 246,400 Q 265,415 280,425" stroke-width="2" />
+          </g>
+
+          <!-- WATER DROPLETS FLOW IN ROOTS (ANIMATED PATHS) -->
+          <g id="waterFlowInRoots" class="transition-opacity duration-300" opacity="0">
+            <path d="M 195,385 Q 220,365 249,345" stroke="#38BDF8" stroke-width="3" class="water-flow-active" fill="none" />
+            <path d="M 305,400 Q 280,380 249,360" stroke="#38BDF8" stroke-width="3" class="water-flow-active" fill="none" />
+            <path d="M 245,420 Q 248,370 250,330" stroke="#0284C7" stroke-width="4" class="water-flow-active" fill="none" />
+          </g>
+
+          <!-- STEM (TALL & STRONG) -->
+          <g id="plantStem">
+            <path d="M 250,332 Q 246,240 250,150" stroke="url(#stemGrad)" stroke-width="12" stroke-linecap="round" fill="none" />
+            <!-- Inner Xylem vessel simulation -->
+            <path id="xylemFlow" d="M 250,332 Q 246,240 250,150" stroke="#38BDF8" stroke-width="3" fill="none" opacity="0" />
+          </g>
+
+          <!-- LEAF 1 (LEFT BOTTOM) -->
+          <g id="leafLeft" class="transition-all duration-500 origin-bottom-right">
+            <!-- Leaf stem -->
+            <path d="M 248,255 Q 215,250 185,260" stroke="#16A34A" stroke-width="5" fill="none" stroke-linecap="round" />
+            <!-- Leaf blade -->
+            <path id="leafBodyLeft" d="M 185,260 C 130,225 105,255 100,270 C 120,295 160,290 185,260 Z" fill="url(#leafGrad)" stroke="#15803D" stroke-width="2" />
+            <!-- Veins -->
+            <path d="M 185,260 Q 140,265 110,270" stroke="#86EFAC" stroke-width="2" fill="none" />
+            <path d="M 160,262 L 150,250" stroke="#86EFAC" stroke-width="1.5" />
+            <path d="M 140,265 L 132,277" stroke="#86EFAC" stroke-width="1.5" />
+            <!-- Leaf Label -->
+            <text id="svgLeafLabel" x="105" y="240" font-size="11" font-weight="bold" fill="#14532D">पत्ती (Leaf)</text>
+          </g>
+
+          <!-- LEAF 2 (RIGHT MIDDLE) -->
+          <g id="leafRight" class="transition-all duration-500 origin-bottom-left">
+            <!-- Leaf stem -->
+            <path d="M 252,215 Q 285,200 315,205" stroke="#16A34A" stroke-width="5" fill="none" stroke-linecap="round" />
+            <!-- Leaf blade -->
+            <path id="leafBodyRight" d="M 315,205 C 370,170 395,200 400,215 C 380,240 340,235 315,205 Z" fill="url(#leafGrad)" stroke="#15803D" stroke-width="2" />
+            <!-- Veins -->
+            <path d="M 315,205 Q 360,210 390,215" stroke="#86EFAC" stroke-width="2" fill="none" />
+            <path d="M 340,207 L 348,196" stroke="#86EFAC" stroke-width="1.5" />
+            <path d="M 360,210 L 368,223" stroke="#86EFAC" stroke-width="1.5" />
+            <!-- Chlorophyll tag -->
+            <g id="chlorophyllBadge" class="transition-opacity duration-500" opacity="1">
+              <rect x="330" y="245" width="85" height="18" rx="9" fill="#15803D" opacity="0.9"/>
+              <text id="svgChloroLabel" x="372" y="258" font-size="9.5" font-weight="bold" fill="#ffffff" text-anchor="middle">क्लोरोफिल (Green)</text>
+            </g>
+          </g>
+
+          <!-- FLOWER / TOP BUD -->
+          <g id="flowerGroup" transform="translate(250, 140)">
+            <!-- Flower petals -->
+            <circle cx="-12" cy="0" r="11" fill="#F43F5E" />
+            <circle cx="12" cy="0" r="11" fill="#F43F5E" />
+            <circle cx="0" cy="-12" r="11" fill="#FB7185" />
+            <circle cx="0" cy="12" r="11" fill="#E11D48" />
+            <circle cx="0" cy="0" r="10" fill="#FBBF24" />
+          </g>
+
+          <!-- ANIMATED CO2 INFLOW PARTICLES (Air into Leaf) -->
+          <g id="co2FlowGroup" class="transition-opacity duration-300" opacity="0">
+            <!-- CO2 Left -->
+            <g class="animate-bounce" style="animation-duration: 2s;">
+              <circle cx="70" cy="220" r="12" fill="#475569" opacity="0.85" />
+              <text x="70" y="224" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">CO₂</text>
+              <!-- Flow Arrow -->
+              <path d="M 85,225 Q 115,245 130,255" stroke="#475569" stroke-width="2" stroke-dasharray="4 2" fill="none" />
+            </g>
+            <!-- CO2 Right -->
+            <g class="animate-bounce" style="animation-duration: 2.3s;">
+              <circle cx="430" cy="170" r="12" fill="#475569" opacity="0.85" />
+              <text x="430" y="174" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">CO₂</text>
+              <path d="M 415,180 Q 380,195 365,205" stroke="#475569" stroke-width="2" stroke-dasharray="4 2" fill="none" />
+            </g>
+          </g>
+
+          <!-- ANIMATED O2 BUBBLES RELEASE (From Leaves into Air) -->
+          <g id="o2BubbleGroup" class="hidden">
+            <!-- Bubble 1 from Left Leaf -->
+            <g transform="translate(130, 240)" class="animate-float-o2">
+              <circle cx="0" cy="0" r="13" fill="#38BDF8" stroke="#0284C7" stroke-width="1.5" opacity="0.9" />
+              <text x="0" y="4" font-size="10" font-weight="800" fill="#ffffff" text-anchor="middle">O₂</text>
+            </g>
+            <!-- Bubble 2 from Right Leaf -->
+            <g transform="translate(370, 195)" class="animate-float-o2" style="animation-delay: 1.1s;">
+              <circle cx="0" cy="0" r="14" fill="#38BDF8" stroke="#0284C7" stroke-width="1.5" opacity="0.9" />
+              <text x="0" y="4" font-size="10" font-weight="800" fill="#ffffff" text-anchor="middle">O₂</text>
+            </g>
+          </g>
+
+          <!-- GLUCOSE (FOOD) DROPLETS GOING DOWN STEM -->
+          <g id="glucoseGroup" class="hidden">
+            <circle cx="250" cy="230" r="5" fill="#F59E0B" stroke="#B45309" stroke-width="1.5">
+              <animate attributeName="cy" values="200; 320" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="1; 0.2" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <!-- Label -->
+            <rect x="260" y="275" width="85" height="18" rx="9" fill="#D97706" opacity="0.95" />
+            <text id="svgGlucoseLabel" x="302" y="288" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">ग्लूकोज (भोजन)</text>
+          </g>
+
+          <!-- WATERING CAN (ACTIVE ON WATER ACTION) -->
+          <g id="wateringCan" class="transition-opacity duration-300 opacity-0 pointer-events-none" transform="translate(50, 270)">
+            <path d="M 0,20 L 35,20 L 30,50 L 5,50 Z" fill="#0284C7" />
+            <path d="M 30,30 L 60,15" stroke="#0284C7" stroke-width="4" stroke-linecap="round" />
+            <circle cx="62" cy="14" r="5" fill="#38BDF8" />
+            <path d="M 5,20 Q -10,35 5,45" stroke="#0284C7" stroke-width="4" fill="none" />
+            <!-- Water spray lines -->
+            <line x1="65" y1="18" x2="85" y2="45" stroke="#38BDF8" stroke-width="2" stroke-dasharray="3 3" />
+            <line x1="68" y1="20" x2="95" y2="50" stroke="#38BDF8" stroke-width="2" stroke-dasharray="3 3" />
+            <line x1="63" y1="22" x2="78" y2="52" stroke="#38BDF8" stroke-width="2" stroke-dasharray="3 3" />
+          </g>
+
+        </svg>
+
+        <!-- Fun Hint Overlay Bar at the bottom of visual -->
+        <div id="hintBar" class="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-amber-200 text-xs sm:text-sm text-slate-700 flex items-center justify-between shadow">
+          <span id="hintMessage" class="flex items-center gap-1 font-semibold text-emerald-800">
+            💡 <span id="hintText">प्रकाश संश्लेषण शुरू करने के लिए धूप, पानी और CO₂ चालू करें!</span>
+          </span>
+          <span id="sugarIndicator" class="hidden text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">
+            भोजन निर्माण चालू 🍯
+          </span>
+        </div>
+      </div>
+
+      <!-- Live Reaction Equation Board -->
+      <div class="mt-3 p-3 bg-slate-50 border-2 border-emerald-200 rounded-2xl">
+        <div class="flex items-center justify-between mb-1.5">
+          <h2 id="reactionBoardTitle" class="text-xs font-bold text-slate-500 uppercase tracking-wider">रासायनिक समीकरण (Chemical Reaction)</h2>
+          <span id="reactionRateLabel" class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">प्रक्रिया रुकी हुई है</span>
+        </div>
+        
+        <!-- Equation Blocks -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-extrabold">
+          <!-- Light -->
+          <div id="eqLight" class="px-2.5 py-1.5 rounded-xl border-2 border-amber-300 bg-amber-50 text-amber-900 transition-all duration-300 flex items-center gap-1 opacity-40">
+            <span>☀️</span> <span id="eqTextLight">सूर्य का प्रकाश</span>
+          </div>
+          <span class="text-slate-400 font-bold">+</span>
+          <!-- Water -->
+          <div id="eqWater" class="px-2.5 py-1.5 rounded-xl border-2 border-sky-300 bg-sky-50 text-sky-900 transition-all duration-300 flex items-center gap-1 opacity-40">
+            <span>💧</span> <span id="eqTextWater">जल (H₂O)</span>
+          </div>
+          <span class="text-slate-400 font-bold">+</span>
+          <!-- CO2 -->
+          <div id="eqCO2" class="px-2.5 py-1.5 rounded-xl border-2 border-slate-300 bg-slate-100 text-slate-800 transition-all duration-300 flex items-center gap-1 opacity-40">
+            <span>💨</span> <span id="eqTextCO2">कार्बन डाइऑक्साइड (CO₂)</span>
+          </div>
+          
+          <span class="text-emerald-700 font-black text-base sm:text-lg">➔</span>
+
+          <!-- Glucose -->
+          <div id="eqGlucose" class="px-2.5 py-1.5 rounded-xl border-2 border-orange-300 bg-orange-50 text-orange-950 transition-all duration-300 flex items-center gap-1 opacity-40">
+            <span>🍯</span> <span id="eqTextGlucose">ग्लूकोज (भोजन)</span>
+          </div>
+          <span class="text-slate-400 font-bold">+</span>
+          <!-- O2 -->
+          <div id="eqOxygen" class="px-2.5 py-1.5 rounded-xl border-2 border-teal-300 bg-teal-50 text-teal-900 transition-all duration-300 flex items-center gap-1 opacity-40">
+            <span>🫧</span> <span id="eqTextOxygen">ऑक्सीजन (O₂)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Interactive Controls & Educational Insights (5 Columns) -->
+    <div class="lg:col-span-5 space-y-4">
+      
+      <!-- Control Panel Box -->
+      <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-lg border-2 border-slate-200">
+        <h2 id="labControlsTitle" class="text-lg font-extrabold text-slate-800 flex items-center gap-2 mb-3">
+          <span>🎛️</span> प्रयोगशाला नियंत्रण (Lab Controls)
+        </h2>
+        
+        <div class="space-y-4">
+          
+          <!-- Control 1: Sunlight -->
+          <div class="p-3 bg-amber-50/80 rounded-2xl border border-amber-200">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="sunSlider" id="sunLabel" class="text-sm font-bold text-amber-900 flex items-center gap-1.5">
+                <span>☀️</span> सूर्य का प्रकाश (Sunlight)
+              </label>
+              <span id="sunValueText" class="text-xs font-extrabold px-2 py-0.5 bg-amber-200 text-amber-900 rounded-lg">तेज़ (100%)</span>
+            </div>
+            <input id="sunSlider" type="range" min="0" max="100" value="100" class="w-full accent-amber-500 cursor-pointer h-2 bg-amber-200 rounded-lg">
+            <div class="flex justify-between text-[11px] text-amber-700/80 mt-1 font-semibold">
+              <span id="sunLevelDark">रात/अंधेरा (0%)</span>
+              <span id="sunLevelMed">छाया (50%)</span>
+              <span id="sunLevelFull">पूर्ण धूप (100%)</span>
+            </div>
+          </div>
+
+          <!-- Control 2: Water (Watering Can Action) -->
+          <div class="p-3 bg-sky-50/80 rounded-2xl border border-sky-200 flex items-center justify-between">
+            <div>
+              <div id="waterLabel" class="text-sm font-bold text-sky-900 flex items-center gap-1.5">
+                <span>💧</span> जड़ों में जल (Water in Soil)
+              </div>
+              <p id="waterStatusSub" class="text-xs text-sky-700">मिट्टी नम है, जड़ें पानी खींच रही हैं।</p>
+            </div>
+            <button id="toggleWaterBtn" class="px-4 py-2 rounded-xl font-extrabold text-xs shadow-md transition-transform active:scale-95 bg-sky-500 hover:bg-sky-600 text-white flex items-center gap-1">
+              <span>🚿</span> <span id="waterBtnText">पानी दें (ON)</span>
+            </button>
+          </div>
+
+          <!-- Control 3: CO2 Atmosphere -->
+          <div class="p-3 bg-slate-100 rounded-2xl border border-slate-300 flex items-center justify-between">
+            <div>
+              <div id="co2Label" class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <span>💨</span> वायु में CO₂ (Carbon Dioxide)
+              </div>
+              <p id="co2StatusSub" class="text-xs text-slate-600">पत्तियाँ रंध्रों से CO₂ ले रही हैं।</p>
+            </div>
+            <button id="toggleCO2Btn" class="px-4 py-2 rounded-xl font-extrabold text-xs shadow-md transition-transform active:scale-95 bg-slate-700 hover:bg-slate-800 text-white flex items-center gap-1">
+              <span>🌬️</span> <span id="co2BtnText">CO₂ चालू</span>
+            </button>
+          </div>
+
+          <!-- Control 4: Chlorophyll Toggle -->
+          <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between">
+            <div>
+              <div id="chloroLabel" class="text-sm font-bold text-emerald-900 flex items-center gap-1.5">
+                <span>🍃</span> पर्णहरिम / क्लोरोफिल (Chlorophyll)
+              </div>
+              <p id="chloroDesc" class="text-xs text-emerald-700">पत्तियों का हरा वर्णक जो प्रकाश सोखता है।</p>
+            </div>
+            <button id="toggleChloroBtn" class="px-3.5 py-1.5 rounded-xl font-extrabold text-xs shadow-md transition bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1">
+              <span>✨</span> <span id="chloroBtnText">हरा (सक्रिय)</span>
+            </button>
+          </div>
+
+          <!-- Preset Quick Scenarios for Teachers -->
+          <div class="pt-1 border-t border-slate-200">
+            <span id="scenariosHeading" class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">शिक्षक/छात्र प्रयोग (Quick Scenarios)</span>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button id="scenarioNight" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-left transition">
+                🌙 रात का समय (No Sun)
+              </button>
+              <button id="scenarioDrought" class="p-2 rounded-xl bg-amber-100 hover:bg-amber-200 font-bold text-amber-800 text-left transition">
+                🏜️ सूखा / बिना पानी
+              </button>
+              <button id="scenarioNoAir" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-left transition">
+                📦 बिना CO₂ (बंद जार)
+              </button>
+              <button id="scenarioIdeal" class="p-2 rounded-xl bg-emerald-100 hover:bg-emerald-200 font-bold text-emerald-800 text-left transition">
+                🌟 आदर्श स्थिति (सभी On)
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Learning Card (Classes 4-8 concept) -->
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-3xl p-4 shadow-lg">
+        <h3 id="kitchenCardTitle" class="font-black text-base flex items-center gap-2 mb-1">
+          <span>📖</span> पौधे का रसोईघर (The Plant's Kitchen)
+        </h3>
+        <p id="kitchenCardBody" class="text-xs text-emerald-100 leading-relaxed">
+          पौधे की पत्तियाँ <strong>पर्णहरिम (Chlorophyll)</strong> की सहायता से सूर्य के प्रकाश को पकड़ती हैं, जड़ों से <strong>पानी</strong> और वायु से <strong>कार्बन डाइऑक्साइड</strong> लेकर ग्लूकोज रूपी भोजन बनाती हैं और हमें जीवनदायिनी <strong>ऑक्सीजन</strong> देती हैं।
+        </p>
+        <div class="mt-2.5 pt-2 border-t border-emerald-400/40 flex justify-between text-[11px] font-bold text-emerald-200">
+          <span id="xylemFact">• ज़ाइलम (Xylem): पानी लाता है</span>
+          <span id="phloemFact">• फ्लोएम (Phloem): भोजन बांटता है</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL 1: MICROSCOPIC STOMATA / LEAF VIEW -->
+  <div id="stomataModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3">
+    <div class="glass-card max-w-xl w-full rounded-3xl p-5 border-4 border-emerald-400 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+      <button id="closeStomataModal" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-200 hover:bg-slate-300 font-extrabold text-slate-700 flex items-center justify-center transition">✕</button>
+      
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">🔬</span>
+        <div>
+          <h3 id="stomataModalTitle" class="text-lg font-black text-emerald-900">पत्ती की आंतरिक संरचना एवं रंध्र (Stomata)</h3>
+          <p id="stomataModalSubtitle" class="text-xs text-slate-500">सूक्ष्मदर्शीय दृश्य (Microscopic Cross-Section View)</p>
+        </div>
+      </div>
+
+      <!-- Stomata SVG Model -->
+      <div class="bg-emerald-950 rounded-2xl p-3 my-3 flex flex-col items-center justify-center relative overflow-hidden">
+        <svg class="w-full h-56" viewBox="0 0 400 220">
+          <defs>
+            <radialGradient id="guardGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#4ADE80"/>
+              <stop offset="100%" stop-color="#15803D"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Surrounding Epidermal Cells -->
+          <g fill="#166534" stroke="#22C55E" stroke-width="2" opacity="0.6">
+            <rect x="20" y="20" width="80" height="80" rx="20"/>
+            <rect x="20" y="115" width="80" height="80" rx="20"/>
+            <rect x="300" y="20" width="80" height="80" rx="20"/>
+            <rect x="300" y="115" width="80" height="80" rx="20"/>
+          </g>
+
+          <!-- Guard Cells (Left & Right) that open/close -->
+          <!-- Left Guard Cell -->
+          <path id="leftGuardCell" d="M 175,40 C 130,70 130,150 175,180 C 150,150 150,70 175,40 Z" fill="url(#guardGrad)" stroke="#86EFAC" stroke-width="2" />
+          <!-- Right Guard Cell -->
+          <path id="rightGuardCell" d="M 225,40 C 270,70 270,150 225,180 C 250,150 250,70 225,40 Z" fill="url(#guardGrad)" stroke="#86EFAC" stroke-width="2" />
+
+          <!-- Guard Cell Nuclei & Chloroplasts -->
+          <circle cx="150" cy="110" r="8" fill="#FDE047" opacity="0.9" />
+          <circle cx="250" cy="110" r="8" fill="#FDE047" opacity="0.9" />
+
+          <!-- Stomatal Pore Aperture -->
+          <ellipse id="stomaPore" cx="200" cy="110" rx="26" ry="50" fill="#022c22" />
+
+          <!-- Gas exchange arrows -->
+          <g id="gasFlowInStoma">
+            <!-- CO2 Entering -->
+            <path d="M 120,20 Q 170,50 195,90" stroke="#94A3B8" stroke-width="3" stroke-dasharray="4 3" fill="none" />
+            <text id="stomaCO2Text" x="110" y="25" fill="#CBD5E1" font-size="11" font-weight="bold">CO₂ अंदर</text>
+            <!-- O2 Exiting -->
+            <path d="M 205,120 Q 240,160 280,180" stroke="#38BDF8" stroke-width="3" stroke-dasharray="4 3" fill="none" />
+            <text id="stomaO2Text" x="285" y="185" fill="#38BDF8" font-size="11" font-weight="bold">O₂ बाहर</text>
+          </g>
+
+          <!-- Labels inside SVG -->
+          <text id="stomaPoreLabel" x="200" y="205" fill="#A7F3D0" font-size="11" font-weight="bold" text-anchor="middle">रंध्र छिद्र (Stomatal Pore)</text>
+          <text id="stomaGuardLeftLabel" x="145" y="130" fill="#FEF08A" font-size="9" text-anchor="middle">द्वार कोशिका</text>
+          <text id="stomaGuardRightLabel" x="255" y="130" fill="#FEF08A" font-size="9" text-anchor="middle">Guard Cell</text>
+        </svg>
+
+        <div class="absolute bottom-2 right-3 text-[10px] text-emerald-300 bg-emerald-900/80 px-2 py-0.5 rounded-md">
+          <span id="stomaStatusPrefix">स्थिति:</span> <span id="stomaStatusLabel" class="font-bold text-white">खुला हुआ (Open)</span>
+        </div>
+      </div>
+
+      <!-- Explanation details -->
+      <div class="text-xs text-slate-700 space-y-1.5 bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200">
+        <p id="stomaExpl1"><strong>1. रंध्र (Stomata):</strong> पत्तियों की सतह पर पाए जाने वाले सूक्ष्म छिद्र हैं जिनसे गैसों का आदान-प्रदान और वाष्पोत्सर्जन (Transpiration) होता है।</p>
+        <p id="stomaExpl2"><strong>2. द्वार कोशिकाएं (Guard Cells):</strong> जब इनमें पानी भरता है तो ये फूल जाती हैं और रंध्र खुल जाता है। पानी कम होने पर ये सिकुड़ जाती हैं और रंध्र बंद हो जाता है।</p>
+      </div>
+
+      <div class="mt-4 flex justify-end">
+        <button id="toggleStomaStateBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition">
+          रंध्र बंद/खोलें (Toggle Open/Close)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: INTERACTIVE MINI QUIZ -->
+  <div id="quizModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-5 border-4 border-indigo-300 shadow-2xl relative">
+      <button id="closeQuizModal" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-200 hover:bg-slate-300 font-extrabold text-slate-700 flex items-center justify-center transition">✕</button>
+      
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-2xl">🎯</span>
+        <div>
+          <h3 id="quizModalTitle" class="text-lg font-black text-indigo-950">परखें अपना ज्ञान (Mini Quiz)</h3>
+          <p id="quizModalSubtitle" class="text-xs text-slate-500">कक्षा 4 से 8 के छात्रों के लिए त्वरित प्रश्नोत्तरी</p>
+        </div>
+      </div>
+
+      <!-- Quiz Content Box -->
+      <div id="quizContent" class="space-y-4">
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+          <div id="quizProgressBar" class="bg-indigo-600 h-full w-1/3 transition-all duration-300"></div>
+        </div>
+
+        <!-- Question Counter & Text -->
+        <div>
+          <span id="quizQuestionCount" class="text-xs font-bold text-indigo-600 uppercase tracking-wider">प्रश्न 1 / 3</span>
+          <h4 id="quizQuestionText" class="text-base font-bold text-slate-800 mt-1">पौधे का रसोईघर किसे कहा जाता है?</h4>
+        </div>
+
+        <!-- Options Buttons -->
+        <div id="quizOptionsContainer" class="grid grid-cols-1 gap-2 pt-1">
+          <!-- Dynamic buttons inserted via JS -->
+        </div>
+
+        <!-- Result Feedback Banner -->
+        <div id="quizFeedback" class="hidden p-3 rounded-xl text-xs font-bold transition"></div>
+      </div>
+
+      <!-- Score Box (Final Screen) -->
+      <div id="quizScoreBox" class="hidden text-center py-6 space-y-3">
+        <div class="text-5xl">🏆</div>
+        <h4 id="quizSummaryTitle" class="text-xl font-black text-indigo-950">शाबाश! आपने क्विज़ पूरा किया!</h4>
+        <p id="quizScoreText" class="text-sm font-semibold text-slate-600">आपका स्कोर: 3 में से 3</p>
+        <button id="restartQuizBtn" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+          पुनः प्रयास करें (Play Again)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer / Teacher Note -->
+  <footer class="w-full bg-white/85 backdrop-blur border-t border-emerald-100 py-3 px-4 text-center text-xs text-slate-500 shadow-inner">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-1.5 text-slate-600 font-medium">
+        <span>💡</span> <span id="footerTipText"><strong>TLM टिप:</strong> प्रोजेक्टर या स्मार्ट टीवी पर बच्चों को एक-एक कारक (धूप, पानी) बंद करके प्रभाव दिखाएं।</span>
+      </div>
+      <!-- Strict English Author Credit Badge -->
+      <div class="flex items-center gap-2">
+        <span class="px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 shadow-sm flex items-center gap-1.5 text-xs">
+          <span>✨</span> Created by Aman Singhal
+        </span>
+        <span id="footerGradeBadge" class="text-slate-400 font-semibold hidden md:inline">• Class 4-8 Science TLM</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC & BILINGUAL ENGINE -->
+  <script>
+    // --- Application State ---
+    const state = {
+      lang: 'hi',         // 'hi' or 'en'
+      sunlight: 100,      // 0 to 100
+      water: true,        // true or false
+      co2: true,          // true or false
+      chlorophyll: true,  // true or false
+      soundEnabled: true,
+      stomataOpen: true
+    };
+
+    // --- Bilingual Dictionaries ---
+    const i18n = {
+      hi: {
+        appTitle: "प्रकाश संश्लेषण प्रयोगशाला",
+        appSubtitle: "कक्षा 4-8 के लिए इंटरैक्टिव विज्ञान TLM (Primary & Upper Primary)",
+        soundOn: "ध्वनि ऑन",
+        soundOff: "ध्वनि म्यूट",
+        stomataBtn: "पत्ती के अंदर देखें (Stomata)",
+        quizBtn: "मिनी क्विज़",
+        collectMaterials: "सामग्री एकत्रित करें...",
+        activeStatus: "प्रकाश संश्लेषण सक्रिय है! (Active)",
+        haltedStatus: "प्रक्रिया रुकी हुई है (Halted)",
+        reactionActive: "भोजन व ऑक्सीजन निर्माण चालू",
+        reactionHalted: "कमी के कारण क्रिया बंद",
+        reactionIdle: "प्रक्रिया रुकी हुई है",
+        foodMakingActive: "भोजन निर्माण चालू 🍯",
+        hintStart: "प्रकाश संश्लेषण शुरू करने के लिए धूप, पानी और CO₂ चालू करें!",
+        hintSuccess: "अद्भुत! पौधा सूर्य की रोशनी से भोजन (ग्लूकोज) बना रहा है और ऑक्सीजन छोड़ रहा है।",
+        hintNeedSun: "पौधे को धूप की आवश्यकता है! सूर्य का प्रकाश स्लाइडर बढ़ाएं।",
+        hintNeedWater: "पौधे की जड़ें प्यासी हैं! 'पानी दें' बटन दबाएं।",
+        hintNeedCO2: "पत्तियों को कार्बन डाइऑक्साइड (CO₂) चाहिए! CO₂ चालू करें।",
+        hintNeedChloro: "बिना क्लोरोफिल के पत्तियाँ प्रकाश ऊर्जा नहीं सोख सकतीं!",
+        svgLeaf: "पत्ती (Leaf)",
+        svgChloro: "क्लोरोफिल (Green)",
+        svgGlucose: "ग्लूकोज (भोजन)",
+        reactionTitle: "रासायनिक समीकरण (Chemical Reaction)",
+        eqLight: "सूर्य का प्रकाश",
+        eqWater: "जल (H₂O)",
+        eqCO2: "कार्बन डाइऑक्साइड (CO₂)",
+        eqGlucose: "ग्लूकोज (भोजन)",
+        eqOxygen: "ऑक्सीजन (O₂)",
+        labControlsTitle: "प्रयोगशाला नियंत्रण (Lab Controls)",
+        sunLabel: "सूर्य का प्रकाश (Sunlight)",
+        sunBright: "तेज़",
+        sunMedium: "मध्यम",
+        sunDark: "रात/अंधेरा",
+        sunLevelDark: "रात/अंधेरा (0%)",
+        sunLevelMed: "छाया (50%)",
+        sunLevelFull: "पूर्ण धूप (100%)",
+        waterLabel: "जड़ों में जल (Water in Soil)",
+        waterWetDesc: "मिट्टी नम है, जड़ें पानी खींच रही हैं।",
+        waterDryDesc: "मिट्टी सूखी है! पौधे को पानी चाहिए।",
+        waterBtnOn: "पानी चालू (ON)",
+        waterBtnOff: "पानी बंद (OFF)",
+        co2Label: "वायु में CO₂ (Carbon Dioxide)",
+        co2ActiveDesc: "पत्तियाँ रंध्रों से CO₂ ले रही हैं।",
+        co2MissingDesc: "हवा में CO₂ नहीं है! रंध्र भूखे हैं।",
+        co2BtnOn: "CO₂ चालू",
+        co2BtnOff: "CO₂ बंद",
+        chloroLabel: "पर्णहरिम / क्लोरोफिल (Chlorophyll)",
+        chloroDesc: "पत्तियों का हरा वर्णक जो प्रकाश सोखता है।",
+        chloroBtnOn: "हरा (सक्रिय)",
+        chloroBtnOff: "वर्णक निष्क्रिय",
+        scenariosHeading: "शिक्षक/छात्र प्रयोग (Quick Scenarios)",
+        scenarioNight: "🌙 रात का समय (No Sun)",
+        scenarioDrought: "🏜️ सूखा / बिना पानी",
+        scenarioNoAir: "📦 बिना CO₂ (बंद जार)",
+        scenarioIdeal: "🌟 आदर्श स्थिति (सभी On)",
+        kitchenCardTitle: "पौधे का रसोईघर (The Plant's Kitchen)",
+        kitchenCardBody: "पौधे की पत्तियाँ पर्णहरिम (Chlorophyll) की सहायता से सूर्य के प्रकाश को पकड़ती हैं, जड़ों से पानी और वायु से कार्बन डाइऑक्साइड लेकर ग्लूकोज रूपी भोजन बनाती हैं और हमें जीवनदायिनी ऑक्सीजन देती हैं।",
+        xylemFact: "• ज़ाइलम (Xylem): पानी लाता है",
+        phloemFact: "• फ्लोएम (Phloem): भोजन बांटता है",
+        stomataModalTitle: "पत्ती की आंतरिक संरचना एवं रंध्र (Stomata)",
+        stomataModalSubtitle: "सूक्ष्मदर्शीय दृश्य (Microscopic Cross-Section View)",
+        stomaCO2: "CO₂ अंदर",
+        stomaO2: "O₂ बाहर",
+        stomaPoreLabel: "रंध्र छिद्र (Stomatal Pore)",
+        stomaGuardLeft: "द्वार कोशिका",
+        stomaGuardRight: "Guard Cell",
+        stomaStatusPrefix: "स्थिति:",
+        stomaOpenText: "खुला हुआ (Open - गैस विनिमय सक्रिय)",
+        stomaClosedText: "बंद (Closed - वाष्पोत्सर्जन रुका)",
+        stomaExpl1: "1. रंध्र (Stomata): पत्तियों की सतह पर पाए जाने वाले सूक्ष्म छिद्र हैं जिनसे गैसों का आदान-प्रदान और वाष्पोत्सर्जन (Transpiration) होता है।",
+        stomaExpl2: "2. द्वार कोशिकाएं (Guard Cells): जब इनमें पानी भरता है तो ये फूल जाती हैं और रंध्र खुल जाता है। पानी कम होने पर ये सिकुड़ जाती हैं और रंध्र बंद हो जाता है।",
+        stomaToggleBtn: "रंध्र बंद/खोलें (Toggle Open/Close)",
+        quizModalTitle: "परखें अपना ज्ञान (Mini Quiz)",
+        quizModalSubtitle: "कक्षा 4 से 8 के छात्रों के लिए त्वरित प्रश्नोत्तरी",
+        quizSummaryTitle: "शाबाश! आपने क्विज़ पूरा किया!",
+        playAgain: "पुनः प्रयास करें (Play Again)",
+        footerTip: "TLM टिप: प्रोजेक्टर या स्मार्ट टीवी पर बच्चों को एक-एक कारक (धूप, पानी) बंद करके प्रभाव दिखाएं।",
+        footerGrade: "• कक्षा 4-8 विज्ञान TLM"
+      },
+      en: {
+        appTitle: "Photosynthesis Virtual Lab",
+        appSubtitle: "Interactive Science TLM for Classes 4-8 (Primary & Upper Primary)",
+        soundOn: "Sound ON",
+        soundOff: "Sound Muted",
+        stomataBtn: "Look Inside Leaf (Stomata)",
+        quizBtn: "Mini Quiz",
+        collectMaterials: "Gathering essentials...",
+        activeStatus: "Photosynthesis is Active!",
+        haltedStatus: "Process Halted!",
+        reactionActive: "Food & Oxygen Production Active",
+        reactionHalted: "Reaction stopped due to missing input",
+        reactionIdle: "Process Idle",
+        foodMakingActive: "Food Synthesis Active 🍯",
+        hintStart: "Turn on Sunlight, Water, and CO₂ to start Photosynthesis!",
+        hintSuccess: "Wonderful! Plant is synthesizing glucose and releasing oxygen using sunlight.",
+        hintNeedSun: "Plant needs sunlight! Increase the Sunlight slider.",
+        hintNeedWater: "Roots are thirsty! Click 'Give Water' button.",
+        hintNeedCO2: "Leaves need Carbon Dioxide (CO₂)! Turn on CO₂.",
+        hintNeedChloro: "Leaves cannot absorb solar energy without Chlorophyll!",
+        svgLeaf: "Leaf",
+        svgChloro: "Chlorophyll (Green)",
+        svgGlucose: "Glucose (Food)",
+        reactionTitle: "Chemical Reaction Equation",
+        eqLight: "Sunlight",
+        eqWater: "Water (H₂O)",
+        eqCO2: "Carbon Dioxide (CO₂)",
+        eqGlucose: "Glucose (Food)",
+        eqOxygen: "Oxygen (O₂)",
+        labControlsTitle: "Lab Controls",
+        sunLabel: "Sunlight Intensity",
+        sunBright: "Bright",
+        sunMedium: "Medium",
+        sunDark: "Dark/Night",
+        sunLevelDark: "Night/Dark (0%)",
+        sunLevelMed: "Shade (50%)",
+        sunLevelFull: "Full Sun (100%)",
+        waterLabel: "Water in Soil",
+        waterWetDesc: "Soil is moist, roots are absorbing water.",
+        waterDryDesc: "Soil is dry! Plant needs water.",
+        waterBtnOn: "Water ON",
+        waterBtnOff: "Water OFF",
+        co2Label: "Atmospheric CO₂",
+        co2ActiveDesc: "Leaves are absorbing CO₂ via stomata.",
+        co2MissingDesc: "No CO₂ available in the atmosphere!",
+        co2BtnOn: "CO₂ ON",
+        co2BtnOff: "CO₂ OFF",
+        chloroLabel: "Chlorophyll Pigment",
+        chloroDesc: "Green pigment inside leaves that captures light.",
+        chloroBtnOn: "Active (Green)",
+        chloroBtnOff: "Inactive Pigment",
+        scenariosHeading: "Teacher / Student Scenarios",
+        scenarioNight: "🌙 Night Time (No Sun)",
+        scenarioDrought: "🏜️ Drought / No Water",
+        scenarioNoAir: "📦 No CO₂ (Sealed Jar)",
+        scenarioIdeal: "🌟 Ideal Condition (All ON)",
+        kitchenCardTitle: "The Plant's Kitchen",
+        kitchenCardBody: "Plant leaves trap solar energy using Chlorophyll, absorb water through roots and CO₂ from air, synthesize food (glucose), and give us life-supporting Oxygen.",
+        xylemFact: "• Xylem: Transports water upwards",
+        phloemFact: "• Phloem: Distributes glucose/food",
+        stomataModalTitle: "Leaf Internal Structure & Stomata",
+        stomataModalSubtitle: "Microscopic Cross-Section View",
+        stomaCO2: "CO₂ Inflow",
+        stomaO2: "O₂ Outflow",
+        stomaPoreLabel: "Stomatal Pore",
+        stomaGuardLeft: "Guard Cell",
+        stomaGuardRight: "Guard Cell",
+        stomaStatusPrefix: "Status:",
+        stomaOpenText: "Open (Gas exchange active)",
+        stomaClosedText: "Closed (Transpiration stopped)",
+        stomaExpl1: "1. Stomata: Microscopic pores present on leaf surfaces that facilitate gas exchange and transpiration.",
+        stomaExpl2: "2. Guard Cells: When water flows in, they swell and open the pore. When water is depleted, they shrink and close the pore.",
+        stomaToggleBtn: "Toggle Open / Close Stomata",
+        quizModalTitle: "Test Your Knowledge (Mini Quiz)",
+        quizModalSubtitle: "Quick interactive quiz for Classes 4 to 8",
+        quizSummaryTitle: "Awesome! You completed the quiz!",
+        playAgain: "Play Again",
+        footerTip: "TLM Tip: Use projector or smart TV to demonstrate what happens when sunlight or water is turned off.",
+        footerGrade: "• Class 4-8 Science TLM"
+      }
+    };
+
+    // Bilingual Quiz Data
+    const quizData = {
+      hi: [
+        {
+          question: "1. पौधे का 'रसोईघर' (Kitchen of the Plant) किसे कहा जाता है?",
+          options: ["जड़ (Root)", "पत्ती (Leaf)", "तना (Stem)", "फूल (Flower)"],
+          correct: 1,
+          explanation: "पत्तियों में क्लोरोफिल होता है जो भोजन बनाने (प्रकाश संश्लेषण) का मुख्य केंद्र है।"
+        },
+        {
+          question: "2. प्रकाश संश्लेषण के दौरान पौधे वायु से कौन सी गैस लेते हैं?",
+          options: ["ऑक्सीजन (O₂)", "नाइट्रोजन (N₂)", "कार्बन डाइऑक्साइड (CO₂)", "हीलियम"],
+          correct: 2,
+          explanation: "पौधे रंध्रों (Stomata) के माध्यम से कार्बन डाइऑक्साइड (CO₂) अवशोषित करते हैं।"
+        },
+        {
+          question: "3. प्रकाश संश्लेषण की क्रिया के उपरांत कौन सी प्राणवायु बाहर निकलती है?",
+          options: ["ऑक्सीजन (O₂)", "कार्बन डाइऑक्साइड (CO₂)", "हाइड्रोजन", "मीथेन"],
+          correct: 0,
+          explanation: "पौधे हमारे लिए आवश्यक प्राणवायु 'ऑक्सीजन' वातावरण में छोड़ते हैं।"
+        }
+      ],
+      en: [
+        {
+          question: "1. Which part is known as the 'Kitchen of the Plant'?",
+          options: ["Root", "Leaf", "Stem", "Flower"],
+          correct: 1,
+          explanation: "Leaves contain chlorophyll and are the primary site for food synthesis (photosynthesis)."
+        },
+        {
+          question: "2. Which gas do plants absorb from air during photosynthesis?",
+          options: ["Oxygen (O₂)", "Nitrogen (N₂)", "Carbon Dioxide (CO₂)", "Helium"],
+          correct: 2,
+          explanation: "Plants take in Carbon Dioxide (CO₂) through microscopic pores called stomata."
+        },
+        {
+          question: "3. Which life-giving gas is released by plants during photosynthesis?",
+          options: ["Oxygen (O₂)", "Carbon Dioxide (CO₂)", "Hydrogen", "Methane"],
+          correct: 0,
+          explanation: "Plants release Oxygen (O₂) into the atmosphere as a vital byproduct."
+        }
+      ]
+    };
+
+    let currentQuestionIndex = 0;
+    let quizScore = 0;
+
+    // --- Sound Effects using Web Audio API ---
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+      },
+      playWater() {
+        if (!state.soundEnabled) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.15);
+        } catch(e) {}
+      },
+      playSuccess() {
+        if (!state.soundEnabled) return;
+        this.init();
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          osc.frequency.setValueAtTime(783.99, now + 0.2);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(now + 0.35);
+        } catch(e) {}
+      },
+      playPop() {
+        if (!state.soundEnabled) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(350, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.08);
+        } catch(e) {}
+      }
+    };
+
+    // --- DOM Elements ---
+    const langHiBtn = document.getElementById('langHiBtn');
+    const langEnBtn = document.getElementById('langEnBtn');
+
+    const appTitle = document.getElementById('appTitle');
+    const appSubtitle = document.getElementById('appSubtitle');
+    const toggleSoundBtn = document.getElementById('toggleSoundBtn');
+    const soundIcon = document.getElementById('soundIcon');
+    const soundText = document.getElementById('soundText');
+    const stomataBtn = document.getElementById('stomataBtn');
+    const stomataBtnText = document.getElementById('stomataBtnText');
+    const quizBtn = document.getElementById('quizBtn');
+    const quizBtnText = document.getElementById('quizBtnText');
+
+    const sunSlider = document.getElementById('sunSlider');
+    const sunLabel = document.getElementById('sunLabel');
+    const sunValueText = document.getElementById('sunValueText');
+    const sunLevelDark = document.getElementById('sunLevelDark');
+    const sunLevelMed = document.getElementById('sunLevelMed');
+    const sunLevelFull = document.getElementById('sunLevelFull');
+    const sunGroup = document.getElementById('sunGroup');
+    const sunBeams = document.getElementById('sunBeams');
+    const cloudGroup = document.getElementById('cloudGroup');
+    const skyBackground = document.getElementById('skyBackground');
+
+    const waterLabel = document.getElementById('waterLabel');
+    const toggleWaterBtn = document.getElementById('toggleWaterBtn');
+    const waterBtnText = document.getElementById('waterBtnText');
+    const waterStatusSub = document.getElementById('waterStatusSub');
+    const waterFlowInRoots = document.getElementById('waterFlowInRoots');
+    const xylemFlow = document.getElementById('xylemFlow');
+    const wateringCan = document.getElementById('wateringCan');
+
+    const co2Label = document.getElementById('co2Label');
+    const toggleCO2Btn = document.getElementById('toggleCO2Btn');
+    const co2BtnText = document.getElementById('co2BtnText');
+    const co2StatusSub = document.getElementById('co2StatusSub');
+    const co2FlowGroup = document.getElementById('co2FlowGroup');
+
+    const chloroLabel = document.getElementById('chloroLabel');
+    const chloroDesc = document.getElementById('chloroDesc');
+    const toggleChloroBtn = document.getElementById('toggleChloroBtn');
+    const chloroBtnText = document.getElementById('chloroBtnText');
+    const chlorophyllBadge = document.getElementById('chlorophyllBadge');
+    const leafBodyLeft = document.getElementById('leafBodyLeft');
+    const leafBodyRight = document.getElementById('leafBodyRight');
+
+    const o2BubbleGroup = document.getElementById('o2BubbleGroup');
+    const glucoseGroup = document.getElementById('glucoseGroup');
+    const statusBadge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+    const hintText = document.getElementById('hintText');
+    const sugarIndicator = document.getElementById('sugarIndicator');
+    const reactionRateLabel = document.getElementById('reactionRateLabel');
+
+    // Equation Elements
+    const reactionBoardTitle = document.getElementById('reactionBoardTitle');
+    const eqLight = document.getElementById('eqLight');
+    const eqWater = document.getElementById('eqWater');
+    const eqCO2 = document.getElementById('eqCO2');
+    const eqGlucose = document.getElementById('eqGlucose');
+    const eqOxygen = document.getElementById('eqOxygen');
+    const eqTextLight = document.getElementById('eqTextLight');
+    const eqTextWater = document.getElementById('eqTextWater');
+    const eqTextCO2 = document.getElementById('eqTextCO2');
+    const eqTextGlucose = document.getElementById('eqTextGlucose');
+    const eqTextOxygen = document.getElementById('eqTextOxygen');
+
+    // Controls Box Elements
+    const labControlsTitle = document.getElementById('labControlsTitle');
+    const scenariosHeading = document.getElementById('scenariosHeading');
+    const scenarioNight = document.getElementById('scenarioNight');
+    const scenarioDrought = document.getElementById('scenarioDrought');
+    const scenarioNoAir = document.getElementById('scenarioNoAir');
+    const scenarioIdeal = document.getElementById('scenarioIdeal');
+
+    // Facts Card Elements
+    const kitchenCardTitle = document.getElementById('kitchenCardTitle');
+    const kitchenCardBody = document.getElementById('kitchenCardBody');
+    const xylemFact = document.getElementById('xylemFact');
+    const phloemFact = document.getElementById('phloemFact');
+
+    // SVG Labels
+    const svgLeafLabel = document.getElementById('svgLeafLabel');
+    const svgChloroLabel = document.getElementById('svgChloroLabel');
+    const svgGlucoseLabel = document.getElementById('svgGlucoseLabel');
+
+    // Stomata Modal
+    const stomataModal = document.getElementById('stomataModal');
+    const closeStomataModal = document.getElementById('closeStomataModal');
+    const stomataModalTitle = document.getElementById('stomataModalTitle');
+    const stomataModalSubtitle = document.getElementById('stomataModalSubtitle');
+    const toggleStomaStateBtn = document.getElementById('toggleStomaStateBtn');
+    const stomaPore = document.getElementById('stomaPore');
+    const stomaStatusPrefix = document.getElementById('stomaStatusPrefix');
+    const stomaStatusLabel = document.getElementById('stomaStatusLabel');
+    const gasFlowInStoma = document.getElementById('gasFlowInStoma');
+    const stomaCO2Text = document.getElementById('stomaCO2Text');
+    const stomaO2Text = document.getElementById('stomaO2Text');
+    const stomaPoreLabel = document.getElementById('stomaPoreLabel');
+    const stomaGuardLeftLabel = document.getElementById('stomaGuardLeftLabel');
+    const stomaGuardRightLabel = document.getElementById('stomaGuardRightLabel');
+    const stomaExpl1 = document.getElementById('stomaExpl1');
+    const stomaExpl2 = document.getElementById('stomaExpl2');
+
+    // Quiz Elements
+    const quizModal = document.getElementById('quizModal');
+    const closeQuizModal = document.getElementById('closeQuizModal');
+    const quizModalTitle = document.getElementById('quizModalTitle');
+    const quizModalSubtitle = document.getElementById('quizModalSubtitle');
+    const quizProgressBar = document.getElementById('quizProgressBar');
+    const quizQuestionCount = document.getElementById('quizQuestionCount');
+    const quizQuestionText = document.getElementById('quizQuestionText');
+    const quizOptionsContainer = document.getElementById('quizOptionsContainer');
+    const quizFeedback = document.getElementById('quizFeedback');
+    const quizContent = document.getElementById('quizContent');
+    const quizScoreBox = document.getElementById('quizScoreBox');
+    const quizSummaryTitle = document.getElementById('quizSummaryTitle');
+    const quizScoreText = document.getElementById('quizScoreText');
+    const restartQuizBtn = document.getElementById('restartQuizBtn');
+
+    // Footer
+    const footerTipText = document.getElementById('footerTipText');
+    const footerGradeBadge = document.getElementById('footerGradeBadge');
+
+    // --- Language Switcher Handler ---
+    function setLanguage(lang) {
+      state.lang = lang;
+      const dict = i18n[lang];
+
+      if (lang === 'hi') {
+        langHiBtn.className = "px-2.5 py-1 text-xs font-bold rounded-xl transition bg-emerald-600 text-white shadow-sm";
+        langEnBtn.className = "px-2.5 py-1 text-xs font-bold rounded-xl transition text-slate-600 hover:text-slate-900";
+        appTitle.innerHTML = `${dict.appTitle} <span class="text-xs sm:text-sm font-semibold text-emerald-600 block sm:inline sm:ml-1">Photosynthesis Lab TLM</span>`;
+      } else {
+        langEnBtn.className = "px-2.5 py-1 text-xs font-bold rounded-xl transition bg-emerald-600 text-white shadow-sm";
+        langHiBtn.className = "px-2.5 py-1 text-xs font-bold rounded-xl transition text-slate-600 hover:text-slate-900";
+        appTitle.innerHTML = `${dict.appTitle} <span class="text-xs sm:text-sm font-semibold text-emerald-600 block sm:inline sm:ml-1">Class 4-8 Science</span>`;
+      }
+
+      appSubtitle.textContent = dict.appSubtitle;
+      soundText.textContent = state.soundEnabled ? dict.soundOn : dict.soundOff;
+      stomataBtnText.textContent = dict.stomataBtn;
+      quizBtnText.textContent = dict.quizBtn;
+
+      // SVG Labels
+      svgLeafLabel.textContent = dict.svgLeaf;
+      svgChloroLabel.textContent = dict.svgChloro;
+      svgGlucoseLabel.textContent = dict.svgGlucose;
+
+      // Reaction Board
+      reactionBoardTitle.textContent = dict.reactionTitle;
+      eqTextLight.textContent = dict.eqLight;
+      eqTextWater.textContent = dict.eqWater;
+      eqTextCO2.textContent = dict.eqCO2;
+      eqTextGlucose.textContent = dict.eqGlucose;
+      eqTextOxygen.textContent = dict.eqOxygen;
+
+      // Controls Titles & Scenarios
+      labControlsTitle.innerHTML = `<span>🎛️</span> ${dict.labControlsTitle}`;
+      sunLabel.innerHTML = `<span>☀️</span> ${dict.sunLabel}`;
+      sunLevelDark.textContent = dict.sunLevelDark;
+      sunLevelMed.textContent = dict.sunLevelMed;
+      sunLevelFull.textContent = dict.sunLevelFull;
+      waterLabel.innerHTML = `<span>💧</span> ${dict.waterLabel}`;
+      co2Label.innerHTML = `<span>💨</span> ${dict.co2Label}`;
+      chloroLabel.innerHTML = `<span>🍃</span> ${dict.chloroLabel}`;
+      chloroDesc.textContent = dict.chloroDesc;
+      scenariosHeading.textContent = dict.scenariosHeading;
+      scenarioNight.textContent = dict.scenarioNight;
+      scenarioDrought.textContent = dict.scenarioDrought;
+      scenarioNoAir.textContent = dict.scenarioNoAir;
+      scenarioIdeal.textContent = dict.scenarioIdeal;
+
+      // Kitchen Card
+      kitchenCardTitle.innerHTML = `<span>📖</span> ${dict.kitchenCardTitle}`;
+      kitchenCardBody.innerHTML = dict.kitchenCardBody;
+      xylemFact.textContent = dict.xylemFact;
+      phloemFact.textContent = dict.phloemFact;
+
+      // Stomata Modal
+      stomataModalTitle.textContent = dict.stomataModalTitle;
+      stomataModalSubtitle.textContent = dict.stomataModalSubtitle;
+      stomaCO2Text.textContent = dict.stomaCO2;
+      stomaO2Text.textContent = dict.stomaO2;
+      stomaPoreLabel.textContent = dict.stomaPoreLabel;
+      stomaGuardLeftLabel.textContent = dict.stomaGuardLeft;
+      stomaGuardRightLabel.textContent = dict.stomaGuardRight;
+      stomaStatusPrefix.textContent = dict.stomaStatusPrefix;
+      stomaStatusLabel.textContent = state.stomataOpen ? dict.stomaOpenText : dict.stomaClosedText;
+      stomaExpl1.innerHTML = `<strong>${dict.stomaExpl1.slice(0, 18)}</strong>${dict.stomaExpl1.slice(18)}`;
+      stomaExpl2.innerHTML = `<strong>${dict.stomaExpl2.slice(0, 24)}</strong>${dict.stomaExpl2.slice(24)}`;
+      toggleStomaStateBtn.textContent = dict.stomaToggleBtn;
+
+      // Quiz Modal Static Titles
+      quizModalTitle.textContent = dict.quizModalTitle;
+      quizModalSubtitle.textContent = dict.quizModalSubtitle;
+      quizSummaryTitle.textContent = dict.quizSummaryTitle;
+      restartQuizBtn.textContent = dict.playAgain;
+
+      // Footer
+      footerTipText.innerHTML = `<strong>TLM ${lang === 'hi' ? 'टिप' : 'Tip'}:</strong> ${dict.footerTip.replace(/^.*?:\s*/, '')}`;
+      footerGradeBadge.textContent = dict.footerGrade;
+
+      // Refresh quiz questions if quiz modal is open
+      if (!quizModal.classList.contains('hidden')) {
+        renderQuizQuestion();
+      }
+
+      updateSimulation();
+    }
+
+    langHiBtn.addEventListener('click', () => {
+      AudioEngine.playPop();
+      setLanguage('hi');
+    });
+
+    langEnBtn.addEventListener('click', () => {
+      AudioEngine.playPop();
+      setLanguage('en');
+    });
+
+    // --- Core Simulation Update Logic ---
+    function updateSimulation() {
+      const dict = i18n[state.lang];
+      const isSunSufficient = state.sunlight >= 30;
+      const isAllActive = isSunSufficient && state.water && state.co2 && state.chlorophyll;
+
+      // 1. Update Sun & Sky visual
+      const sunRatio = state.sunlight / 100;
+      sunGroup.setAttribute('opacity', Math.max(0.1, sunRatio).toString());
+      sunBeams.setAttribute('opacity', (sunRatio * 0.8).toString());
+      cloudGroup.setAttribute('opacity', (1 - sunRatio).toString());
+      
+      if (state.sunlight > 65) {
+        skyBackground.className = "relative rounded-2xl overflow-hidden border border-sky-300 transition-colors duration-700 h-[380px] sm:h-[440px] bg-gradient-to-b from-sky-400 via-sky-200 to-amber-100";
+        sunValueText.textContent = `${dict.sunBright} (${state.sunlight}%)`;
+      } else if (state.sunlight >= 30) {
+        skyBackground.className = "relative rounded-2xl overflow-hidden border border-amber-300 transition-colors duration-700 h-[380px] sm:h-[440px] bg-gradient-to-b from-sky-600 via-amber-200 to-orange-100";
+        sunValueText.textContent = `${dict.sunMedium} (${state.sunlight}%)`;
+      } else {
+        skyBackground.className = "relative rounded-2xl overflow-hidden border border-indigo-900 transition-colors duration-700 h-[380px] sm:h-[440px] bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-800";
+        sunValueText.textContent = `${dict.sunDark} (${state.sunlight}%)`;
+      }
+
+      // Equation highlighting for Light
+      if (isSunSufficient) {
+        eqLight.classList.remove('opacity-40');
+        eqLight.classList.add('scale-105', 'shadow-md', 'border-amber-400');
+      } else {
+        eqLight.classList.add('opacity-40');
+        eqLight.classList.remove('scale-105', 'shadow-md', 'border-amber-400');
+      }
+
+      // 2. Update Water visual
+      if (state.water) {
+        waterFlowInRoots.setAttribute('opacity', '1');
+        xylemFlow.setAttribute('opacity', '0.7');
+        eqWater.classList.remove('opacity-40');
+        eqWater.classList.add('scale-105', 'shadow-md', 'border-sky-400');
+        waterStatusSub.textContent = dict.waterWetDesc;
+        waterBtnText.textContent = dict.waterBtnOn;
+        toggleWaterBtn.className = "px-4 py-2 rounded-xl font-extrabold text-xs shadow-md transition-transform active:scale-95 bg-sky-500 hover:bg-sky-600 text-white flex items-center gap-1";
+      } else {
+        waterFlowInRoots.setAttribute('opacity', '0');
+        xylemFlow.setAttribute('opacity', '0');
+        eqWater.classList.add('opacity-40');
+        eqWater.classList.remove('scale-105', 'shadow-md', 'border-sky-400');
+        waterStatusSub.textContent = dict.waterDryDesc;
+        waterBtnText.textContent = dict.waterBtnOff;
+        toggleWaterBtn.className = "px-4 py-2 rounded-xl font-extrabold text-xs shadow-md transition-transform active:scale-95 bg-slate-300 text-slate-700 hover:bg-slate-400 flex items-center gap-1";
+      }
+
+      // 3. Update CO2 visual
+      if (state.co2) {
+        co2FlowGroup.setAttribute('opacity', '1');
+        eqCO2.classList.remove('opacity-40');
+        eqCO2.classList.add('scale-105', 'shadow-md', 'border-slate-500');
+        co2StatusSub.textContent = dict.co2ActiveDesc;
+        co2BtnText.textContent = dict.co2BtnOn;
+        toggleCO2Btn.className = "px-4 py-2 rounded-xl font-extrabold text-xs shadow-md transition-transform active:scale-95 bg-slate-700 hover:bg-slate-800 text-white flex items-center gap-1";
+      } else {
+        co2FlowGroup.setAttribute('opacity', '0');
+        eqCO2.classList.add('opacity-40');
+        eqCO2.classList.remove('scale-105', 'shadow-md', 'border-slate-500');
+        co2StatusSub.textContent = dict.co2MissingDesc;
+        co2BtnText.textContent = dict.co2BtnOff;
+        toggleCO2Btn.className = "px-4 py-2 rounded-xl font-extrabold text-xs shadow-md transition-transform active:scale-95 bg-slate-300 text-slate-700 hover:bg-slate-400 flex items-center gap-1";
+      }
+
+      // 4. Update Chlorophyll visual
+      if (state.chlorophyll) {
+        leafBodyLeft.setAttribute('fill', 'url(#leafGrad)');
+        leafBodyRight.setAttribute('fill', 'url(#leafGrad)');
+        chlorophyllBadge.setAttribute('opacity', '1');
+        chloroBtnText.textContent = dict.chloroBtnOn;
+        toggleChloroBtn.className = "px-3.5 py-1.5 rounded-xl font-extrabold text-xs shadow-md transition bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1";
+      } else {
+        leafBodyLeft.setAttribute('fill', '#CA8A04');
+        leafBodyRight.setAttribute('fill', '#CA8A04');
+        chlorophyllBadge.setAttribute('opacity', '0.2');
+        chloroBtnText.textContent = dict.chloroBtnOff;
+        toggleChloroBtn.className = "px-3.5 py-1.5 rounded-xl font-extrabold text-xs shadow-md transition bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1";
+      }
+
+      // 5. Outcome Assessment
+      if (isAllActive) {
+        o2BubbleGroup.classList.remove('hidden');
+        glucoseGroup.classList.remove('hidden');
+        sugarIndicator.classList.remove('hidden');
+        sugarIndicator.textContent = dict.foodMakingActive;
+
+        eqGlucose.classList.remove('opacity-40');
+        eqGlucose.classList.add('scale-105', 'border-orange-500');
+        eqOxygen.classList.remove('opacity-40');
+        eqOxygen.classList.add('scale-105', 'border-teal-500');
+
+        statusBadge.className = "px-3 py-1 rounded-full text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 shadow flex items-center gap-1";
+        statusText.textContent = dict.activeStatus;
+
+        reactionRateLabel.className = "text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+        reactionRateLabel.textContent = dict.reactionActive;
+
+        hintText.innerHTML = `<span class='text-emerald-700 font-bold'>${dict.hintSuccess}</span>`;
+      } else {
+        o2BubbleGroup.classList.add('hidden');
+        glucoseGroup.classList.add('hidden');
+        sugarIndicator.classList.add('hidden');
+
+        eqGlucose.classList.add('opacity-40');
+        eqGlucose.classList.remove('scale-105', 'border-orange-500');
+        eqOxygen.classList.add('opacity-40');
+        eqOxygen.classList.remove('scale-105', 'border-teal-500');
+
+        statusBadge.className = "px-3 py-1 rounded-full text-xs sm:text-sm font-bold bg-rose-100 text-rose-900 border border-rose-300 shadow flex items-center gap-1";
+        statusText.textContent = dict.haltedStatus;
+
+        reactionRateLabel.className = "text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800";
+        reactionRateLabel.textContent = dict.reactionHalted;
+
+        if (!isSunSufficient) {
+          hintText.textContent = dict.hintNeedSun;
+        } else if (!state.water) {
+          hintText.textContent = dict.hintNeedWater;
+        } else if (!state.co2) {
+          hintText.textContent = dict.hintNeedCO2;
+        } else if (!state.chlorophyll) {
+          hintText.textContent = dict.hintNeedChloro;
+        }
+      }
+    }
+
+    // --- Controls Listeners ---
+    sunSlider.addEventListener('input', (e) => {
+      state.sunlight = parseInt(e.target.value);
+      updateSimulation();
+    });
+
+    toggleWaterBtn.addEventListener('click', () => {
+      state.water = !state.water;
+      if (state.water) {
+        AudioEngine.playWater();
+        wateringCan.classList.remove('opacity-0');
+        setTimeout(() => wateringCan.classList.add('opacity-0'), 1500);
+      }
+      AudioEngine.playPop();
+      updateSimulation();
+    });
+
+    toggleCO2Btn.addEventListener('click', () => {
+      state.co2 = !state.co2;
+      AudioEngine.playPop();
+      updateSimulation();
+    });
+
+    toggleChloroBtn.addEventListener('click', () => {
+      state.chlorophyll = !state.chlorophyll;
+      AudioEngine.playPop();
+      updateSimulation();
+    });
+
+    // Preset Scenarios
+    document.getElementById('scenarioNight').addEventListener('click', () => {
+      sunSlider.value = 0;
+      state.sunlight = 0;
+      state.water = true;
+      state.co2 = true;
+      state.chlorophyll = true;
+      AudioEngine.playPop();
+      updateSimulation();
+    });
+
+    document.getElementById('scenarioDrought').addEventListener('click', () => {
+      sunSlider.value = 100;
+      state.sunlight = 100;
+      state.water = false;
+      state.co2 = true;
+      state.chlorophyll = true;
+      AudioEngine.playPop();
+      updateSimulation();
+    });
+
+    document.getElementById('scenarioNoAir').addEventListener('click', () => {
+      sunSlider.value = 100;
+      state.sunlight = 100;
+      state.water = true;
+      state.co2 = false;
+      state.chlorophyll = true;
+      AudioEngine.playPop();
+      updateSimulation();
+    });
+
+    document.getElementById('scenarioIdeal').addEventListener('click', () => {
+      sunSlider.value = 100;
+      state.sunlight = 100;
+      state.water = true;
+      state.co2 = true;
+      state.chlorophyll = true;
+      AudioEngine.playSuccess();
+      updateSimulation();
+    });
+
+    // Sound Toggle
+    toggleSoundBtn.addEventListener('click', () => {
+      state.soundEnabled = !state.soundEnabled;
+      const dict = i18n[state.lang];
+      soundIcon.textContent = state.soundEnabled ? "🔊" : "🔇";
+      soundText.textContent = state.soundEnabled ? dict.soundOn : dict.soundOff;
+    });
+
+    // --- Stomata Microscopic Modal Logic ---
+    stomataBtn.addEventListener('click', () => {
+      stomataModal.classList.remove('hidden');
+      AudioEngine.playPop();
+    });
+    closeStomataModal.addEventListener('click', () => {
+      stomataModal.classList.add('hidden');
+    });
+
+    toggleStomaStateBtn.addEventListener('click', () => {
+      state.stomataOpen = !state.stomataOpen;
+      const dict = i18n[state.lang];
+      AudioEngine.playPop();
+      if (state.stomataOpen) {
+        stomaPore.setAttribute('rx', '26');
+        gasFlowInStoma.style.display = 'block';
+        stomaStatusLabel.textContent = dict.stomaOpenText;
+        stomaStatusLabel.className = "font-bold text-emerald-300";
+      } else {
+        stomaPore.setAttribute('rx', '2');
+        gasFlowInStoma.style.display = 'none';
+        stomaStatusLabel.textContent = dict.stomaClosedText;
+        stomaStatusLabel.className = "font-bold text-rose-300";
+      }
+    });
+
+    // --- Quiz Logic ---
+    quizBtn.addEventListener('click', () => {
+      quizModal.classList.remove('hidden');
+      resetQuiz();
+      renderQuizQuestion();
+      AudioEngine.playPop();
+    });
+
+    closeQuizModal.addEventListener('click', () => {
+      quizModal.classList.add('hidden');
+    });
+
+    function resetQuiz() {
+      currentQuestionIndex = 0;
+      quizScore = 0;
+      quizContent.classList.remove('hidden');
+      quizScoreBox.classList.add('hidden');
+    }
+
+    function renderQuizQuestion() {
+      const questions = quizData[state.lang];
+      const q = questions[currentQuestionIndex];
+      const qPrefix = state.lang === 'hi' ? 'प्रश्न' : 'Question';
+      quizQuestionCount.textContent = `${qPrefix} ${currentQuestionIndex + 1} / ${questions.length}`;
+      quizQuestionText.textContent = q.question;
+      quizProgressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+      quizFeedback.classList.add('hidden');
+
+      quizOptionsContainer.innerHTML = '';
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3 rounded-2xl border-2 border-slate-200 hover:border-indigo-400 bg-white font-bold text-xs sm:text-sm text-slate-700 transition flex items-center justify-between";
+        btn.innerHTML = `<span>${opt}</span> <span class="text-slate-300">➜</span>`;
+        btn.onclick = () => handleQuizAnswer(idx, btn);
+        quizOptionsContainer.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(selectedIdx, btnElement) {
+      const questions = quizData[state.lang];
+      const q = questions[currentQuestionIndex];
+      const buttons = quizOptionsContainer.querySelectorAll('button');
+      buttons.forEach(b => b.disabled = true);
+
+      if (selectedIdx === q.correct) {
+        quizScore++;
+        AudioEngine.playSuccess();
+        btnElement.classList.remove('bg-white', 'border-slate-200');
+        btnElement.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900');
+        quizFeedback.className = "p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 block";
+        const successPrefix = state.lang === 'hi' ? '🎉 सही उत्तर!' : '🎉 Correct Answer!';
+        quizFeedback.innerHTML = `${successPrefix} ${q.explanation}`;
+      } else {
+        AudioEngine.playPop();
+        btnElement.classList.remove('bg-white', 'border-slate-200');
+        btnElement.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-900');
+        buttons[q.correct].classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900');
+        quizFeedback.className = "p-3 rounded-xl text-xs font-bold bg-rose-100 text-rose-900 border border-rose-300 block";
+        const wrongPrefix = state.lang === 'hi' ? '❌ गलत उत्तर! सही उत्तर था:' : '❌ Incorrect! The correct answer was:';
+        quizFeedback.innerHTML = `${wrongPrefix} <strong>${q.options[q.correct]}</strong>.<br>${q.explanation}`;
+      }
+
+      setTimeout(() => {
+        if (currentQuestionIndex < questions.length - 1) {
+          currentQuestionIndex++;
+          renderQuizQuestion();
+        } else {
+          showQuizSummary();
+        }
+      }, 1800);
+    }
+
+    function showQuizSummary() {
+      const questions = quizData[state.lang];
+      quizContent.classList.add('hidden');
+      quizScoreBox.classList.remove('hidden');
+      if (state.lang === 'hi') {
+        quizScoreText.textContent = `आपका स्कोर: ${questions.length} में से ${quizScore} अंक प्राप्त किए!`;
+      } else {
+        quizScoreText.textContent = `Your Score: You scored ${quizScore} out of ${questions.length}!`;
+      }
+      if (quizScore === questions.length) {
+        AudioEngine.playSuccess();
+      }
+    }
+
+    restartQuizBtn.addEventListener('click', () => {
+      resetQuiz();
+      renderQuizQuestion();
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === stomataModal) stomataModal.classList.add('hidden');
+      if (e.target === quizModal) quizModal.classList.add('hidden');
+    });
+
+    // Initial Trigger on Page Load
+    window.onload = function() {
+      setLanguage('hi');
+    };
+  </script>
+</body>
+</html>
