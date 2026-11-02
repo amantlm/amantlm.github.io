@@ -177,6 +177,22 @@
   "link": "indian_judiciary.html",
   "btn_hi": "अदालत देखें",
   "btn_en": "Explore Courts"
+},
+    {
+  "id": "plant-cell-explorer",
+  "title_hi": "पादप कोशिका की आंतरिक दुनिया",
+  "title_en": "Plant Cell 3D Explorer",
+  "subject": "science",
+  "grade": "6,7,8,9",
+  "search": "plant cell structure padap koshika cell organelles chloroplast mitochondria nucleus science biology विज्ञान",
+  "icon": "🔬",
+  "glow": "#16a34a",
+  "classTag": "CLASS 6–9",
+  "desc_hi": "पादप कोशिका के विभिन्न अंगों, उनके कार्य, 'खोजो और पहचानो' गेम व क्विज़ को इंटरैक्टिव मॉडल से समझो।",
+  "desc_en": "Explore plant cell organelles, functions, interactive find-the-part game, and quiz.",
+  "link": "plant_cell.html",
+  "btn_hi": "कोशिका देखें",
+  "btn_en": "Explore Cell"
 }
   ]
 }
