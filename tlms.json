@@ -163,10 +163,6 @@
       "btn_en": "Start experiment"
     },
   {
-    "id": "previous-tlm-1",
-    "title": "..."
-  },
-  {
   "id": "indian-judiciary-hierarchy",
   "title_hi": "न्याय की सीढ़ी: भारतीय न्यायपालिका",
   "title_en": "Indian Judiciary Hierarchy",
@@ -178,7 +174,7 @@
   "classTag": "CLASS 6–10",
   "desc_hi": "3D पिरामिड मॉडल, अपील की यात्रा (केस सिमुलेटर), 'आप बनें जज' और इंटरैक्टिव क्विज़ से न्यायपालिका समझो।",
   "desc_en": "Explore the 3D court pyramid, step-by-step case appeal journey, 'Be a Judge' interactive lab, and judicial quiz.",
-  "link": "indian-judiciary.html",
+  "link": "indian_judiciary.html",
   "btn_hi": "अदालत देखें",
   "btn_en": "Explore Courts"
 }
