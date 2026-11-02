@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="hi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>न्याय की सीढ़ी: भारतीय न्यायपालिका | Digital TLM</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for judicial & educational icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Poppins & Rozha One / Hind -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        hindi: ['Hind', 'sans-serif'],
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        apex: '#dc2626',      // Red for Supreme Court
+                        middle: '#2563eb',    // Blue for High Court
+                        basecourt: '#16a34a', // Green for District Court
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Hind', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+        }
+
+        /* 3D Pyramid Layer Perspective styling */
+        .pyramid-tier {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .tier-supreme-box {
+            clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+        }
+
+        .tier-high-box {
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+        }
+
+        .tier-district-box {
+            clip-path: polygon(6% 0%, 94% 0%, 100% 100%, 0% 100%);
+        }
+
+        .pyramid-tier:hover {
+            transform: translateY(-3px) scale(1.015);
+            filter: brightness(1.15);
+        }
+
+        .tier-active {
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.7);
+            border-color: #facc15 !important;
+            transform: scale(1.025);
+            filter: brightness(1.2);
+            z-index: 10;
+        }
+
+        /* Animated Pulsing Dot for Case Journey */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.25); opacity: 0.85; }
+        }
+        .pulse-dot {
+            animation: pulseGlow 1.4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-400 selection:text-black">
+
+    <!-- Top Header Bar -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-700/60 shadow-lg px-4 py-3">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 text-xl shadow-inner">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <span id="header-title">न्याय की सीढ़ी</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">TLM 3D</span>
+                    </h1>
+                    <p id="header-sub" class="text-xs text-slate-400 font-medium">भारतीय न्यायपालिका संरचना (Judicial Hierarchy)</p>
+                </div>
+            </div>
+
+            <!-- Language Switcher Toggle -->
+            <button onclick="toggleLanguage()" id="lang-btn" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition shadow-sm active:scale-95 text-amber-300">
+                <i class="fa-solid fa-language text-sm"></i>
+                <span id="lang-label">English</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto w-full px-3 sm:px-6 py-6 space-y-8 flex-grow">
+
+        <!-- Physical to Digital Bridge Badge & Audio Reader -->
+        <div class="bg-gradient-to-r from-amber-500/10 via-slate-800/80 to-blue-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-lg shrink-0 shadow">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-amber-300" id="badge-title">गत्ता पिरामिड मॉडल का डिजिटल संस्करण</h2>
+                    <p class="text-xs text-slate-300" id="badge-desc">कक्षा में बने पिरामिड के स्तरों को समझने के लिए नीचे किसी भी न्यायालय पर क्लिक या टैप करें।</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="#case-simulator" class="inline-flex items-center gap-2 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 rounded-xl transition shadow">
+                    <i class="fa-solid fa-play"></i>
+                    <span id="btn-explore-flow">केस चलाकर देखें</span>
+                </a>
+                <a href="#judge-lab" class="inline-flex items-center gap-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 px-3.5 py-2 rounded-xl transition shadow">
+                    <i class="fa-solid fa-gavel text-amber-400"></i>
+                    <span id="btn-judge-lab">आप बनें जज!</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2 Column Workspace: Left: Interactive Pyramid, Right: Court Details -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- LEFT: 3-Tier Pyramid Representation -->
+            <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col items-center">
+                <div class="w-full flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-amber-400"></i>
+                        <span id="lbl-pyramid-title">न्यायिक पिरामिड (3 स्तर)</span>
+                    </span>
+                    <span class="text-[11px] text-amber-400/90 font-medium" id="lbl-tap-hint">टैप करके विवरण देखें</span>
+                </div>
+
+                <!-- The Interactive Pyramid Stack with responsive widths & unclipped text -->
+                <div class="w-full max-w-[340px] flex flex-col items-center gap-2.5 py-2 select-none">
+
+                    <!-- Tier 1: Supreme Court (Apex) -->
+                    <div onclick="selectCourt('supreme')" id="tier-supreme" role="button" tabindex="0" 
+                        class="pyramid-tier tier-supreme-box w-full max-w-[270px] min-h-[96px] bg-gradient-to-t from-red-800 via-red-600 to-red-500 cursor-pointer flex flex-col items-center justify-center p-3 text-white border-2 border-red-400/60 shadow-xl rounded-t-xl group">
+                        <div class="text-center px-2">
+                            <span class="text-sm sm:text-base font-extrabold tracking-wide uppercase drop-shadow flex items-center justify-center gap-1.5 flex-wrap">
+                                <i class="fa-solid fa-landmark text-amber-300 text-xs shrink-0"></i>
+                                <span id="pyr-sc-name" class="leading-tight break-words">सर्वोच्च न्यायालय</span>
+                            </span>
+                            <span class="inline-block text-[10px] font-semibold bg-red-950/80 px-2 py-0.5 rounded-full mt-1 border border-red-400/40 text-red-100" id="pyr-sc-tag">
+                                शीर्ष स्तर (Supreme Court)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Tier 2: High Court (Middle) -->
+                    <div onclick="selectCourt('high')" id="tier-high" role="button" tabindex="0"
+                        class="pyramid-tier tier-high-box w-full max-w-[305px] min-h-[90px] bg-gradient-to-t from-blue-800 via-blue-600 to-blue-500 cursor-pointer flex flex-col items-center justify-center p-3 text-white border-2 border-blue-400/60 shadow-xl group">
+                        <div class="text-center px-2">
+                            <span class="text-sm sm:text-base font-extrabold tracking-wide uppercase drop-shadow flex items-center justify-center gap-1.5 flex-wrap">
+                                <i class="fa-solid fa-building-columns text-blue-200 text-xs shrink-0"></i>
+                                <span id="pyr-hc-name" class="leading-tight break-words">उच्च न्यायालय</span>
+                            </span>
+                            <span class="inline-block text-[10px] font-semibold bg-blue-950/80 px-2.5 py-0.5 rounded-full mt-1 border border-blue-400/40 text-blue-100" id="pyr-hc-tag">
+                                राज्य स्तर (High Court)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Tier 3: District & Subordinate Courts (Base) -->
+                    <div onclick="selectCourt('district')" id="tier-district" role="button" tabindex="0"
+                        class="pyramid-tier tier-district-box w-full max-w-[340px] min-h-[92px] bg-gradient-to-t from-emerald-800 via-emerald-600 to-emerald-500 cursor-pointer flex flex-col items-center justify-center p-3 text-white border-2 border-emerald-400/60 shadow-xl rounded-b-xl group tier-active">
+                        <div class="text-center px-2">
+                            <span class="text-xs sm:text-sm font-extrabold tracking-wide uppercase drop-shadow flex items-center justify-center gap-1.5 flex-wrap">
+                                <i class="fa-solid fa-gavel text-emerald-200 text-xs shrink-0"></i>
+                                <span id="pyr-dc-name" class="leading-tight break-words">जिला एवं अधीनस्थ न्यायालय</span>
+                            </span>
+                            <span class="inline-block text-[10px] font-semibold bg-emerald-950/80 px-2 py-0.5 rounded-full mt-1 border border-emerald-400/40 text-emerald-100" id="pyr-dc-tag">
+                                ज़िला / आधार स्तर (District Court)
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Base Label indicator -->
+                <div class="text-center mt-2">
+                    <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-arrow-up text-amber-400"></i>
+                        <span id="pyramid-note">फैसलों के खिलाफ अपील नीचे से ऊपर की ओर होती है</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- RIGHT: Dynamic Court Details Card -->
+            <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden transition-all duration-300" id="court-detail-panel">
+                
+                <!-- Dynamic Header banner -->
+                <div class="flex items-start justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="card-badge" class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider">
+                                आधार स्तर
+                            </span>
+                            <span id="card-article" class="text-xs text-slate-400 font-mono">Art. 233</span>
+                        </div>
+                        <h3 id="card-title" class="text-xl sm:text-2xl font-bold text-white">जिला एवं सत्र न्यायालय</h3>
+                        <p id="card-subtitle" class="text-xs sm:text-sm text-slate-400">District & Sessions Court (ज़िला स्तर)</p>
+                    </div>
+
+                    <div id="card-icon-container" class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl shrink-0 shadow-inner">
+                        <i id="card-icon" class="fa-solid fa-gavel"></i>
+                    </div>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-5">
+                    <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700/50">
+                        <span class="text-[11px] font-semibold text-amber-400 uppercase tracking-wider block mb-1" id="lbl-chief-officer">
+                            मुख्य न्यायिक अधिकारी
+                        </span>
+                        <p id="card-head-person" class="text-sm font-medium text-slate-200">
+                            जिला एवं सत्र न्यायाधीश (District Judge)
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-800/60 p-3.5 rounded-2xl border border-slate-700/50">
+                        <span class="text-[11px] font-semibold text-amber-400 uppercase tracking-wider block mb-1" id="lbl-jurisdiction">
+                            अधिकार क्षेत्र (Jurisdiction)
+                        </span>
+                        <p id="card-jurisdiction" class="text-sm font-medium text-slate-200">
+                            संबंधित जिला (Civil & Criminal Cases)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Bullet Points of Duties -->
+                <div class="space-y-2.5 mb-5">
+                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="lbl-key-roles">मुख्य विशेषताएं एवं कार्य:</h4>
+                    <ul id="card-roles" class="text-xs sm:text-sm space-y-2 text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0 text-xs"></i>
+                            <span>आम नागरिक सबसे पहले अपने दीवानी (Civil) या फौजदारी (Criminal) मामलों के लिए यहीं आता है।</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0 text-xs"></i>
+                            <span>दीवानी मामलों के लिए जिला जज एवं आपराधिक मामलों के लिए सत्र जज सुनवाई करते हैं।</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400 mt-1 shrink-0 text-xs"></i>
+                            <span>यहाँ के फैसले से असंतुष्ट होने पर नागरिक उच्च न्यायालय (High Court) में अपील कर सकता है।</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Example Pill (e.g., Allahabad HC) -->
+                <div id="card-example-box" class="bg-gradient-to-r from-slate-800 to-slate-800/40 p-3 rounded-xl border-l-4 border-emerald-500 text-xs text-slate-300 flex items-center justify-between">
+                    <div>
+                        <strong class="text-white" id="lbl-example-title">उदाहरण / संदर्भ:</strong>
+                        <span id="card-example-text" class="ml-1">प्रत्येक जनपद की जिला कचहरी (जैसे मेरठ, लखनऊ, वाराणसी जिला न्यायालय)।</span>
+                    </div>
+                    <i class="fa-solid fa-info-circle text-slate-400 ml-2"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- CASE JOURNEY SIMULATION SECTION -->
+        <section id="case-simulator" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 mb-1">
+                        <i class="fa-solid fa-route"></i>
+                        <span id="sim-badge">इंटरैक्टिव सिमुलेशन</span>
+                    </span>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white" id="sim-title">केस की वास्तविक यात्रा: रमेश का ज़मीनी विवाद</h3>
+                    <p class="text-xs sm:text-sm text-slate-400" id="sim-sub">न्याय पाने के लिए नागरिक चरण-दर-चरण अपील कैसे करते हैं?</p>
+                </div>
+
+                <!-- Simulation Action Controls -->
+                <div class="flex items-center gap-2">
+                    <button onclick="prevStep()" id="sim-prev-btn" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold disabled:opacity-40 transition">
+                        <i class="fa-solid fa-backward-step mr-1"></i> <span id="btn-prev">पीछे</span>
+                    </button>
+                    <button onclick="nextStep()" id="sim-next-btn" class="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition shadow-md">
+                        <span id="btn-next">अगला चरण</span> <i class="fa-solid fa-forward-step ml-1"></i>
+                    </button>
+                    <button onclick="resetSimulation()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 text-xs transition" title="पुनः शुरू करें">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Visual Stepper Progress Bar -->
+            <div class="relative mb-8 px-4">
+                <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1.5 bg-slate-800 rounded-full z-0"></div>
+                <div id="sim-progress-bar" class="absolute left-6 top-1/2 -translate-y-1/2 h-1.5 bg-gradient-to-r from-emerald-500 via-blue-500 to-red-500 rounded-full z-0 transition-all duration-500" style="width: 0%;"></div>
+
+                <div class="relative z-10 flex justify-between items-center text-center">
+                    
+                    <!-- Step 1 Node -->
+                    <div onclick="goToStep(1)" class="cursor-pointer group flex flex-col items-center">
+                        <div id="node-1" class="w-11 h-11 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center border-4 border-slate-900 shadow-xl transition-all scale-110 ring-4 ring-emerald-500/40">
+                            1
+                        </div>
+                        <span class="text-xs font-semibold mt-2 text-emerald-400" id="step-node-1-txt">जिला अदालत</span>
+                        <span class="text-[10px] text-slate-400" id="step-node-1-sub">शुरुआती वाद व फैसला</span>
+                    </div>
+
+                    <!-- Step 2 Node -->
+                    <div onclick="goToStep(2)" class="cursor-pointer group flex flex-col items-center">
+                        <div id="node-2" class="w-11 h-11 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center border-4 border-slate-900 shadow-xl transition-all">
+                            2
+                        </div>
+                        <span class="text-xs font-semibold mt-2 text-slate-400" id="step-node-2-txt">हाई कोर्ट</span>
+                        <span class="text-[10px] text-slate-400" id="step-node-2-sub">अपील की सुनवाई</span>
+                    </div>
+
+                    <!-- Step 3 Node -->
+                    <div onclick="goToStep(3)" class="cursor-pointer group flex flex-col items-center">
+                        <div id="node-3" class="w-11 h-11 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center border-4 border-slate-900 shadow-xl transition-all">
+                            3
+                        </div>
+                        <span class="text-xs font-semibold mt-2 text-slate-400" id="step-node-3-txt">सुप्रीम कोर्ट</span>
+                        <span class="text-[10px] text-slate-400" id="step-node-3-sub">अंतिम व बाध्यकारी फैसला</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Active Step Explanation Card with Story Continuity -->
+            <div id="sim-story-card" class="bg-slate-800/70 border border-slate-700/60 rounded-2xl p-5 flex flex-col sm:flex-row gap-5 items-center">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl shrink-0 border border-emerald-500/30">
+                    <i class="fa-solid fa-file-contract" id="sim-step-icon"></i>
+                </div>
+                <div class="space-y-1.5 text-center sm:text-left flex-grow">
+                    <div class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" id="sim-step-badge">
+                        चरण 1: शुरुआत (Ground Level)
+                    </div>
+                    <h4 class="text-base sm:text-lg font-bold text-white" id="sim-step-heading">
+                        विवाद की शुरुआत: जिला न्यायालय में प्रारंभिक मुकदमा
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="sim-step-desc">
+                        रमेश और उसके पड़ोसी के बीच पुश्तैनी ज़मीन को लेकर विवाद उत्पन्न हुआ। रमेश ने अपने जनपद के जिला न्यायालय में दीवानी वाद (Civil Suit) दायर किया। गवाहों और पुराने दस्तावेजों की सुनवाई के बाद जिला अदालत ने पड़ोसी के पक्ष में फैसला सुनाया। रमेश इस फैसले से पूरी तरह असंतुष्ट है और उसने न्याय के लिए उच्च न्यायालय जाने का निर्णय लिया।
+                    </p>
+                    <div id="sim-step-outcome" class="mt-2 text-xs font-medium text-amber-300/90 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20">
+                        <strong>निचला नतीजा:</strong> जिला अदालत का आदेश रमेश के खिलाफ आया ➔ अब अपील का रास्ता खुला।
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: INTERACTIVE JUDGE'S BENCH (ROLE-PLAY MINI-LAB) -->
+        <section id="judge-lab" class="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 border border-amber-500/30 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shadow-inner">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2" id="judge-lab-title">
+                            न्यायिक पीठ: "आप बनें जज!"
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 font-semibold" id="judge-badge-status">निर्णय लें</span>
+                        </h3>
+                        <p class="text-xs text-slate-400" id="judge-lab-sub">विवाद का अध्ययन करें और तय करें कि मामला किस अदालत के अधिकार क्षेत्र में आता है।</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400" id="judge-score-label">जज स्कोर:</span>
+                    <span id="judge-score" class="text-base font-extrabold text-amber-400 ml-1">0/3</span>
+                </div>
+            </div>
+
+            <!-- Case Scenario Box -->
+            <div id="judge-main-box" class="bg-slate-800/80 p-4 sm:p-5 rounded-2xl border border-slate-750 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="scenario-case-no">केस संख्या: #01</span>
+                    <span class="text-[11px] text-slate-400 font-medium" id="scenario-category">श्रेणी: संवैधानिक अधिकार</span>
+                </div>
+                <p class="text-sm sm:text-base font-medium text-slate-150 leading-relaxed text-slate-200" id="scenario-text">
+                    "सोहन को पुलिस ने बिना कोई कारण बताए या वारंट दिखाए 48 घंटे से अधिक हिरासत में रखा है। उसके मौलिक अधिकार (Article 21) का हनन हुआ है। वह तत्काल रिहाई के लिए किस अदालत में रिट दायर कर सकता है?"
+                </p>
+
+                <!-- Options: Pick the Court -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2" id="judge-choices-container">
+                    <button onclick="judgeVerdict('district')" id="judge-btn-district" class="judge-choice-btn p-3 rounded-xl bg-slate-900/90 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 text-left transition flex items-center justify-between group">
+                        <span id="choice-lbl-district">जिला अदालत (District Court)</span>
+                        <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-amber-400 transition" id="judge-icon-district"></i>
+                    </button>
+                    <button onclick="judgeVerdict('high')" id="judge-btn-high" class="judge-choice-btn p-3 rounded-xl bg-slate-900/90 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 text-left transition flex items-center justify-between group">
+                        <span id="choice-lbl-high">उच्च न्यायालय (High Court)</span>
+                        <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-amber-400 transition" id="judge-icon-high"></i>
+                    </button>
+                    <button onclick="judgeVerdict('supreme')" id="judge-btn-supreme" class="judge-choice-btn p-3 rounded-xl bg-slate-900/90 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 text-left transition flex items-center justify-between group">
+                        <span id="choice-lbl-supreme">सर्वोच्च न्यायालय (Supreme Court)</span>
+                        <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-amber-400 transition" id="judge-icon-supreme"></i>
+                    </button>
+                </div>
+
+                <!-- Verdict Stamp Output -->
+                <div id="judge-verdict-box" class="hidden mt-4 p-4 rounded-xl border flex flex-col gap-2">
+                    <div class="flex items-center gap-3">
+                        <div id="judge-verdict-icon" class="text-2xl shrink-0"></div>
+                        <div>
+                            <h5 id="judge-verdict-heading" class="text-sm font-bold"></h5>
+                            <span id="judge-verdict-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded"></span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-700/60 text-xs space-y-1">
+                        <p id="judge-verdict-correct-info" class="text-amber-300 font-semibold"></p>
+                        <p id="judge-verdict-reason" class="text-slate-300 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-2 border-t border-slate-700/60">
+                    <span class="text-xs text-slate-400" id="judge-step-indicator">केस 1 / 3</span>
+                    <button onclick="nextScenario()" id="btn-next-scenario" class="hidden text-xs font-semibold px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow">
+                        <span id="btn-next-scenario-txt">अगला केस</span> <i class="fa-solid fa-forward ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Judge Summary Final Box (Hidden until 3 cases answered) -->
+            <div id="judge-summary-box" class="hidden bg-slate-800/90 p-5 rounded-2xl border border-amber-500/40 text-center space-y-4">
+                <div class="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-400/40 mx-auto flex items-center justify-center text-3xl shadow-inner">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold text-white" id="judge-sum-title">न्यायिक मूल्यांकन परिणाम</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1" id="judge-sum-desc"></p>
+                </div>
+                <div class="flex justify-center gap-3">
+                    <button onclick="resetJudgeBench()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition shadow">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> <span id="judge-sum-replay">पुनः अभ्यास करें</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3-TIER COMPARISON MATRIX TABLE -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl overflow-x-auto">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-table-columns"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white" id="matrix-title">त्वरित तुलनात्मक तालिका (Hierarchy Comparison)</h3>
+                    <p class="text-xs text-slate-400" id="matrix-sub">तीनों न्यायिक स्तरों के मुख्य प्रावधान एक नज़र में</p>
+                </div>
+            </div>
+
+            <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-700 text-slate-400 uppercase text-[11px] tracking-wider">
+                        <th class="p-3">विशेषता / आधार</th>
+                        <th class="p-3 text-emerald-400">जिला न्यायालय</th>
+                        <th class="p-3 text-blue-400">उच्च न्यायालय</th>
+                        <th class="p-3 text-red-400">सर्वोच्च न्यायालय</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    <tr>
+                        <td class="p-3 font-semibold text-white">प्रमुख पद</td>
+                        <td class="p-3">जिला एवं सत्र न्यायाधीश</td>
+                        <td class="p-3">मुख्य न्यायाधीश (High Court CJ)</td>
+                        <td class="p-3 font-bold text-amber-300">CJI (भारत के मुख्य न्यायाधीश)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">संवैधानिक अनुच्छेद</td>
+                        <td class="p-3 font-mono">Article 233-237</td>
+                        <td class="p-3 font-mono">Article 214-231</td>
+                        <td class="p-3 font-mono">Article 124-147</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">नियुक्ति कर्ता</td>
+                        <td class="p-3">राज्यपाल (HC के परामर्श से)</td>
+                        <td class="p-3">राष्ट्रपति (CJI व राज्यपाल के परामर्श से)</td>
+                        <td class="p-3">राष्ट्रपति (कॉलेजियम प्रणाली द्वारा)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">सेवानिवृत्ति आयु (Retirement)</td>
+                        <td class="p-3">राज्य सेवा नियमानुसार (60 वर्ष)</td>
+                        <td class="p-3 font-semibold">62 वर्ष</td>
+                        <td class="p-3 font-semibold text-amber-300">65 वर्ष</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">अपील का अधिकार</td>
+                        <td class="p-3">इसके फैसले के खिलाफ HC में</td>
+                        <td class="p-3">इसके फैसले के खिलाफ SC में</td>
+                        <td class="p-3 font-bold text-red-400">अंतिम व सर्वोपरि (No Appeal)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SPECIAL EXCEPTION CALLOUT: Direct Access via Fundamental Rights -->
+        <div class="bg-gradient-to-r from-amber-500/20 via-slate-900 to-purple-900/30 border-l-4 border-amber-400 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center text-xl shrink-0 font-bold shadow-md">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-amber-400 text-slate-950" id="didyouknow-badge">
+                        रोचक तथ्य / अपवाद
+                    </span>
+                    <span class="text-xs font-mono text-amber-300">Article 32 & 226</span>
+                </div>
+                <h4 class="text-base sm:text-lg font-bold text-white" id="didyouknow-title">क्या कोई सीधे सुप्रीम कोर्ट जा सकता है?</h4>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1" id="didyouknow-desc">
+                    हाँ! सामान्य मामलों में पहले जिला न्यायालय फिर हाई कोर्ट जाना अनिवार्य है। परंतु यदि किसी नागरिक के <strong>मौलिक अधिकारों (Fundamental Rights)</strong> का उल्लंघन होता है, तो वह संविधान के <strong>अनुच्छेद 32</strong> के तहत सीधे <em>सुप्रीम कोर्ट</em> अथवा <strong>अनुच्छेद 226</strong> के तहत <em>हाई कोर्ट</em> में रिट (Writ) याचिका दायर कर सकता है।
+                </p>
+            </div>
+        </div>
+
+        <!-- QUICK INTERACTIVE MINI QUIZ FOR STUDENTS -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white" id="quiz-header-title">त्वरित ज्ञान परख (Mini Quiz)</h3>
+                        <p class="text-xs text-slate-400" id="quiz-header-sub">टीएलएम से आपने क्या सीखा? प्रश्नों के उत्तर दें।</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400" id="score-label">स्कोर:</span>
+                    <span id="quiz-score" class="text-base font-extrabold text-amber-400 ml-1">0/3</span>
+                </div>
+            </div>
+
+            <!-- Quiz Items Container -->
+            <div id="quiz-container" class="space-y-6">
+                <!-- Question 1 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-1">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q1-text">
+                            1. भारत की सर्वोच्च और अंतिम अपीलीय अदालत कौन सी है?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 shrink-0 ml-2">Q1</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs" id="q1-options">
+                        <button onclick="checkAnswer(1, 0)" id="q1-btn-0" class="q-opt-1 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>A) उच्च न्यायालय (High Court)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-1"></i>
+                        </button>
+                        <button onclick="checkAnswer(1, 1)" id="q1-btn-1" class="q-opt-1 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>B) सर्वोच्च न्यायालय (Supreme Court)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-1"></i>
+                        </button>
+                        <button onclick="checkAnswer(1, 2)" id="q1-btn-2" class="q-opt-1 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>C) जिला कचहरी (District Court)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-1"></i>
+                        </button>
+                    </div>
+                    <!-- Detailed Instant Feedback Box -->
+                    <div id="q1-feedback" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-2">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q2-text">
+                            2. जिला न्यायालय के फैसले से असंतुष्ट होने पर व्यक्ति सबसे पहले कहाँ अपील करता है?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 shrink-0 ml-2">Q2</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs" id="q2-options">
+                        <button onclick="checkAnswer(2, 0)" id="q2-btn-0" class="q-opt-2 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>A) उच्च न्यायालय (High Court)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-2"></i>
+                        </button>
+                        <button onclick="checkAnswer(2, 1)" id="q2-btn-1" class="q-opt-2 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>B) सीधे राष्ट्रपति के पास</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-2"></i>
+                        </button>
+                        <button onclick="checkAnswer(2, 2)" id="q2-btn-2" class="q-opt-2 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>C) ग्राम पंचायत</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-2"></i>
+                        </button>
+                    </div>
+                    <!-- Detailed Instant Feedback Box -->
+                    <div id="q2-feedback" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-3">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q3-text">
+                            3. उत्तर प्रदेश राज्य का उच्च न्यायालय (High Court) कहाँ स्थित है?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 shrink-0 ml-2">Q3</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs" id="q3-options">
+                        <button onclick="checkAnswer(3, 0)" id="q3-btn-0" class="q-opt-3 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>A) कानपुर</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-3"></i>
+                        </button>
+                        <button onclick="checkAnswer(3, 1)" id="q3-btn-1" class="q-opt-3 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>B) प्रयागराज (इलाहाबाद) एवं लखनऊ बेंच</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-3"></i>
+                        </button>
+                        <button onclick="checkAnswer(3, 2)" id="q3-btn-2" class="q-opt-3 p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group">
+                            <span>C) वाराणसी</span>
+                            <i class="fa-regular fa-circle text-slate-500 q-icon-3"></i>
+                        </button>
+                    </div>
+                    <!-- Detailed Instant Feedback Box -->
+                    <div id="q3-feedback" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Summary Card (Shown after completing all questions) -->
+            <div id="quiz-final-scorecard" class="hidden mt-6 bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-800 p-5 rounded-2xl border border-amber-500/40 text-center space-y-3">
+                <div class="text-amber-400 text-3xl font-black">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h4 class="text-base sm:text-lg font-bold text-white" id="scorecard-title">क्विज़ परिणाम (Quiz Scorecard)</h4>
+                <p class="text-xs sm:text-sm text-slate-300" id="scorecard-msg"></p>
+                <button onclick="retakeQuiz()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow">
+                    <i class="fa-solid fa-rotate-right"></i> <span id="scorecard-btn-retake">क्विज़ पुनः हल करें</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800/80 py-5 px-4 text-center text-xs text-slate-400">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-graduation-cap text-amber-400 text-base"></i>
+                <span class="font-medium text-slate-300">शैक्षणिक नवाचार एवं डिजिटल शिक्षण अधिगम सामग्री (Digital TLM)</span>
+            </div>
+            <div class="text-slate-400">
+                Created with ❤️ for Education | <strong class="text-amber-300 font-semibold tracking-wide">Aman TLM</strong>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Data and Complete Interactive Logic -->
+    <script>
+        // Global State Variables
+        let currentLang = 'hi';
+        let currentTier = 'district';
+        let currentSimStep = 1;
+
+        // Translation Dictionary
+        const i18n = {
+            hi: {
+                headerTitle: "न्याय की सीढ़ी",
+                headerSub: "भारतीय न्यायपालिका संरचना (Judicial Hierarchy)",
+                langBtn: "English",
+                badgeTitle: "गत्ता पिरामिड मॉडल का डिजिटल संस्करण",
+                badgeDesc: "कक्षा में बने पिरामिड के स्तरों को समझने के लिए नीचे किसी भी न्यायालय पर क्लिक या टैप करें।",
+                btnExploreFlow: "केस चलाकर देखें",
+                btnJudgeLab: "आप बनें जज!",
+                lblPyramidTitle: "न्यायिक पिरामिड (3 स्तर)",
+                lblTapHint: "टैप करके विवरण देखें",
+                pyramidNote: "फैसलों के खिलाफ अपील नीचे से ऊपर की ओर होती है",
+                pyrSC: "सर्वोच्च न्यायालय",
+                pyrSCTag: "शीर्ष स्तर (Supreme Court)",
+                pyrHC: "उच्च न्यायालय",
+                pyrHCTag: "राज्य स्तर (High Court)",
+                pyrDC: "जिला एवं अधीनस्थ न्यायालय",
+                pyrDCTag: "ज़िला / आधार स्तर (District Court)",
+                lblChief: "मुख्य न्यायिक अधिकारी",
+                lblJuris: "अधिकार क्षेत्र (Jurisdiction)",
+                lblRoles: "मुख्य विशेषताएं एवं कार्य:",
+                lblExample: "उदाहरण / संदर्भ:",
+                simBadge: "इंटरैक्टिव सिमुलेशन",
+                simTitle: "केस की वास्तविक यात्रा: रमेश का ज़मीनी विवाद",
+                simSub: "न्याय पाने के लिए नागरिक चरण-दर-चरण अपील कैसे करते हैं?",
+                btnPrev: "पीछे",
+                btnNext: "अगला चरण",
+                step1Txt: "जिला अदालत",
+                step1Sub: "शुरुआती वाद व फैसला",
+                step2Txt: "हाई कोर्ट",
+                step2Sub: "अपील की सुनवाई",
+                step3Txt: "सुप्रीम कोर्ट",
+                step3Sub: "अंतिम व बाध्यकारी फैसला",
+                didYouKnowBadge: "रोचक तथ्य / अपवाद",
+                didYouKnowTitle: "क्या कोई सीधे सुप्रीम कोर्ट जा सकता है?",
+                didYouKnowDesc: "हाँ! सामान्य मामलों में पहले जिला न्यायालय फिर हाई कोर्ट जाना अनिवार्य है। परंतु यदि किसी नागरिक के <strong>मौलिक अधिकारों (Fundamental Rights)</strong> का उल्लंघन होता है, तो वह संविधान के <strong>अनुच्छेद 32</strong> के तहत सीधे <em>सुप्रीम कोर्ट</em> अथवा <strong>अनुच्छेद 226</strong> के तहत <em>हाई कोर्ट</em> में याचिका (Writ) दायर कर सकता है।",
+                quizHeaderTitle: "त्वरित ज्ञान परख (Mini Quiz)",
+                quizHeaderSub: "टीएलएम से आपने क्या सीखा? प्रश्नों के उत्तर दें।",
+                scoreLabel: "स्कोर:",
+                judgeTitle: 'न्यायिक पीठ: "आप बनें जज!"',
+                judgeSub: "विवाद का अध्ययन करें और तय करें कि मामला किस अदालत के अधिकार क्षेत्र में आता है।",
+                matrixTitle: "त्वरित तुलनात्मक तालिका (Hierarchy Comparison)",
+                matrixSub: "तीनों न्यायिक स्तरों के मुख्य प्रावधान एक नज़र में"
+            },
+            en: {
+                headerTitle: "Ladder of Justice",
+                headerSub: "Indian Judicial Hierarchy & Structure",
+                langBtn: "हिन्दी",
+                badgeTitle: "Digital Twin of Cardboard Pyramid Model",
+                badgeDesc: "Tap any court layer on the pyramid to inspect powers, jurisdictions, and roles.",
+                btnExploreFlow: "Simulate a Case",
+                btnJudgeLab: "You be the Judge!",
+                lblPyramidTitle: "Judicial Pyramid (3 Tiers)",
+                lblTapHint: "Tap tier to view details",
+                pyramidNote: "Appeals flow upwards from the base to the apex",
+                pyrSC: "Supreme Court",
+                pyrSCTag: "Apex Level (New Delhi)",
+                pyrHC: "High Court",
+                pyrHCTag: "State Level",
+                pyrDC: "District & Subordinate Courts",
+                pyrDCTag: "Grassroot / District Base",
+                lblChief: "Presiding Chief Officer",
+                lblJuris: "Jurisdiction Scope",
+                lblRoles: "Key Powers & Responsibilities:",
+                lblExample: "Example / Reference:",
+                simBadge: "Interactive Simulation",
+                simTitle: "Real Case Journey: Ramesh's Land Dispute",
+                simSub: "How a citizen navigates hierarchical appeals to attain justice",
+                btnPrev: "Previous",
+                btnNext: "Next Step",
+                step1Txt: "District Court",
+                step1Sub: "Original Case & Ruling",
+                step2Txt: "High Court",
+                step2Sub: "1st Appeal Hearing",
+                step3Txt: "Supreme Court",
+                step3Sub: "Final & Binding Verdict",
+                didYouKnowBadge: "Did You Know? / Exception",
+                didYouKnowTitle: "Can a citizen go directly to the Supreme Court?",
+                didYouKnowDesc: "Yes! While civil and criminal cases must start at the district level, when a citizen's <strong>Fundamental Rights</strong> are violated, they can approach the <strong>Supreme Court directly under Article 32</strong> or the <strong>High Court under Article 226</strong> via Constitutional Writs.",
+                quizHeaderTitle: "Quick Knowledge Check",
+                quizHeaderSub: "Test what you learned from this TLM by answering questions.",
+                scoreLabel: "Score:",
+                judgeTitle: 'Judicial Bench: "You be the Judge!"',
+                judgeSub: "Evaluate legal disputes and determine which court possesses constitutional jurisdiction.",
+                matrixTitle: "Hierarchy Comparison Matrix",
+                matrixSub: "Core judicial differences across tiers at a glance"
+            }
+        };
+
+        // Complete Court Data Dictionary for Pyramid Dynamic Display
+        const courtsData = {
+            district: {
+                color: 'emerald',
+                article: 'Art. 233-237',
+                icon: 'fa-solid fa-gavel',
+                hi: {
+                    badge: 'आधार स्तर (Base Level)',
+                    title: 'जिला एवं सत्र न्यायालय',
+                    subtitle: 'District & Sessions Court (ज़िला स्तर)',
+                    headPerson: 'जिला एवं सत्र न्यायाधीश (District & Sessions Judge)',
+                    jurisdiction: 'संबंधित जिला (दीवानी एवं फौजदारी मामले)',
+                    roles: [
+                        'आम नागरिक सबसे पहले अपने विवाद (दीवानी या आपराधिक) को लेकर यहीं मुकदमा दायर करता है।',
+                        'जमीन, संपत्ति, तलाक व पैसों के विवाद दीवानी कोर्ट (Civil Court) में सुने जाते हैं।',
+                        'चोरी, हत्या, मारपीट जैसे आपराधिक मुकदमे सत्र अदालत (Sessions Court) में चलते हैं।',
+                        'यदि कोई पक्ष इस अदालत के निर्णय से असंतुष्ट हो, तो वह राज्य के उच्च न्यायालय में अपील कर सकता है।'
+                    ],
+                    example: 'प्रत्येक जनपद की जिला कचहरी (जैसे मेरठ, लखनऊ, प्रयागराज जिला न्यायालय)।'
+                },
+                en: {
+                    badge: 'Base / Grassroot Level',
+                    title: 'District & Sessions Court',
+                    subtitle: 'District Level Judicial Forum',
+                    headPerson: 'District & Sessions Judge',
+                    jurisdiction: 'Respective District (Civil & Criminal Jurisdiction)',
+                    roles: [
+                        'First point of entry for ordinary citizens to institute civil lawsuits or register criminal trials.',
+                        'Civil cases (property, contracts, family law) are heard on the civil side.',
+                        'Criminal offences (theft, assault, murder) are tried before the Sessions Judge.',
+                        'Appeals against decrees or sentences passed here lie before the State High Court.'
+                    ],
+                    example: 'Every district headquarters court (e.g., Meerut, Lucknow, or Prayagraj District Court).'
+                }
+            },
+            high: {
+                color: 'blue',
+                article: 'Art. 214-231',
+                icon: 'fa-solid fa-building-columns',
+                hi: {
+                    badge: 'मध्यम स्तर (State Level)',
+                    title: 'उच्च न्यायालय',
+                    subtitle: 'High Court (राज्य का शीर्ष न्यायालय)',
+                    headPerson: 'उच्च न्यायालय के मुख्य न्यायाधीश (Chief Justice of High Court)',
+                    jurisdiction: 'संपूर्ण राज्य अथवा दो या अधिक केंद्र शासित प्रदेश',
+                    roles: [
+                        'यह राज्य की न्यायपालिका का सर्वोच्च न्यायालय है जो निचली अदालतों के फैसलों के खिलाफ अपील सुनता है।',
+                        'संविधान के अनुच्छेद 226 के तहत नागरिकों के मौलिक अधिकारों की रक्षा हेतु 5 प्रकार की रिट जारी कर सकता है।',
+                        'यह राज्य के समस्त अधीनस्थ एवं जिला न्यायालयों के कामकाज पर प्रशासनिक व न्यायिक नियंत्रण रखता है।',
+                        'इसके फैसले राज्य की सभी निचली अदालतों के लिए कानूनी नज़ीर (Precedent) बनते हैं।'
+                    ],
+                    example: 'इलाहाबाद उच्च न्यायालय (प्रयागराज) और इसकी खंडपीठ (लखनऊ) — उत्तर प्रदेश।'
+                },
+                en: {
+                    badge: 'Intermediate / State Level',
+                    title: 'High Court',
+                    subtitle: 'Apex Judicial Body of the State',
+                    headPerson: 'Chief Justice of the High Court',
+                    jurisdiction: 'Territory of the State (or Union Territories)',
+                    roles: [
+                        'Highest judicial authority in the state, primarily exercising appellate jurisdiction over district courts.',
+                        'Empowered under Article 226 to issue constitutional writs for enforcement of Fundamental Rights.',
+                        'Exercises supervisory control and administrative inspection over all subordinate courts in the state.',
+                        'Its decisions serve as binding legal precedents for all lower courts within its territorial jurisdiction.'
+                    ],
+                    example: 'Allahabad High Court (Prayagraj) with bench at Lucknow (Uttar Pradesh).'
+                }
+            },
+            supreme: {
+                color: 'red',
+                article: 'Art. 124-147',
+                icon: 'fa-solid fa-landmark',
+                hi: {
+                    badge: 'सर्वोच्च स्तर (Apex Level)',
+                    title: 'सर्वोच्च न्यायालय (उच्चतम न्यायालय)',
+                    subtitle: 'Supreme Court of India (तिलक मार्ग, नई दिल्ली)',
+                    headPerson: 'भारत के मुख्य न्यायाधीश (Chief Justice of India - CJI)',
+                    jurisdiction: 'समग्र भारत (अखिल भारतीय अधिकार क्षेत्र)',
+                    roles: [
+                        'यह भारत का अंतिम और सबसे बड़ा अपीलीय न्यायालय तथा संविधान का सर्वोच्च संरक्षक (Guardian) है।',
+                        'अनुच्छेद 131 के तहत केंद्र सरकार और राज्यों अथवा राज्यों के बीच के विवादों का एकमात्र निर्णायक मंच है।',
+                        'अनुच्छेद 32 के तहत सीधे मौलिक अधिकारों की रक्षा के लिए नागरिकों को रिट याचिका सुनने का अधिकार है।',
+                        'अनुच्छेद 141 के अनुसार सर्वोच्च न्यायालय द्वारा घोषित कानून भारत के सभी न्यायालयों पर बाध्यकारी होता है।'
+                    ],
+                    example: 'भारत का सर्वोच्च न्यायालय (तिलक मार्ग, नई दिल्ली) — पूरे देश के लिए एक।'
+                },
+                en: {
+                    badge: 'Apex Constitutional Court',
+                    title: 'Supreme Court of India',
+                    subtitle: 'The Highest Judicial Forum of India (New Delhi)',
+                    headPerson: 'Chief Justice of India (CJI)',
+                    jurisdiction: 'Entire Territory of India (All-India Jurisdiction)',
+                    roles: [
+                        'Apex appellate body and the ultimate interpreter and guardian of the Constitution of India.',
+                        'Exclusive original jurisdiction under Article 131 over disputes between Centre and States or between States.',
+                        'Direct constitutional guarantor under Article 32 to enforce fundamental rights via prerogative writs.',
+                        'Under Article 141, the law declared by the Supreme Court is binding on all courts within India.'
+                    ],
+                    example: 'Supreme Court of India (Tilak Marg, New Delhi) — A unified court for the entire nation.'
+                }
+            }
+        };
+
+        // Render Dynamic Details for Selected Pyramid Tier
+        function renderCourtDetails() {
+            const data = courtsData[currentTier];
+            const t = data[currentLang];
+
+            // Badge & Article
+            const badgeEl = document.getElementById('card-badge');
+            const articleEl = document.getElementById('card-article');
+            badgeEl.textContent = t.badge;
+            articleEl.textContent = data.article;
+
+            // Styles & Colors based on Tier
+            const iconBox = document.getElementById('card-icon-container');
+            const iconEl = document.getElementById('card-icon');
+            const exampleBox = document.getElementById('card-example-box');
+
+            if (currentTier === 'supreme') {
+                badgeEl.className = "px-2.5 py-0.5 text-xs font-bold rounded-md bg-red-500/20 text-red-400 border border-red-500/30 uppercase tracking-wider";
+                iconBox.className = "w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 text-2xl shrink-0 shadow-inner";
+                exampleBox.className = "bg-gradient-to-r from-slate-800 to-slate-800/40 p-3 rounded-xl border-l-4 border-red-500 text-xs text-slate-300 flex items-center justify-between";
+            } else if (currentTier === 'high') {
+                badgeEl.className = "px-2.5 py-0.5 text-xs font-bold rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase tracking-wider";
+                iconBox.className = "w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl shrink-0 shadow-inner";
+                exampleBox.className = "bg-gradient-to-r from-slate-800 to-slate-800/40 p-3 rounded-xl border-l-4 border-blue-500 text-xs text-slate-300 flex items-center justify-between";
+            } else {
+                badgeEl.className = "px-2.5 py-0.5 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider";
+                iconBox.className = "w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl shrink-0 shadow-inner";
+                exampleBox.className = "bg-gradient-to-r from-slate-800 to-slate-800/40 p-3 rounded-xl border-l-4 border-emerald-500 text-xs text-slate-300 flex items-center justify-between";
+            }
+
+            iconEl.className = data.icon;
+            document.getElementById('card-title').textContent = t.title;
+            document.getElementById('card-subtitle').textContent = t.subtitle;
+            document.getElementById('card-head-person').textContent = t.headPerson;
+            document.getElementById('card-jurisdiction').textContent = t.jurisdiction;
+            document.getElementById('card-example-text').textContent = t.example;
+
+            // Render Bullet points
+            const rolesList = document.getElementById('card-roles');
+            rolesList.innerHTML = '';
+            t.roles.forEach(roleText => {
+                const li = document.createElement('li');
+                li.className = "flex items-start gap-2";
+                const checkColor = currentTier === 'supreme' ? 'text-red-400' : (currentTier === 'high' ? 'text-blue-400' : 'text-emerald-400');
+                li.innerHTML = `<i class="fa-solid fa-circle-check ${checkColor} mt-1 shrink-0 text-xs"></i><span>${roleText}</span>`;
+                rolesList.appendChild(li);
+            });
+        }
+
+        // Tier Selection Function
+        function selectCourt(tierName) {
+            currentTier = tierName;
+            
+            document.getElementById('tier-supreme').classList.remove('tier-active');
+            document.getElementById('tier-high').classList.remove('tier-active');
+            document.getElementById('tier-district').classList.remove('tier-active');
+
+            const selectedElem = document.getElementById('tier-' + tierName);
+            if (selectedElem) selectedElem.classList.add('tier-active');
+
+            renderCourtDetails();
+        }
+
+        // Case Journey Simulation Steps Data
+        const simulationSteps = [
+            {
+                step: 1,
+                color: 'emerald',
+                icon: 'fa-solid fa-file-signature',
+                progressWidth: '0%',
+                hi: {
+                    badge: 'चरण 1: शुरुआत (जिला अदालत)',
+                    heading: 'विवाद की शुरुआत: जिला न्यायालय में प्रारंभिक मुकदमा',
+                    desc: 'रमेश और उसके पड़ोसी के बीच पुश्तैनी ज़मीन के स्वामित्व को लेकर विवाद उत्पन्न हुआ। रमेश ने अपने जिले की दीवानी अदालत (District Court) में मूल वाद दायर किया। गवाहों और पुराने दस्तावेजों की सुनवाई के बाद जिला अदालत ने पड़ोसी के पक्ष में फैसला सुनाया। रमेश इस फैसले से असंतुष्ट हुआ और उसने उच्च न्यायालय में अपील करने की ठानी।',
+                    outcome: '<strong>निचला नतीजा:</strong> जिला अदालत का आदेश रमेश के खिलाफ आया ➔ अब अपील का कानूनी अधिकार शुरू हुआ।'
+                },
+                en: {
+                    badge: 'Step 1: Initiation (District Court)',
+                    heading: 'The Origin: Civil Lawsuit Instituted at District Court',
+                    desc: "A title dispute over ancestral farmland arose between Ramesh and his neighbor. Ramesh instituted an original civil suit in the local District Court. Upon examining revenue receipts and testimonies, the District Judge ruled against Ramesh. Dissatisfied with the decree, Ramesh decided to invoke his appellate right before the High Court.",
+                    outcome: '<strong>Subordinate Outcome:</strong> Decree passed in neighbor’s favour ➔ Right to appeal invoked.'
+                }
+            },
+            {
+                step: 2,
+                color: 'blue',
+                icon: 'fa-solid fa-scale-balanced',
+                progressWidth: '50%',
+                hi: {
+                    badge: 'चरण 2: पहली अपील (उच्च न्यायालय - High Court)',
+                    heading: 'उच्च न्यायालय में प्रथम अपील एवं निचली अदालत का फैसला बरकरार',
+                    desc: 'रमेश ने जिला अदालत के फैसले को इलाहाबाद उच्च न्यायालय में चुनौती दी। उच्च न्यायालय की एकल पीठ ने मामले के तथ्यों और राजस्व अभिलेखों का पुनरावलोकन किया। विस्तृत सुनवाई के पश्चात हाई कोर्ट ने जिला न्यायालय के कानूनी तर्कों को सही मानते हुए रमेश की अपील खारिज कर दी और निचली अदालत के फैसले को बरकरार (Upheld) रखा।',
+                    outcome: '<strong>हाईकोर्ट का फैसला:</strong> रमेश की अपील खारिज, जिला अदालत का फैसला कायम ➔ रमेश ने अंतिम न्याय हेतु सर्वोच्च न्यायालय जाने का संकल्प लिया।'
+                },
+                en: {
+                    badge: 'Step 2: First Appeal (High Court)',
+                    heading: 'Appellate Review: High Court Upholds District Court Decree',
+                    desc: "Ramesh preferred a statutory first appeal before the High Court. After reviewing the Lower Court Records (LCR) and listening to counsel, the High Court determined that the district judge made no legal error. The High Court dismissed Ramesh's appeal, affirming the neighbor's title.",
+                    outcome: '<strong>High Court Verdict:</strong> Appeal dismissed; District ruling upheld ➔ Final recourse remains only before the Supreme Court.'
+                }
+            },
+            {
+                step: 3,
+                color: 'red',
+                icon: 'fa-solid fa-landmark-flag',
+                progressWidth: '100%',
+                hi: {
+                    badge: 'चरण 3: अंतिम फैसला (सर्वोच्च न्यायालय - Supreme Court)',
+                    heading: 'सर्वोच्च न्यायालय में विशेष अनुमति याचिका (SLP) व ऐतिहासिक जीत',
+                    desc: 'रमेश ने हार नहीं मानी और भारत के संविधान के अनुच्छेद 136 के तहत सर्वोच्च न्यायालय (नई दिल्ली) में विशेष अनुमति याचिका (Special Leave Petition) दाखिल की। देश की सर्वोच्च पीठ ने पुराने चकबंदी अभिलेखों में हुई विधिक भूल को पकड़ा और निचली दोनों अदालतों के फैसलों को रद्द (Overturned) कर दिया। सुप्रीम कोर्ट ने रमेश के पक्ष में अंतिम, बाध्यकारी और स्थायी फैसला सुनाया!',
+                    outcome: '<strong>अंतिम व सर्वोपरि फैसला:</strong> रमेश की ऐतिहासिक जीत! सुप्रीम कोर्ट के इस फैसले के खिलाफ अब देश में कोई अपील संभव नहीं।'
+                },
+                en: {
+                    badge: 'Step 3: Ultimate Recourse (Supreme Court)',
+                    heading: 'Special Leave Petition (SLP): Supreme Court Grants Full Relief',
+                    desc: "Ramesh approached the Supreme Court of India under Article 136 through a Special Leave Petition. A division bench detected a critical error in how the lower courts interpreted the historical consolidation records. The Supreme Court overturned both the District Court and High Court decrees, restoring full ownership to Ramesh!",
+                    outcome: '<strong>Apex Final Order:</strong> Absolute victory for Ramesh! Binding under Article 141 across all of India; no further appeal lies.'
+                }
+            }
+        ];
+
+        // Update Case Simulation Visual State
+        function updateSimulationUI() {
+            const stepObj = simulationSteps[currentSimStep - 1];
+            const t = stepObj[currentLang];
+
+            // Update Progress Bar
+            document.getElementById('sim-progress-bar').style.width = stepObj.progressWidth;
+
+            // Update Nodes Style
+            for (let i = 1; i <= 3; i++) {
+                const node = document.getElementById(`node-${i}`);
+                const text = document.getElementById(`step-node-${i}-txt`);
+                if (i <= currentSimStep) {
+                    if (i === 1) {
+                        node.className = "w-11 h-11 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center border-4 border-slate-900 shadow-xl transition-all scale-110 ring-4 ring-emerald-500/40";
+                        text.className = "text-xs font-semibold mt-2 text-emerald-400";
+                    } else if (i === 2) {
+                        node.className = "w-11 h-11 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center border-4 border-slate-900 shadow-xl transition-all scale-110 ring-4 ring-blue-500/40";
+                        text.className = "text-xs font-semibold mt-2 text-blue-400";
+                    } else if (i === 3) {
+                        node.className = "w-11 h-11 rounded-full bg-red-600 text-white font-bold flex items-center justify-center border-4 border-slate-900 shadow-xl transition-all scale-110 ring-4 ring-red-500/40";
+                        text.className = "text-xs font-semibold mt-2 text-red-400";
+                    }
+                } else {
+                    node.className = "w-11 h-11 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center border-4 border-slate-900 shadow-xl transition-all scale-100 ring-0";
+                    text.className = "text-xs font-semibold mt-2 text-slate-400";
+                }
+            }
+
+            // Update Story Card Content
+            const iconContainer = document.getElementById('sim-step-icon').parentElement;
+            const iconEl = document.getElementById('sim-step-icon');
+            const badgeEl = document.getElementById('sim-step-badge');
+            const headingEl = document.getElementById('sim-step-heading');
+            const descEl = document.getElementById('sim-step-desc');
+            const outcomeEl = document.getElementById('sim-step-outcome');
+
+            iconEl.className = stepObj.icon;
+            badgeEl.textContent = t.badge;
+            headingEl.textContent = t.heading;
+            descEl.textContent = t.desc;
+            outcomeEl.innerHTML = t.outcome;
+
+            if (currentSimStep === 1) {
+                iconContainer.className = "w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl shrink-0 border border-emerald-500/30";
+                badgeEl.className = "inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            } else if (currentSimStep === 2) {
+                iconContainer.className = "w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl shrink-0 border border-blue-500/30";
+                badgeEl.className = "inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30";
+            } else {
+                iconContainer.className = "w-14 h-14 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-2xl shrink-0 border border-red-500/30";
+                badgeEl.className = "inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-500/20 text-red-300 border border-red-500/30";
+            }
+
+            // Disable/Enable Step Navigation buttons
+            document.getElementById('sim-prev-btn').disabled = (currentSimStep === 1);
+            document.getElementById('sim-next-btn').disabled = (currentSimStep === 3);
+        }
+
+        function nextStep() {
+            if (currentSimStep < 3) {
+                currentSimStep++;
+                updateSimulationUI();
+            }
+        }
+
+        function prevStep() {
+            if (currentSimStep > 1) {
+                currentSimStep--;
+                updateSimulationUI();
+            }
+        }
+
+        function goToStep(stepNum) {
+            currentSimStep = stepNum;
+            updateSimulationUI();
+        }
+
+        function resetSimulation() {
+            currentSimStep = 1;
+            updateSimulationUI();
+        }
+
+        // Language Switcher Function
+        function toggleLanguage() {
+            currentLang = currentLang === 'hi' ? 'en' : 'hi';
+            applyLanguage();
+        }
+
+        // Scenarios for "You be the Judge" Role-Play with clear correct forums and legal reasoning
+        const judgeScenarios = [
+            {
+                id: 1,
+                correctTier: 'supreme',
+                validTiers: ['supreme', 'high'],
+                bestTierNameHi: "सर्वोच्च न्यायालय (Art 32) या उच्च न्यायालय (Art 226)",
+                bestTierNameEn: "Supreme Court (Art 32) or High Court (Art 226)",
+                hi: {
+                    caseNo: "केस संख्या: #01",
+                    cat: "श्रेणी: मौलिक अधिकार (Fundamental Rights)",
+                    text: "सोहन को पुलिस ने बिना कोई कारण बताए या वारंट दिखाए 48 घंटे से अधिक हिरासत में रखा है। उसके मौलिक अधिकार (Article 21) का हनन हुआ है। वह तत्काल रिहाई (Habeas Corpus) के लिए किस अदालत में जा सकता है?",
+                    reasonCorrect: "शाबाश! जब मौलिक अधिकारों का हनन होता है, तो नागरिक को जिला कोर्ट जाने की जरूरत नहीं होती। संविधान के अनुच्छेद 32 के तहत सीधे सर्वोच्च न्यायालय या अनुच्छेद 226 के तहत उच्च न्यायालय में रिट याचिका (Writ) दायर की जा सकती है।",
+                    reasonWrong: "गलत चुनाव! सामान्य मामलों के विपरीत, मौलिक अधिकारों के हनन पर नागरिक को जिला अदालत में भटकना नहीं पड़ता। वह सीधे हाई कोर्ट (Art 226) या सुप्रीम कोर्ट (Art 32) में बंदी प्रत्यक्षीकरण रिट लगा सकता है।"
+                },
+                en: {
+                    caseNo: "Case: #01",
+                    cat: "Category: Fundamental Rights",
+                    text: "Sohan has been detained by police for over 48 hours without warrant. His fundamental right to personal liberty is violated. Which court can issue a Writ of Habeas Corpus?",
+                    reasonCorrect: "Correct Ruling! Fundamental rights violations bypass district courts. Citizens can directly invoke Supreme Court under Article 32 or High Court under Article 226.",
+                    reasonWrong: "Incorrect Forum! For fundamental rights infringements, citizens need not begin at the District Court; they can directly approach the High Court or Supreme Court."
+                }
+            },
+            {
+                id: 2,
+                correctTier: 'supreme',
+                validTiers: ['supreme'],
+                bestTierNameHi: "सर्वोच्च न्यायालय (Supreme Court of India)",
+                bestTierNameEn: "Supreme Court of India",
+                hi: {
+                    caseNo: "केस संख्या: #02",
+                    cat: "श्रेणी: अंतर्राज्यीय जल विवाद (Inter-State Dispute)",
+                    text: "कर्नाटक और तमिलनाडु राज्यों के बीच कावेरी नदी के जल बंटवारे को लेकर गंभीर विवाद छिड़ गया है। इस विवाद का निपटारा कौन सी अदालत करेगी?",
+                    reasonCorrect: "बिल्कुल सटीक निर्णय! भारतीय संविधान के अनुच्छेद 131 के तहत दो या दो से अधिक राज्यों के बीच का विवाद केवल और केवल सर्वोच्च न्यायालय (Supreme Court) के अनन्य आरंभिक अधिकार क्षेत्र (Original Jurisdiction) में आता है।",
+                    reasonWrong: "गलत मंच! किसी भी राज्य का उच्च न्यायालय या जिला अदालत दो राज्यों के आपसी विवाद का फैसला नहीं कर सकती। अनुच्छेद 131 के अनुसार यह अधिकार सिर्फ देश के सर्वोच्च न्यायालय (Supreme Court) को है।"
+                },
+                en: {
+                    caseNo: "Case: #02",
+                    cat: "Category: Inter-State Dispute",
+                    text: "A major dispute arises between Karnataka and Tamil Nadu regarding water-sharing of the Cauvery river. Which court resolves inter-state disputes?",
+                    reasonCorrect: "Flawless Ruling! Under Article 131, disputes between two or more States fall exclusively under the Original Jurisdiction of the Supreme Court of India.",
+                    reasonWrong: "Jurisdiction Error! No High Court or District Court can adjudicate between two sovereign states. Under Article 131, this rests exclusively with the Supreme Court."
+                }
+            },
+            {
+                id: 3,
+                correctTier: 'district',
+                validTiers: ['district'],
+                bestTierNameHi: "जिला एवं अधीनस्थ न्यायालय (District Court)",
+                bestTierNameEn: "District Court",
+                hi: {
+                    caseNo: "केस संख्या: #03",
+                    cat: "श्रेणी: स्थानीय दीवानी मामला (Local Civil Dispute)",
+                    text: "मोहन ने अपने पड़ोसी को ₹2 लाख का ऋण दिया था, जिसे वह वापस नहीं कर रहा है। अनुबंध उल्लंघन का यह प्रारंभिक सिविल मुकदमा किस अदालत में दर्ज होगा?",
+                    reasonCorrect: "कानूनन 100% सही फैसला! सभी सामान्य लेन-देन, धन वसूली, संविदा और दीवानी (Civil) मुकदमे हमेशा सबसे पहले संबंधित जिले की निचली अदालत (District Court) में ही दाखिल होते हैं।",
+                    reasonWrong: "गलत फैसला! सामान्य पैसे के लेन-देन या अनुबंध विवाद को लेकर कोई सीधे हाई कोर्ट या सुप्रीम कोर्ट नहीं जा सकता। कानून के अनुसार इसका प्रारंभिक वाद जिला न्यायालय में ही दायर होगा।"
+                },
+                en: {
+                    caseNo: "Case: #03",
+                    cat: "Category: Local Civil Matter",
+                    text: "Mohan loaned ₹2 Lakh to a neighbour who defaults on repayment. Where must this contract violation suit be originally instituted?",
+                    reasonCorrect: "100% Legally Sound! Routine civil disputes, money recovery, and contract breaches must originate in the local District Court.",
+                    reasonWrong: "Incorrect forum! One cannot approach the High Court or Supreme Court directly for ordinary civil debt disputes. It must be initiated in the District Court."
+                }
+            }
+        ];
+
+        let currentScenarioIndex = 0;
+        let judgeCorrectCount = 0;
+        let judgeAnswersGiven = {};
+
+        function loadJudgeScenario() {
+            const sc = judgeScenarios[currentScenarioIndex];
+            const data = sc[currentLang];
+            document.getElementById('scenario-case-no').textContent = data.caseNo;
+            document.getElementById('scenario-category').textContent = data.cat;
+            document.getElementById('scenario-text').textContent = data.text;
+            document.getElementById('judge-step-indicator').textContent = currentLang === 'hi' ? `केस ${currentScenarioIndex + 1} / 3` : `Case ${currentScenarioIndex + 1} / 3`;
+
+            // Reset buttons
+            ['district', 'high', 'supreme'].forEach(t => {
+                const btn = document.getElementById(`judge-btn-${t}`);
+                btn.disabled = false;
+                btn.className = "judge-choice-btn p-3 rounded-xl bg-slate-900/90 hover:bg-slate-700 border border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 text-left transition flex items-center justify-between group";
+                const icon = document.getElementById(`judge-icon-${t}`);
+                icon.className = "fa-solid fa-arrow-right text-slate-500 group-hover:text-amber-400 transition";
+            });
+
+            document.getElementById('judge-verdict-box').classList.add('hidden');
+            document.getElementById('btn-next-scenario').classList.add('hidden');
+        }
+
+        function judgeVerdict(chosenTier) {
+            if (judgeAnswersGiven[currentScenarioIndex] !== undefined) return;
+
+            const sc = judgeScenarios[currentScenarioIndex];
+            const data = sc[currentLang];
+            const isCorrect = sc.validTiers.includes(chosenTier);
+            judgeAnswersGiven[currentScenarioIndex] = isCorrect;
+
+            if (isCorrect) judgeCorrectCount++;
+            document.getElementById('judge-score').textContent = `${judgeCorrectCount}/3`;
+
+            // Disable all choice buttons & highlight selected vs correct
+            ['district', 'high', 'supreme'].forEach(t => {
+                const btn = document.getElementById(`judge-btn-${t}`);
+                const icon = document.getElementById(`judge-icon-${t}`);
+                btn.disabled = true;
+
+                if (t === chosenTier) {
+                    if (isCorrect) {
+                        btn.className = "judge-choice-btn p-3 rounded-xl bg-emerald-700/80 border-2 border-emerald-400 text-xs sm:text-sm font-bold text-white text-left flex items-center justify-between";
+                        icon.className = "fa-solid fa-circle-check text-white text-base";
+                    } else {
+                        btn.className = "judge-choice-btn p-3 rounded-xl bg-red-700/80 border-2 border-red-400 text-xs sm:text-sm font-bold text-white text-left flex items-center justify-between";
+                        icon.className = "fa-solid fa-circle-xmark text-white text-base";
+                    }
+                } else if (sc.validTiers.includes(t)) {
+                    btn.className = "judge-choice-btn p-3 rounded-xl bg-emerald-950 border-2 border-emerald-500/80 text-xs sm:text-sm font-bold text-emerald-300 text-left flex items-center justify-between";
+                    icon.className = "fa-solid fa-check text-emerald-400";
+                } else {
+                    btn.className = "judge-choice-btn p-3 rounded-xl bg-slate-900/50 border border-slate-800 text-xs sm:text-sm text-slate-500 text-left flex items-center justify-between opacity-50";
+                }
+            });
+
+            // Display Verdict Box
+            const vBox = document.getElementById('judge-verdict-box');
+            const vIcon = document.getElementById('judge-verdict-icon');
+            const vHeading = document.getElementById('judge-verdict-heading');
+            const vBadge = document.getElementById('judge-verdict-badge');
+            const vCorrectInfo = document.getElementById('judge-verdict-correct-info');
+            const vReason = document.getElementById('judge-verdict-reason');
+
+            vBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                vBox.className = "mt-4 p-4 rounded-xl border border-emerald-500/60 bg-emerald-950/40 text-emerald-300 flex flex-col gap-2";
+                vIcon.innerHTML = '<i class="fa-solid fa-stamp text-emerald-400 text-3xl"></i>';
+                vHeading.textContent = currentLang === 'hi' ? "🎉 आपका फैसला कानूनन 100% सही है!" : "🎉 Legally Sound Verdict!";
+                vHeading.className = "text-sm sm:text-base font-bold text-emerald-300";
+                vBadge.className = "text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                vBadge.textContent = currentLang === 'hi' ? "फैसला: मान्य व संवैधानिक" : "Verdict: Validated";
+                vCorrectInfo.textContent = currentLang === 'hi' 
+                    ? `⚖️ सही मंच: ${sc.bestTierNameHi}` 
+                    : `⚖️ Correct Legal Forum: ${sc.bestTierNameEn}`;
+                vReason.textContent = data.reasonCorrect;
+            } else {
+                vBox.className = "mt-4 p-4 rounded-xl border border-red-500/60 bg-red-950/40 text-red-300 flex flex-col gap-2";
+                vIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400 text-3xl"></i>';
+                vHeading.textContent = currentLang === 'hi' ? "❌ कानूनन गलत फैसला / गलत अदालत!" : "❌ Legally Incorrect Forum!";
+                vHeading.className = "text-sm sm:text-base font-bold text-red-300";
+                vBadge.className = "text-[11px] font-semibold px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/40";
+                vBadge.textContent = currentLang === 'hi' ? "फैसला: अधिकार क्षेत्र से बाहर" : "Verdict: Jurisdiction Error";
+                vCorrectInfo.textContent = currentLang === 'hi' 
+                    ? `⚖️ कानून के अनुसार सही अदालत: ${sc.bestTierNameHi}` 
+                    : `⚖️ Correct Court under Law: ${sc.bestTierNameEn}`;
+                vReason.textContent = data.reasonWrong;
+            }
+
+            // Show Next Button
+            const nextBtn = document.getElementById('btn-next-scenario');
+            nextBtn.classList.remove('hidden');
+            if (currentScenarioIndex === judgeScenarios.length - 1) {
+                document.getElementById('btn-next-scenario-txt').textContent = currentLang === 'hi' ? "परिणाम देखें" : "View Assessment";
+            } else {
+                document.getElementById('btn-next-scenario-txt').textContent = currentLang === 'hi' ? "अगला केस" : "Next Case";
+            }
+        }
+
+        function nextScenario() {
+            if (currentScenarioIndex < judgeScenarios.length - 1) {
+                currentScenarioIndex++;
+                loadJudgeScenario();
+            } else {
+                // Show Final Assessment
+                document.getElementById('judge-main-box').classList.add('hidden');
+                const sumBox = document.getElementById('judge-summary-box');
+                sumBox.classList.remove('hidden');
+                
+                const sumTitle = document.getElementById('judge-sum-title');
+                const sumDesc = document.getElementById('judge-sum-desc');
+
+                if (currentLang === 'hi') {
+                    sumTitle.textContent = `आपका जज स्कोर: ${judgeCorrectCount} / 3 सही`;
+                    if (judgeCorrectCount === 3) {
+                        sumDesc.textContent = "असाधारण योग्यता! आपने तीनों कानूनी विवादों में भारतीय संविधान व अधिकार क्षेत्र के अनुसार 100% सटीक निर्णय दिए।";
+                    } else if (judgeCorrectCount >= 1) {
+                        sumDesc.textContent = "अच्छा प्रयास! आपने कानूनी प्रावधानों को समझा, लेकिन कुछ अधिकार क्षेत्रों (Jurisdiction) का पुनः अभ्यास करें।";
+                    } else {
+                        sumDesc.textContent = "पुनः अध्ययन आवश्यक! टीएलएम के पिरामिड और तुलनात्मक चार्ट को पढ़कर दोबारा प्रयास करें।";
+                    }
+                } else {
+                    sumTitle.textContent = `Your Judge Score: ${judgeCorrectCount} / 3 Correct`;
+                    sumDesc.textContent = judgeCorrectCount === 3 
+                        ? "Outstanding Judicial Acumen! You resolved all cases with 100% constitutional precision." 
+                        : "Good effort! Review the hierarchy pyramid to master constitutional jurisdictions.";
+                }
+            }
+        }
+
+        function resetJudgeBench() {
+            currentScenarioIndex = 0;
+            judgeCorrectCount = 0;
+            judgeAnswersGiven = {};
+            document.getElementById('judge-score').textContent = "0/3";
+            document.getElementById('judge-main-box').classList.remove('hidden');
+            document.getElementById('judge-summary-box').classList.add('hidden');
+            loadJudgeScenario();
+        }
+
+        // Quiz Question Definitions with Correct Answers and Detailed Explanations
+        const quizData = {
+            1: {
+                correctIndex: 1, // Supreme Court
+                hi: {
+                    correctTitle: "B) सर्वोच्च न्यायालय (Supreme Court)",
+                    explainCorrect: "बिल्कुल सही! भारत में एकीकृत न्यायपालिका के शीर्ष पर 'सर्वोच्च न्यायालय' (Supreme Court of India) स्थित है। इसके द्वारा दिया गया फैसला अंतिम और सर्वोपरि होता है।",
+                    explainWrong: "गलत उत्तर! सही उत्तर विकल्प (B) 'सर्वोच्च न्यायालय' है क्योंकि भारत में न्यायपालिका के पिरामिड में सबसे ऊपर केवल सुप्रीम कोर्ट है और इसके फैसले के खिलाफ कहीं और अपील नहीं हो सकती।"
+                },
+                en: {
+                    correctTitle: "B) Supreme Court",
+                    explainCorrect: "Spot on! The Supreme Court of India sits at the apex of the unified judicial system. Its verdicts are final and binding on all courts.",
+                    explainWrong: "Incorrect! The correct answer is (B) 'Supreme Court'. It is the highest appellate court and constitutionally supreme."
+                }
+            },
+            2: {
+                correctIndex: 0, // High Court
+                hi: {
+                    correctTitle: "A) उच्च न्यायालय (High Court)",
+                    explainCorrect: "बिल्कुल सही! न्यायिक पदानुक्रम के नियम के अनुसार, जिला न्यायालय के फैसले के खिलाफ पहली अपील हमेशा राज्य के 'उच्च न्यायालय' (High Court) में की जाती है।",
+                    explainWrong: "गलत उत्तर! सही उत्तर विकल्प (A) 'उच्च न्यायालय' है। सामान्य दीवानी या फौजदारी मामलों में जिला अदालत के फैसले को सीधे सुप्रीम कोर्ट या राष्ट्रपति के पास नहीं ले जाया जा सकता; पहली अपील हमेशा हाई कोर्ट में होती है।"
+                },
+                en: {
+                    correctTitle: "A) High Court",
+                    explainCorrect: "Accurate! In the judicial hierarchy, the first appeal against a District Court decree lies before the State High Court.",
+                    explainWrong: "Incorrect! The correct answer is (A) 'High Court'. Ordinary appeals must follow hierarchy and cannot skip directly to the Supreme Court or President."
+                }
+            },
+            3: {
+                correctIndex: 1, // Prayagraj & Lucknow
+                hi: {
+                    correctTitle: "B) प्रयागराज (इलाहाबाद) एवं लखनऊ बेंच",
+                    explainCorrect: "बिल्कुल सही! उत्तर प्रदेश का उच्च न्यायालय 'इलाहाबाद उच्च न्यायालय' (प्रयागराज) में स्थित है और इसकी एक स्थायी खंडपीठ (Bench) राजधानी लखनऊ में कार्यरत है।",
+                    explainWrong: "गलत उत्तर! सही उत्तर विकल्प (B) 'प्रयागराज (इलाहाबाद) एवं लखनऊ बेंच' है। उत्तर प्रदेश का मुख्य उच्च न्यायालय प्रयागराज में है और इसकी बेंच लखनऊ में है।"
+                },
+                en: {
+                    correctTitle: "B) Prayagraj (Allahabad) and Lucknow Bench",
+                    explainCorrect: "Correct! The High Court of Judicature for Uttar Pradesh is situated at Prayagraj with a permanent bench at Lucknow.",
+                    explainWrong: "Incorrect! The correct answer is (B) 'Prayagraj and Lucknow Bench'. It is the apex judicial forum for Uttar Pradesh."
+                }
+            }
+        };
+
+        let quizUserAnswers = {};
+        let score = 0;
+
+        function checkAnswer(questionNum, optionIdx) {
+            if (quizUserAnswers[questionNum] !== undefined) return;
+
+            const qInfo = quizData[questionNum];
+            const qLang = qInfo[currentLang];
+            const isCorrect = (optionIdx === qInfo.correctIndex);
+
+            quizUserAnswers[questionNum] = {
+                userChoice: optionIdx,
+                isCorrect: isCorrect
+            };
+
+            if (isCorrect) score++;
+            document.getElementById('quiz-score').textContent = `${score}/3`;
+
+            // Visual feedback on buttons
+            const buttons = document.querySelectorAll(`.q-opt-${questionNum}`);
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                const icon = btn.querySelector(`.q-icon-${questionNum}`);
+
+                if (idx === optionIdx) {
+                    if (isCorrect) {
+                        btn.className = `q-opt-${questionNum} p-3 rounded-xl bg-emerald-600 border-2 border-emerald-400 text-white font-bold flex items-center justify-between shadow-lg`;
+                        icon.className = "fa-solid fa-circle-check text-white text-base";
+                    } else {
+                        btn.className = `q-opt-${questionNum} p-3 rounded-xl bg-red-600 border-2 border-red-400 text-white font-bold flex items-center justify-between shadow-lg`;
+                        icon.className = "fa-solid fa-circle-xmark text-white text-base";
+                    }
+                } else if (idx === qInfo.correctIndex) {
+                    btn.className = `q-opt-${questionNum} p-3 rounded-xl bg-emerald-950 border-2 border-emerald-500/80 text-emerald-300 font-bold flex items-center justify-between`;
+                    icon.className = "fa-solid fa-check text-emerald-400 text-base";
+                } else {
+                    btn.className = `q-opt-${questionNum} p-3 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-500 flex items-center justify-between opacity-50`;
+                    icon.className = "fa-regular fa-circle text-slate-600";
+                }
+            });
+
+            // Display Feedback Box with full explanation
+            const fbBox = document.getElementById(`q${questionNum}-feedback`);
+            fbBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                fbBox.className = "p-3.5 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-emerald-200 text-xs space-y-1";
+                fbBox.innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold text-emerald-300 text-sm">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>${currentLang === 'hi' ? 'बिल्कुल सही उत्तर!' : 'Correct Answer!'}</span>
+                    </div>
+                    <p class="leading-relaxed text-slate-200">${qLang.explainCorrect}</p>
+                `;
+            } else {
+                fbBox.className = "p-3.5 rounded-xl border border-red-500/50 bg-red-950/40 text-red-200 text-xs space-y-1.5";
+                fbBox.innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold text-red-300 text-sm">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>${currentLang === 'hi' ? 'गलत उत्तर!' : 'Incorrect Answer!'}</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-2 rounded border border-amber-500/30 text-amber-300 font-semibold">
+                        ⚖️ ${currentLang === 'hi' ? 'सही उत्तर:' : 'Correct Answer:'} ${qLang.correctTitle}
+                    </div>
+                    <p class="leading-relaxed text-slate-200">${qLang.explainWrong}</p>
+                `;
+            }
+
+            if (Object.keys(quizUserAnswers).length === 3) {
+                showFinalScorecard();
+            }
+        }
+
+        function showFinalScorecard() {
+            const card = document.getElementById('quiz-final-scorecard');
+            const msg = document.getElementById('scorecard-msg');
+            card.classList.remove('hidden');
+
+            if (currentLang === 'hi') {
+                if (score === 3) {
+                    msg.innerHTML = `शानदार! आपने <strong>3 में से 3</strong> अंक प्राप्त किए। आपको भारतीय न्यायपालिका की संरचना की पूरी समझ है।`;
+                } else if (score >= 1) {
+                    msg.innerHTML = `अच्छा प्रयास! आपने <strong>3 में से ${score}</strong> अंक प्राप्त किए। नीचे दिए गए सही उत्तरों और कारणों को ध्यानपूर्वक पढ़ें।`;
+                } else {
+                    msg.innerHTML = `आपने <strong>3 में से 0</strong> अंक प्राप्त किए। कृपया ऊपर बने पिरामिड और केस सिमुलेशन को पुनः देखें और दोबारा हल करें।`;
+                }
+            } else {
+                msg.innerHTML = `You scored <strong>${score} out of 3</strong>. Review the detailed feedback above for each question.`;
+            }
+        }
+
+        function retakeQuiz() {
+            score = 0;
+            quizUserAnswers = {};
+            document.getElementById('quiz-score').textContent = "0/3";
+            document.getElementById('quiz-final-scorecard').classList.add('hidden');
+
+            for (let q = 1; q <= 3; q++) {
+                const fbBox = document.getElementById(`q${q}-feedback`);
+                fbBox.classList.add('hidden');
+                fbBox.innerHTML = '';
+
+                const buttons = document.querySelectorAll(`.q-opt-${q}`);
+                buttons.forEach((btn, idx) => {
+                    btn.disabled = false;
+                    btn.className = `q-opt-${q} p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between group`;
+                    const icon = btn.querySelector(`.q-icon-${q}`);
+                    icon.className = `fa-regular fa-circle text-slate-500 q-icon-${q}`;
+                });
+            }
+        }
+
+        // Apply Language Updates
+        function applyLanguage() {
+            const t = i18n[currentLang];
+            
+            // Header
+            document.getElementById('header-title').textContent = t.headerTitle;
+            document.getElementById('header-sub').textContent = t.headerSub;
+            document.getElementById('lang-label').textContent = t.langBtn;
+
+            // Badges & Labels
+            document.getElementById('badge-title').textContent = t.badgeTitle;
+            document.getElementById('badge-desc').textContent = t.badgeDesc;
+            document.getElementById('btn-explore-flow').textContent = t.btnExploreFlow;
+            document.getElementById('btn-judge-lab').textContent = t.btnJudgeLab;
+            document.getElementById('lbl-pyramid-title').textContent = t.lblPyramidTitle;
+            document.getElementById('lbl-tap-hint').textContent = t.lblTapHint;
+            document.getElementById('pyramid-note').textContent = t.pyramidNote;
+
+            // Pyramid Texts
+            document.getElementById('pyr-sc-name').textContent = t.pyrSC;
+            document.getElementById('pyr-sc-tag').textContent = t.pyrSCTag;
+            document.getElementById('pyr-hc-name').textContent = t.pyrHC;
+            document.getElementById('pyr-hc-tag').textContent = t.pyrHCTag;
+            document.getElementById('pyr-dc-name').textContent = t.pyrDC;
+            document.getElementById('pyr-dc-tag').textContent = t.pyrDCTag;
+
+            // Card Section Headers
+            document.getElementById('lbl-chief-officer').textContent = t.lblChief;
+            document.getElementById('lbl-jurisdiction').textContent = t.lblJuris;
+            document.getElementById('lbl-key-roles').textContent = t.lblRoles;
+            document.getElementById('lbl-example-title').textContent = t.lblExample;
+
+            // Simulator Section
+            document.getElementById('sim-badge').textContent = t.simBadge;
+            document.getElementById('sim-title').textContent = t.simTitle;
+            document.getElementById('sim-sub').textContent = t.simSub;
+            document.getElementById('btn-prev').textContent = t.btnPrev;
+            document.getElementById('btn-next').textContent = t.btnNext;
+            document.getElementById('step-node-1-txt').textContent = t.step1Txt;
+            document.getElementById('step-node-1-sub').textContent = t.step1Sub;
+            document.getElementById('step-node-2-txt').textContent = t.step2Txt;
+            document.getElementById('step-node-2-sub').textContent = t.step2Sub;
+            document.getElementById('step-node-3-txt').textContent = t.step3Txt;
+            document.getElementById('step-node-3-sub').textContent = t.step3Sub;
+
+            // Judge Lab & Matrix
+            if (document.getElementById('judge-lab-title')) {
+                document.getElementById('judge-lab-title').innerHTML = `${t.judgeTitle} <span class="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 font-semibold">${currentLang === 'hi' ? 'निर्णय लें' : 'Decide'}</span>`;
+                document.getElementById('judge-lab-sub').textContent = t.judgeSub;
+                document.getElementById('judge-score-label').textContent = currentLang === 'hi' ? 'जज स्कोर:' : 'Judge Score:';
+                document.getElementById('matrix-title').textContent = t.matrixTitle;
+                document.getElementById('matrix-sub').textContent = t.matrixSub;
+            }
+
+            // Exception box
+            document.getElementById('didyouknow-badge').textContent = t.didYouKnowBadge;
+            document.getElementById('didyouknow-title').textContent = t.didYouKnowTitle;
+            document.getElementById('didyouknow-desc').innerHTML = t.didYouKnowDesc;
+
+            // Quiz Section
+            document.getElementById('quiz-header-title').textContent = t.quizHeaderTitle;
+            document.getElementById('quiz-header-sub').textContent = t.quizHeaderSub;
+            document.getElementById('score-label').textContent = t.scoreLabel;
+
+            // Re-render components with active states
+            renderCourtDetails();
+            updateSimulationUI();
+            loadJudgeScenario();
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            selectCourt('district');
+            updateSimulationUI();
+            loadJudgeScenario();
+        });
+    </script>
+</body>
+</html>
