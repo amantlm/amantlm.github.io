@@ -167,17 +167,21 @@
     "title": "..."
   },
   {
-    "id": "indian-judiciary",
-    "title": "भारतीय न्यायपालिका (Indian Judiciary TLM)",
-    "category": "Social Science",
-    "subject": "नागरिक शास्त्र / सामाजिक अध्ययन",
-    "description": "पिरामिड आधारित इंटरैक्टिव 3D मॉडल: जिला अदालत से लेकर सुप्रीम कोर्ट तक अपील की यात्रा, 'आप बनें जज' केस सिमुलेटर और क्विज़।",
-    "icon": "⚖️",
-    "badge": "Phygital TLM",
-    "tags": ["Judiciary", "Supreme Court", "High Court", "Civics", "Interactive TLM"],
-    "url": "indian-judiciary.html",
-    "target": "_blank"
-  }
+  "id": "indian-judiciary-hierarchy",
+  "title_hi": "न्याय की सीढ़ी: भारतीय न्यायपालिका",
+  "title_en": "Indian Judiciary Hierarchy",
+  "subject": "sst",
+  "grade": "6,7,8,9,10",
+  "search": "indian judiciary hierarchy supreme court high court district court bhartiya nyaypalika samvidhan civics sst सामाजिक विज्ञान",
+  "icon": "⚖️",
+  "glow": "#b45309",
+  "classTag": "CLASS 6–10",
+  "desc_hi": "3D पिरामिड मॉडल, अपील की यात्रा (केस सिमुलेटर), 'आप बनें जज' और इंटरैक्टिव क्विज़ से न्यायपालिका समझो।",
+  "desc_en": "Explore the 3D court pyramid, step-by-step case appeal journey, 'Be a Judge' interactive lab, and judicial quiz.",
+  "link": "indian-judiciary.html",
+  "btn_hi": "अदालत देखें",
+  "btn_en": "Explore Courts"
+}
   ]
 }
    
