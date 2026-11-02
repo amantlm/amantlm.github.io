@@ -161,7 +161,23 @@
       "link": "Photosynthesis_lab.html",
       "btn_hi": "प्रयोग शुरू करें",
       "btn_en": "Start experiment"
-    }
+    },
+  {
+    "id": "previous-tlm-1",
+    "title": "..."
+  },
+  {
+    "id": "indian-judiciary",
+    "title": "भारतीय न्यायपालिका (Indian Judiciary TLM)",
+    "category": "Social Science",
+    "subject": "नागरिक शास्त्र / सामाजिक अध्ययन",
+    "description": "पिरामिड आधारित इंटरैक्टिव 3D मॉडल: जिला अदालत से लेकर सुप्रीम कोर्ट तक अपील की यात्रा, 'आप बनें जज' केस सिमुलेटर और क्विज़।",
+    "icon": "⚖️",
+    "badge": "Phygital TLM",
+    "tags": ["Judiciary", "Supreme Court", "High Court", "Civics", "Interactive TLM"],
+    "url": "indian-judiciary.html",
+    "target": "_blank"
+  }
   ]
 }
    
