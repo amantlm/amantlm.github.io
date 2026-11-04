@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="hi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पादप कोशिका की आंतरिक दुनिया | Plant Cell Digital TLM</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        hindi: ['Hind', 'sans-serif'],
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        cellgreen: '#15803d',
+                        cellwall: '#166534',
+                        vacuole: '#e0f2fe',
+                        nucleus: '#ec4899',
+                        chloroplast: '#22c55e',
+                        mitochondria: '#2563eb'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Hind', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #062b16 0%, #0f172a 100%);
+            color: #f8fafc;
+        }
+
+        /* SVG Organelle interaction styling */
+        .cell-organelle {
+            cursor: pointer;
+            transition: all 0.25s ease-in-out;
+            transform-origin: center;
+        }
+
+        .cell-organelle:hover {
+            filter: drop-shadow(0 0 10px #facc15) brightness(1.2);
+            opacity: 1;
+        }
+
+        /* Active Selected Organelle Pulsing Glow */
+        @keyframes organellePulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 12px #facc15) brightness(1.3);
+            }
+            50% {
+                filter: drop-shadow(0 0 24px #38bdf8) brightness(1.45);
+            }
+        }
+
+        .organelle-active {
+            animation: organellePulse 1.4s infinite ease-in-out;
+        }
+
+        /* Plant Exclusive Organelle Glow */
+        .plant-exclusive-glow {
+            animation: organellePulse 1.1s infinite alternate;
+            filter: drop-shadow(0 0 18px #22c55e) brightness(1.3) !important;
+        }
+
+        .dimmed-organelle {
+            opacity: 0.25 !important;
+            filter: grayscale(80%) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-400 selection:text-slate-950">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-emerald-500/30 shadow-lg px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 text-xl shadow-inner">
+                    <i class="fa-solid fa-microscope"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <span id="txt-header-title">पादप कोशिका (Plant Cell)</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">3D TLM</span>
+                    </h1>
+                    <p id="txt-header-sub" class="text-xs text-slate-400 font-medium">कोशिका के भाग और उनके काम</p>
+                </div>
+            </div>
+
+            <!-- Language Switcher Toggle -->
+            <button onclick="toggleLanguage()" id="lang-btn" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition shadow-sm active:scale-95 text-emerald-300">
+                <i class="fa-solid fa-language text-sm"></i>
+                <span id="lang-label">English</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto w-full px-3 sm:px-6 py-6 space-y-6 flex-grow">
+
+        <!-- Physical Cardboard Model Link Banner -->
+        <div class="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left shadow-xl">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-xl shrink-0 shadow-lg">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-emerald-300" id="badge-title">गत्ते के 3D पादप कोशिका मॉडल का डिजिटल रूप</h2>
+                    <p class="text-xs text-slate-300" id="badge-desc">चित्र में किसी भी भाग को छूकर उसके बारे में जानें।</p>
+                </div>
+            </div>
+
+            <!-- Mode Selector Switcher Buttons -->
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <button onclick="setMode('explore')" id="btn-mode-explore" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-md bg-emerald-500 text-slate-950">
+                    <i class="fa-solid fa-hand-pointer mr-1"></i> <span id="lbl-mode-explore">एक्सप्लोर करें</span>
+                </button>
+                <button onclick="setMode('game')" id="btn-mode-game" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-800 text-slate-300 hover:text-white border border-slate-700">
+                    <i class="fa-solid fa-gamepad mr-1 text-amber-400"></i> <span id="lbl-mode-game">खोजो और पहचानो</span>
+                </button>
+                <button onclick="setMode('compare')" id="btn-mode-compare" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-800 text-slate-300 hover:text-white border border-slate-700">
+                    <i class="fa-solid fa-code-compare mr-1 text-blue-400"></i> <span id="lbl-mode-compare">जंतु कोशिका से अंतर</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Notification Banner for Active Modes (Game / Compare Mode) -->
+        <div id="mode-interactive-banner" class="hidden p-4 rounded-2xl border transition-all duration-300"></div>
+
+        <!-- 2 Column Layout: Left (Interactive Plant Cell SVG), Right (Details / Organelle Cards) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- LEFT: Stylized Hexagonal Plant Cell (Matching Cardboard Model) -->
+            <div class="lg:col-span-7 bg-slate-900/90 border border-emerald-500/30 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col items-center relative overflow-hidden">
+                <div class="w-full flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-seedling"></i>
+                        <span id="lbl-cell-view-title">पादप कोशिका आरेख (Plant Cell Model)</span>
+                    </span>
+                    <span class="text-[11px] text-amber-300 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20" id="lbl-click-hint">
+                        अंग पर टच करें
+                    </span>
+                </div>
+
+                <!-- SVG Cell Display: Exact Shape & Colors of Cardboard Model -->
+                <div class="w-full flex justify-center py-2 select-none relative">
+                    <svg viewBox="0 0 500 580" class="w-full max-w-[460px] h-auto drop-shadow-2xl overflow-visible">
+                        <defs>
+                            <!-- Linear and Radial Gradients -->
+                            <linearGradient id="cellWallGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#22c55e" />
+                                <stop offset="100%" stop-color="#14532d" />
+                            </linearGradient>
+
+                            <linearGradient id="cellInteriorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#4ade80" />
+                                <stop offset="100%" stop-color="#22c55e" />
+                            </linearGradient>
+
+                            <radialGradient id="vacuoleGrad" cx="40%" cy="40%" r="60%">
+                                <stop offset="0%" stop-color="#ffffff" />
+                                <stop offset="60%" stop-color="#e0f2fe" />
+                                <stop offset="100%" stop-color="#bae6fd" />
+                            </radialGradient>
+
+                            <radialGradient id="nucleusGrad" cx="35%" cy="35%" r="65%">
+                                <stop offset="0%" stop-color="#f472b6" />
+                                <stop offset="100%" stop-color="#db2777" />
+                            </radialGradient>
+
+                            <radialGradient id="nucleolusGrad" cx="30%" cy="30%" r="70%">
+                                <stop offset="0%" stop-color="#fed7aa" />
+                                <stop offset="100%" stop-color="#f97316" />
+                            </radialGradient>
+
+                            <linearGradient id="chloroplastGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#15803d" />
+                                <stop offset="100%" stop-color="#166534" />
+                            </linearGradient>
+
+                            <linearGradient id="mitoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#1e3a8a" />
+                                <stop offset="100%" stop-color="#0284c7" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Outer Hexagonal Cell Wall (Border from Cardboard Model) -->
+                        <polygon id="svg-cell-wall" points="250,15 470,140 470,490 250,565 30,490 30,140"
+                                 fill="url(#cellWallGrad)" stroke="#14532d" stroke-width="12" stroke-linejoin="round"
+                                 class="cell-organelle" onclick="selectOrganelle('cell_wall')" />
+
+                        <!-- Inner Cell Membrane (Outer edge of cytoplasm) -->
+                        <polygon id="svg-cell-membrane" points="250,32 450,150 450,475 250,545 50,475 50,150"
+                                 fill="url(#cellInteriorGrad)" stroke="#15803d" stroke-width="6" stroke-linejoin="round"
+                                 class="cell-organelle" onclick="selectOrganelle('cell_membrane')" />
+
+                        <!-- Cytoplasm Base Field (Green Cytosol) -->
+                        <!-- Clickable background default to cytoplasm -->
+                        <polygon points="250,40 440,155 440,468 250,538 60,468 60,155"
+                                 fill="#86efac" opacity="0.92"
+                                 class="cell-organelle" onclick="selectOrganelle('cytoplasm')" />
+
+                        <!-- Large Central Vacuole (Prominent kidney/bean shape like Cardboard model) -->
+                        <g id="svg-vacuole" class="cell-organelle" onclick="selectOrganelle('vacuole')">
+                            <!-- Large kidney shaped bean on the right -->
+                            <path d="M 285 185 C 365 170, 420 220, 395 320 C 375 400, 330 445, 275 435 C 245 430, 270 360, 285 310 C 298 265, 260 215, 285 185 Z"
+                                  fill="url(#vacuoleGrad)" stroke="#7dd3fc" stroke-width="4.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.15))" />
+                            <text x="340" y="295" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle" opacity="0.8">Vacuole</text>
+                        </g>
+
+                        <!-- Nucleus & Nucleolus (Spherical Pink structure on mid-left) -->
+                        <g id="svg-nucleus" class="cell-organelle" onclick="selectOrganelle('nucleus')">
+                            <!-- Outer Nucleus Circle -->
+                            <circle cx="210" cy="380" r="58" fill="url(#nucleusGrad)" stroke="#9d174d" stroke-width="4" />
+                            <!-- Inner Nucleolus Circle -->
+                            <circle cx="190" cy="395" r="22" fill="url(#nucleolusGrad)" stroke="#c2410c" stroke-width="2.5" />
+                            <text x="225" y="375" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">Nucleus</text>
+                        </g>
+
+                        <!-- Rough Endoplasmic Reticulum (RER with ribosome dots around nucleus) -->
+                        <g id="svg-rer" class="cell-organelle" onclick="selectOrganelle('rer')">
+                            <!-- Curved fold lines -->
+                            <path d="M 138 335 Q 160 300 210 305 Q 245 308 265 320" fill="none" stroke="#f97316" stroke-width="7" stroke-linecap="round" />
+                            <path d="M 125 365 Q 145 325 185 322" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
+                            <path d="M 135 410 Q 150 435 180 445" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
+                            <!-- Ribosome dots on RER -->
+                            <circle cx="150" cy="315" r="2.8" fill="#431407" />
+                            <circle cx="175" cy="308" r="2.8" fill="#431407" />
+                            <circle cx="200" cy="305" r="2.8" fill="#431407" />
+                            <circle cx="230" cy="312" r="2.8" fill="#431407" />
+                            <circle cx="140" cy="340" r="2.8" fill="#431407" />
+                            <circle cx="160" cy="325" r="2.8" fill="#431407" />
+                            <circle cx="145" cy="415" r="2.8" fill="#431407" />
+                            <circle cx="165" cy="435" r="2.8" fill="#431407" />
+                        </g>
+
+                        <!-- Smooth Endoplasmic Reticulum (SER) at top-middle -->
+                        <g id="svg-ser" class="cell-organelle" onclick="selectOrganelle('ser')">
+                            <path d="M 195 105 Q 250 80 300 110" fill="none" stroke="#f43f5e" stroke-width="7" stroke-linecap="round" />
+                            <path d="M 205 125 Q 250 102 295 130" fill="none" stroke="#f43f5e" stroke-width="6.5" stroke-linecap="round" />
+                            <path d="M 215 145 Q 250 125 285 150" fill="none" stroke="#f43f5e" stroke-width="6" stroke-linecap="round" />
+                        </g>
+
+                        <!-- Chloroplasts (Green Oval with Thylakoid Stacks - Plant Unique) -->
+                        <g id="svg-chloroplast-1" class="cell-organelle" onclick="selectOrganelle('chloroplast')">
+                            <ellipse cx="270" cy="145" rx="30" ry="20" fill="url(#chloroplastGrad)" stroke="#14532d" stroke-width="3" transform="rotate(-15 270 145)" />
+                            <!-- Thylakoid Grana lines -->
+                            <line x1="250" y1="140" x2="285" y2="135" stroke="#86efac" stroke-width="2.5" />
+                            <line x1="252" y1="147" x2="288" y2="142" stroke="#86efac" stroke-width="2.5" />
+                            <line x1="255" y1="154" x2="285" y2="150" stroke="#86efac" stroke-width="2.5" />
+                        </g>
+
+                        <g id="svg-chloroplast-2" class="cell-organelle" onclick="selectOrganelle('chloroplast')">
+                            <ellipse cx="140" cy="180" rx="32" ry="22" fill="url(#chloroplastGrad)" stroke="#14532d" stroke-width="3" transform="rotate(35 140 180)" />
+                            <line x1="120" y1="175" x2="155" y2="190" stroke="#86efac" stroke-width="2.5" />
+                            <line x1="125" y1="168" x2="160" y2="182" stroke="#86efac" stroke-width="2.5" />
+                            <line x1="118" y1="184" x2="150" y2="198" stroke="#86efac" stroke-width="2.5" />
+                        </g>
+
+                        <g id="svg-chloroplast-3" class="cell-organelle" onclick="selectOrganelle('chloroplast')">
+                            <ellipse cx="380" cy="400" rx="30" ry="20" fill="url(#chloroplastGrad)" stroke="#14532d" stroke-width="3" transform="rotate(-30 380 400)" />
+                            <line x1="360" y1="395" x2="395" y2="385" stroke="#86efac" stroke-width="2.5" />
+                            <line x1="362" y1="402" x2="400" y2="392" stroke="#86efac" stroke-width="2.5" />
+                            <line x1="365" y1="409" x2="398" y2="400" stroke="#86efac" stroke-width="2.5" />
+                        </g>
+
+                        <!-- Mitochondria (Blue capsules with zigzag folded cristae) -->
+                        <g id="svg-mitochondria-1" class="cell-organelle" onclick="selectOrganelle('mitochondria')">
+                            <rect x="360" y="160" width="46" height="24" rx="12" fill="url(#mitoGrad)" stroke="#1e40af" stroke-width="2.5" transform="rotate(55 383 172)" />
+                            <path d="M 370 162 Q 380 170 373 178 Q 385 174 380 185 Q 392 182 388 190" fill="none" stroke="#67e8f9" stroke-width="2.2" stroke-linecap="round" />
+                        </g>
+
+                        <g id="svg-mitochondria-2" class="cell-organelle" onclick="selectOrganelle('mitochondria')">
+                            <!-- Bottom-Right Large Mitochondria like in cardboard model -->
+                            <rect x="300" y="460" width="85" height="34" rx="17" fill="url(#mitoGrad)" stroke="#1e40af" stroke-width="3.5" transform="rotate(-35 342 477)" />
+                            <!-- Zigzag internal cristae -->
+                            <path d="M 315 490 L 325 465 L 335 488 L 345 462 L 355 486 L 365 460 L 375 482" fill="none" stroke="#67e8f9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                        </g>
+
+                        <g id="svg-mitochondria-3" class="cell-organelle" onclick="selectOrganelle('mitochondria')">
+                            <rect x="100" y="240" width="40" height="20" rx="10" fill="url(#mitoGrad)" stroke="#1e40af" stroke-width="2.5" transform="rotate(-40 120 250)" />
+                            <path d="M 108 255 Q 118 245 125 252 Q 132 242 136 248" fill="none" stroke="#67e8f9" stroke-width="2" stroke-linecap="round" />
+                        </g>
+
+                        <!-- Golgi Apparatus (Curved magenta stacks with vesicles) -->
+                        <g id="svg-golgi" class="cell-organelle" onclick="selectOrganelle('golgi')">
+                            <path d="M 235 480 Q 260 470 278 485" fill="none" stroke="#d946ef" stroke-width="5.5" stroke-linecap="round" />
+                            <path d="M 238 492 Q 260 482 275 496" fill="none" stroke="#d946ef" stroke-width="5.5" stroke-linecap="round" />
+                            <path d="M 242 503 Q 260 495 272 506" fill="none" stroke="#d946ef" stroke-width="5" stroke-linecap="round" />
+                            <circle cx="286" cy="486" r="3.5" fill="#f43f5e" />
+                            <circle cx="228" cy="495" r="3.5" fill="#f43f5e" />
+                        </g>
+
+                        <!-- Amyloplast (Starch Storage Granules) -->
+                        <g id="svg-amyloplast" class="cell-organelle" onclick="selectOrganelle('amyloplast')">
+                            <ellipse cx="145" cy="485" rx="20" ry="14" fill="#cbd5e1" stroke="#64748b" stroke-width="2.5" />
+                            <ellipse cx="142" cy="483" rx="11" ry="7" fill="#f1f5f9" />
+                        </g>
+
+                        <!-- Free Ribosomes (Dark dots dispersed in cytosol) -->
+                        <g id="svg-ribosomes" class="cell-organelle" onclick="selectOrganelle('ribosomes')">
+                            <circle cx="130" cy="130" r="3.5" fill="#1e293b" stroke="#f8fafc" stroke-width="0.8" />
+                            <circle cx="180" cy="160" r="3.5" fill="#1e293b" stroke="#f8fafc" stroke-width="0.8" />
+                            <circle cx="320" cy="120" r="3.5" fill="#1e293b" stroke="#f8fafc" stroke-width="0.8" />
+                            <circle cx="210" cy="260" r="3.5" fill="#1e293b" stroke="#f8fafc" stroke-width="0.8" />
+                            <circle cx="160" cy="275" r="3.5" fill="#1e293b" stroke="#f8fafc" stroke-width="0.8" />
+                            <circle cx="220" cy="455" r="3.5" fill="#1e293b" stroke="#f8fafc" stroke-width="0.8" />
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Plant Exclusive Highlight Badge -->
+                <div class="w-full flex items-center justify-between text-xs text-slate-400 mt-2 px-2 border-t border-slate-800 pt-2">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+                        <span id="lbl-plant-exclusive-tag">जंतु कोशिका से अलग खास भाग: भित्ति, हरितलवक व बड़ी रसधानी</span>
+                    </span>
+                    <button onclick="playChime(600)" class="text-slate-400 hover:text-emerald-400 transition" title="Sound Test">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT: Dynamic Organelle Information Card & Organelle Key Chart -->
+            <div class="lg:col-span-5 space-y-5">
+
+                <!-- Active Organelle Card -->
+                <div id="organelle-card" class="bg-slate-900/95 border border-emerald-500/40 rounded-3xl p-5 shadow-2xl transition-all duration-300">
+                    <div class="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span id="card-badge" class="px-2.5 py-0.5 text-[11px] font-extrabold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 uppercase">
+                                    पादप कोशिका का खास भाग
+                                </span>
+                                <span id="card-sci-name" class="text-xs text-slate-400 font-mono italic">Cell Wall</span>
+                            </div>
+                            <h3 id="card-title" class="text-xl font-bold text-white">कोशिका भित्ति (Cell Wall)</h3>
+                            <p id="card-nickname" class="text-xs font-semibold text-amber-400 mt-0.5">"पादप कोशिका की सुरक्षा दीवार"</p>
+                        </div>
+                        <div id="card-icon-box" class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl shrink-0 shadow-inner">
+                            <i id="card-icon" class="fa-solid fa-shield-halved"></i>
+                        </div>
+                    </div>
+
+                    <!-- Function / Work summary -->
+                    <div class="my-4 space-y-3">
+                        <div class="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/50">
+                            <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block mb-1" id="lbl-function-title">
+                                मुख्य काम
+                            </span>
+                            <p id="card-function" class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                                यह सेल्यूलोज (Cellulose) से बनी सबसे बाहरी कठोर व रक्षात्मक परत है। यह पौधे को एक निश्चित आकृति, यांत्रिक सहारा और बाहरी दबाव से सुरक्षा प्रदान करती है।
+                            </p>
+                        </div>
+
+                        <!-- Fun Fact / Did You Know -->
+                        <div class="bg-amber-500/10 p-3 rounded-2xl border border-amber-500/20 text-xs text-slate-300 space-y-1">
+                            <div class="flex items-center gap-1.5 text-amber-300 font-bold text-[11px]">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span id="lbl-fact-title">विशेष तथ्य:</span>
+                            </div>
+                            <p id="card-fact" class="leading-relaxed">
+                                यह केवल पादप कोशिकाओं, कवक (Fungi) और जीवाणुओं में पाई जाती है; जंतु कोशिकाओं में कोशिका भित्ति पूर्णतः अनुपस्थित होती है!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Organelle Quick Specs -->
+                    <div class="grid grid-cols-2 gap-2 text-[11px] border-t border-slate-800/80 pt-3">
+                        <div class="bg-slate-800/40 p-2 rounded-xl">
+                            <span class="text-slate-400 block" id="lbl-composition">किससे बना है:</span>
+                            <span id="card-composition" class="font-semibold text-slate-200">सेल्यूलोज, पेक्टिन</span>
+                        </div>
+                        <div class="bg-slate-800/40 p-2 rounded-xl">
+                            <span class="text-slate-400 block" id="lbl-presence">कहाँ मिलता है:</span>
+                            <span id="card-presence" class="font-semibold text-emerald-400">पौधों, कवक और अधिकांश जीवाणुओं में</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed internal structure explorer -->
+                <div id="micro-structure-panel" class="bg-slate-900/95 border border-cyan-500/30 rounded-3xl p-5 shadow-xl space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[11px] font-bold text-cyan-300 uppercase tracking-wider">अंदर की वास्तविक संरचना</span>
+                            <h4 id="micro-title" class="text-base font-bold text-white mt-1">कोशिका भित्ति की सूक्ष्म संरचना</h4>
+                        </div>
+                        <span class="text-[10px] text-cyan-200 bg-cyan-500/10 border border-cyan-500/20 rounded-lg px-2 py-1">शैक्षिक आरेख</span>
+                    </div>
+                    <div id="micro-diagram" class="rounded-2xl bg-slate-950 border border-slate-700 p-2 min-h-[170px] flex items-center justify-center"></div>
+                    <p id="micro-description" class="text-xs sm:text-sm text-slate-200 leading-relaxed"></p>
+                    <div id="micro-parts" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                    <p class="text-[10px] text-slate-500">नोट: ये वैज्ञानिक रूप से आधारित योजनात्मक (schematic) चित्र हैं; वास्तविक कोशिकांगों का आकार और अनुपात इससे अलग हो सकता है।</p>
+                </div>
+
+                <!-- Organelle Palette Quick Selector (Cardboard Model Key matching) -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 shadow-xl">
+                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center justify-between">
+                        <span id="lbl-organelle-list">अंग कुंजी चार्ट (Model Key)</span>
+                        <span class="text-[10px] text-slate-400 font-normal">टैप करके चुनें</span>
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="organelle-buttons-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PLANT VS ANIMAL CELL COMPARISON TABLE -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl overflow-x-auto">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white" id="comp-table-title">पादप कोशिका बनाम जंतु कोशिका (Quick Comparison)</h3>
+                    <p class="text-xs text-slate-400" id="comp-table-sub">पादप और जंतु कोशिका के आसान अंतर</p>
+                </div>
+            </div>
+
+            <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-700 text-slate-400 uppercase text-[11px] tracking-wider">
+                        <th class="p-3">लक्षण / अंग</th>
+                        <th class="p-3 text-emerald-400 font-bold">पादप कोशिका (Plant Cell)</th>
+                        <th class="p-3 text-rose-400 font-bold">जंतु कोशिका (Animal Cell)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    <tr>
+                        <td class="p-3 font-semibold text-white">कोशिका भित्ति (Cell Wall)</td>
+                        <td class="p-3 font-semibold text-emerald-300">✅ उपस्थित (सेल्यूलोज की बनी)</td>
+                        <td class="p-3 text-rose-400">❌ अनुपस्थित</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">हरितलवक (Chloroplast)</td>
+                        <td class="p-3 font-semibold text-emerald-300">✅ हरे भागों की कोशिकाओं में उपस्थित</td>
+                        <td class="p-3 text-rose-400">❌ अनुपस्थित</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">रसधानी (Vacuole)</td>
+                        <td class="p-3 font-semibold text-emerald-300">आमतौर पर एक बड़ी रसधानी; कभी-कभी लगभग 90% जगह</td>
+                        <td class="p-3">अनेक छोटी-छोटी या अस्थायी</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">आकार (Shape)</td>
+                        <td class="p-3">अक्सर निश्चित आकार; जैसे आयताकार या अन्य आकार</td>
+                        <td class="p-3">अनियमित या गोलाकार</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-semibold text-white">भोजन संचय (Stored Food)</td>
+                        <td class="p-3">स्टार्च (मण्ड) के रूप में</td>
+                        <td class="p-3">ग्लाइकोजन के रूप में</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- MINI QUIZ SECTION -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white" id="quiz-header-title">पादप कोशिका ज्ञान परख (Plant Cell Quiz)</h3>
+                        <p class="text-xs text-slate-400" id="quiz-header-sub">जो सही उत्तर लगे, उस पर क्लिक करें।</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400" id="lbl-quiz-score">स्कोर:</span>
+                    <span id="quiz-score-val" class="text-base font-extrabold text-emerald-400 ml-1">0/5</span>
+                </div>
+            </div>
+
+            <!-- Quiz Questions Grid -->
+            <div id="quiz-container" class="space-y-5">
+                <!-- Question 1 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-1">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q1-title">
+                            1. कोशिका का बिजलीघर किसे कहते हैं?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 ml-2">Q1</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <button onclick="handleQuizAnswer(1, 0)" id="q1-opt-0" class="q1-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>A) हरितलवक (Chloroplast)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q1-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(1, 1)" id="q1-opt-1" class="q1-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>B) माइटोकॉन्ड्रिया (Mitochondria)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q1-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(1, 2)" id="q1-opt-2" class="q1-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>C) केंद्रक (Nucleus)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q1-icon"></i>
+                        </button>
+                    </div>
+                    <div id="q1-fb" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-2">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q2-title">
+                            2. पौधों की कोशिका भित्ति मुख्य रूप से किससे बनी होती है?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 ml-2">Q2</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <button onclick="handleQuizAnswer(2, 0)" id="q2-opt-0" class="q2-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>A) सेल्यूलोज (Cellulose)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q2-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(2, 1)" id="q2-opt-1" class="q2-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>B) हीमोग्लोबिन (Hemoglobin)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q2-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(2, 2)" id="q2-opt-2" class="q2-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>C) केवल वसा (Lipids)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q2-icon"></i>
+                        </button>
+                    </div>
+                    <div id="q2-fb" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-3">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q3-title">
+                            3. पौधों के हरे भागों में भोजन बनाने में कौन मदद करता है?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 ml-2">Q3</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <button onclick="handleQuizAnswer(3, 0)" id="q3-opt-0" class="q3-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>A) केंद्रक (Nucleus)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q3-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(3, 1)" id="q3-opt-1" class="q3-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>B) हरितलवक (Chloroplast)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q3-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(3, 2)" id="q3-opt-2" class="q3-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>C) राइबोसोम (Ribosome)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q3-icon"></i>
+                        </button>
+                    </div>
+                    <div id="q3-fb" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-4">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q4-title">
+                            4. कोशिका के कामों को कौन नियंत्रित करता है?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 ml-2">Q4</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <button onclick="handleQuizAnswer(4, 0)" id="q4-opt-0" class="q4-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>A) केंद्रक (Nucleus)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q4-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(4, 1)" id="q4-opt-1" class="q4-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>B) गॉल्जी उपकरण (Golgi Apparatus)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q4-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(4, 2)" id="q4-opt-2" class="q4-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>C) रसधानी (Vacuole)</span>
+                            <i class="fa-regular fa-circle text-slate-500 q4-icon"></i>
+                        </button>
+                    </div>
+                    <div id="q4-fb" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/60 space-y-3" id="q-block-5">
+                    <div class="flex justify-between items-start">
+                        <p class="text-sm font-semibold text-slate-200" id="q5-title">
+                            5. रसधानी में मुख्य रूप से क्या जमा रहता है?
+                        </p>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300 ml-2">Q5</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <button onclick="handleQuizAnswer(5, 0)" id="q5-opt-0" class="q5-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>A) पानी और घुले पदार्थ</span>
+                            <i class="fa-regular fa-circle text-slate-500 q5-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(5, 1)" id="q5-opt-1" class="q5-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>B) केवल हवा</span>
+                            <i class="fa-regular fa-circle text-slate-500 q5-icon"></i>
+                        </button>
+                        <button onclick="handleQuizAnswer(5, 2)" id="q5-opt-2" class="q5-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between">
+                            <span>C) केवल रेत</span>
+                            <i class="fa-regular fa-circle text-slate-500 q5-icon"></i>
+                        </button>
+                    </div>
+                    <div id="q5-fb" class="hidden p-3 rounded-xl border text-xs"></div>
+                </div>
+
+            </div>
+
+            <!-- Quiz Final Scorecard -->
+            <div id="quiz-final-score" class="hidden mt-6 bg-slate-800/90 p-5 rounded-2xl border border-emerald-500/40 text-center space-y-3">
+                <div class="text-emerald-400 text-3xl font-black">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h4 class="text-base sm:text-lg font-bold text-white" id="scorecard-title">क्विज़ मूल्यांकन पूर्ण!</h4>
+                <p class="text-xs sm:text-sm text-slate-300" id="scorecard-text"></p>
+                <button onclick="resetQuiz()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow">
+                    <i class="fa-solid fa-rotate-right"></i> <span>पुनः हल करें</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-400">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-leaf text-emerald-400"></i>
+                <span class="font-medium text-slate-300">Phygital Learning TLM (Physical Model + Digital Explorer)</span>
+            </div>
+            <div>
+                Created by <strong class="text-emerald-300 font-semibold tracking-wide">Aman Singhal | Aman TLM</strong>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State
+        let currentLang = 'hi';
+        let currentMode = 'explore'; // 'explore', 'game', 'compare'
+        let selectedOrganelleKey = 'cell_wall';
+        let currentAudioCtx = null;
+
+        // Web Audio API Synth Sound Chime (Zero External Dependencies)
+        function playChime(freq = 520, type = 'sine', duration = 0.15) {
+            try {
+                if (!currentAudioCtx) {
+                    currentAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (currentAudioCtx.state === 'suspended') {
+                    currentAudioCtx.resume();
+                }
+                const osc = currentAudioCtx.createOscillator();
+                const gain = currentAudioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, currentAudioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, currentAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, currentAudioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(currentAudioCtx.destination);
+                osc.start();
+                osc.stop(currentAudioCtx.currentTime + duration);
+            } catch (e) {
+                // Audio not supported or blocked
+            }
+        }
+
+        // Organelle Data Dictionary matching the Cardboard model elements
+        const organelles = {
+            cell_wall: {
+                id: 'cell_wall',
+                color: 'emerald',
+                icon: 'fa-solid fa-shield-halved',
+                isPlantExclusive: true,
+                svgIds: ['svg-cell-wall'],
+                hi: {
+                    name: 'कोशिका भित्ति',
+                    sciName: 'Cell Wall',
+                    badge: 'पादप कोशिका का खास भाग',
+                    nickname: 'कोशिका की मजबूत दीवार',
+                    func: 'यह पादप कोशिका की प्लाज्मा झिल्ली के बाहर स्थित मजबूत परत है। यह कोशिका को आकार देती है और उसकी रक्षा करती है।',
+                    fact: 'जंतु कोशिका में कोशिका भित्ति नहीं होती। कवक और अधिकांश जीवाणुओं में भी कोशिका भित्ति होती है, लेकिन यह अलग पदार्थों से बनी होती है।',
+                    composition: 'मुख्यतः सेल्यूलोज, हेमिसेल्यूलोज और पेक्टिन',
+                    presence: 'पौधों, कवक और अधिकांश जीवाणुओं में'
+                },
+                en: {
+                    name: 'Cell Wall',
+                    sciName: 'Cell Wall',
+                    badge: 'Plant Exclusive Organelle',
+                    nickname: 'The Outer Protective Armour',
+                    func: 'A tough, rigid outer layer composed primarily of cellulose. It provides structural support, protection, and gives plant cells their characteristic hexagonal/rectangular shape.',
+                    fact: 'Animal cells completely lack a cell wall, allowing them greater flexibility of movement.',
+                    composition: 'Cellulose, Hemicellulose, Pectin',
+                    presence: 'Plant cells, Fungi, Bacteria'
+                }
+            },
+            cell_membrane: {
+                id: 'cell_membrane',
+                color: 'green',
+                icon: 'fa-solid fa-border-all',
+                isPlantExclusive: false,
+                svgIds: ['svg-cell-membrane'],
+                hi: {
+                    name: 'कोशिका झिल्ली',
+                    sciName: 'Cell Membrane / Plasma Membrane',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'कोशिका का दरवाजा',
+                    func: 'यह कोशिका की पतली झिल्ली है। यह तय करती है कि कौन-सा पदार्थ कोशिका के अंदर आएगा और कौन-सा बाहर जाएगा।',
+                    fact: 'यह पादप और जंतु दोनों कोशिकाओं में पाई जाती है।',
+                    composition: 'वसा जैसे पदार्थ और प्रोटीन',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Cell Membrane',
+                    sciName: 'Plasma Membrane',
+                    badge: 'Universal Organelle',
+                    nickname: 'Selective Gatekeeper of the Cell',
+                    func: 'A delicate, flexible, semi-permeable lipid bilayer located directly beneath the cell wall that regulates the entry and exit of nutrients and waste products.',
+                    fact: 'Follows the famous Fluid Mosaic Model proposed by Singer and Nicolson.',
+                    composition: 'Phospholipids & Membrane Proteins',
+                    presence: 'Both Plant & Animal Cells'
+                }
+            },
+            vacuole: {
+                id: 'vacuole',
+                color: 'sky',
+                icon: 'fa-solid fa-droplet',
+                isPlantExclusive: true,
+                svgIds: ['svg-vacuole'],
+                hi: {
+                    name: 'बड़ी केंद्रीय रसधानी / रिक्तिका',
+                    sciName: 'Large Central Vacuole',
+                    badge: 'पादप कोशिका का खास भाग',
+                    nickname: 'पानी रखने की बड़ी थैली',
+                    func: 'यह कोशिका के अंदर पानी और कुछ दूसरे पदार्थ जमा रखती है। पौधे की कोशिका को भरा और सीधा रखने में भी मदद करती है।',
+                    fact: 'पौधों की बड़ी कोशिका में रसधानी बहुत बड़ी हो सकती है और कभी-कभी लगभग 90% जगह घेर सकती है।',
+                    composition: 'पानी और घुले हुए पदार्थ',
+                    presence: 'पौधों में आमतौर पर बड़ी; जंतुओं में छोटी भी हो सकती है'
+                },
+                en: {
+                    name: 'Central Vacuole',
+                    sciName: 'Central Vacuole',
+                    badge: 'Plant Hall-Mark Organelle',
+                    nickname: 'The Storage and Turgor Reservoir',
+                    func: 'In many mature plant cells, the central vacuole is very large and may occupy up to about 90% of the cell volume. Its cell sap helps maintain turgor pressure.',
+                    fact: 'Enclosed by a single specialized selectively permeable membrane named the Tonoplast.',
+                    composition: 'Water, enzymes, inorganic ions',
+                    presence: 'Prominent in Plants; tiny in animals'
+                }
+            },
+            nucleus: {
+                id: 'nucleus',
+                color: 'pink',
+                icon: 'fa-solid fa-atom',
+                isPlantExclusive: false,
+                svgIds: ['svg-nucleus'],
+                hi: {
+                    name: 'केंद्रक एवं केंद्रिका',
+                    sciName: 'Nucleus & Nucleolus',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'कोशिका का नियंत्रण केंद्र',
+                    func: 'यह कोशिका के कामों को नियंत्रित करता है। इसमें DNA होता है, जिसमें जीव के गुणों की जानकारी रहती है।',
+                    fact: 'केंद्रक की खोज वैज्ञानिक रॉबर्ट ब्राउन ने की थी।',
+                    composition: 'मुख्य रूप से DNA और प्रोटीन',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Nucleus & Nucleolus',
+                    sciName: 'Nucleus & Nucleolus',
+                    badge: 'Universal Organelle',
+                    nickname: 'The Control Center / Brain of Cell',
+                    func: 'Coordinates all cellular activities, gene expression, and cell division. Houses the master genetic blueprint (DNA) inside chromatin threads.',
+                    fact: 'Discovered in 1831 by botanist Robert Brown inside plant root cells.',
+                    composition: 'Chromatin (DNA), Nucleolus (rRNA)',
+                    presence: 'Both Plant & Animal Cells'
+                }
+            },
+            chloroplast: {
+                id: 'chloroplast',
+                color: 'green',
+                icon: 'fa-solid fa-sun-plant-wilt',
+                isPlantExclusive: true,
+                svgIds: ['svg-chloroplast-1', 'svg-chloroplast-2', 'svg-chloroplast-3'],
+                hi: {
+                    name: 'हरितलवक (क्लोरोप्लास्ट)',
+                    sciName: 'Chloroplast',
+                    badge: 'पादप कोशिका का खास भाग',
+                    nickname: 'कोशिका का रसोईघर',
+                    func: 'यह पौधे के हरे भागों की कोशिकाओं में पाया जाता है। इसमें हरा पदार्थ क्लोरोफिल होता है। इसकी मदद से पौधा सूर्य के प्रकाश में अपना भोजन बनाता है।',
+                    fact: 'पत्तियों का हरा रंग क्लोरोफिल के कारण होता है।',
+                    composition: 'क्लोरोफिल और अन्य पदार्थ',
+                    presence: 'पौधों के हरे भागों और शैवाल में'
+                },
+                en: {
+                    name: 'Chloroplast',
+                    sciName: 'Chloroplast',
+                    badge: 'Plant Exclusive Organelle',
+                    nickname: 'The Kitchen of the Plant Cell',
+                    func: 'Contains chlorophyll pigment that absorbs photon energy from sunlight to drive photosynthesis—converting CO₂ and water into glucose and oxygen.',
+                    fact: 'It is a semi-autonomous organelle containing its own circular DNA and ribosomes.',
+                    composition: 'Thylakoids, Stroma, Chlorophyll',
+                    presence: 'Only in green plants and algae'
+                }
+            },
+            mitochondria: {
+                id: 'mitochondria',
+                color: 'blue',
+                icon: 'fa-solid fa-bolt',
+                isPlantExclusive: false,
+                svgIds: ['svg-mitochondria-1', 'svg-mitochondria-2', 'svg-mitochondria-3'],
+                hi: {
+                    name: 'माइटोकॉन्ड्रिया',
+                    sciName: 'Mitochondria',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'कोशिका का बिजलीघर',
+                    func: 'यह भोजन से ऊर्जा प्राप्त करने में मदद करता है। इस ऊर्जा से कोशिका के काम चलते हैं।',
+                    fact: 'इसे कोशिका का बिजलीघर भी कहते हैं।',
+                    composition: 'दोहरी झिल्ली',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Mitochondria',
+                    sciName: 'Mitochondria',
+                    badge: 'Universal Organelle',
+                    nickname: 'Powerhouse of the Cell',
+                    func: 'Site of cellular respiration. Converts biochemical energy from nutrients into ATP (Adenosine Triphosphate)—the universal energy currency.',
+                    fact: 'Contains inner membrane foldings called cristae that maximize ATP synthesis surface area.',
+                    composition: 'Double membrane, Matrix, ATP Synthase',
+                    presence: 'Both Plant & Animal Cells'
+                }
+            },
+            rer: {
+                id: 'rer',
+                color: 'orange',
+                icon: 'fa-solid fa-network-wired',
+                isPlantExclusive: false,
+                svgIds: ['svg-rer'],
+                hi: {
+                    name: 'खुरदरी अंतर्द्रव्यी जालिका (RER)',
+                    sciName: 'Rough Endoplasmic Reticulum',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'प्रोटीन बनाने और पहुँचाने में मददगार',
+                    func: 'इसकी सतह पर छोटे-छोटे राइबोसोम लगे होते हैं। यह प्रोटीन बनाने और उन्हें कोशिका के दूसरे भागों तक पहुँचाने में मदद करती है।',
+                    fact: 'राइबोसोम लगे होने के कारण यह खुरदरी दिखाई देती है।',
+                    composition: 'झिल्ली और राइबोसोम',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Rough ER (RER)',
+                    sciName: 'Rough Endoplasmic Reticulum',
+                    badge: 'Universal Organelle',
+                    nickname: 'Protein Synthesis & Packaging Channel',
+                    func: 'Studded with ribosomes on its outer surface; synthesizes, folds, and channels proteins toward the Golgi apparatus or cell membrane.',
+                    fact: 'Continuous with the outer membrane of the nuclear envelope.',
+                    composition: 'Cisternae tubules studded with ribosomes',
+                    presence: 'Both Plant & Animal Cells'
+                }
+            },
+            ser: {
+                id: 'ser',
+                color: 'rose',
+                icon: 'fa-solid fa-wave-square',
+                isPlantExclusive: false,
+                svgIds: ['svg-ser'],
+                hi: {
+                    name: 'चिकनी अंतर्द्रव्यी जालिका (SER)',
+                    sciName: 'Smooth Endoplasmic Reticulum',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'चिकनी जालिका',
+                    func: 'इसकी सतह पर राइबोसोम नहीं होते। यह वसा बनाने और कुछ हानिकारक पदार्थों को कम नुकसानदायक बनाने में मदद करती है।',
+                    fact: 'राइबोसोम न होने के कारण यह चिकनी दिखाई देती है।',
+                    composition: 'चिकनी झिल्लीदार नलिकाएँ',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Smooth ER (SER)',
+                    sciName: 'Smooth Endoplasmic Reticulum',
+                    badge: 'Universal Organelle',
+                    nickname: 'Lipid Synthesizer & Detox Station',
+                    func: 'Lacks ribosomes; synthesizes essential lipids, phospholipids, and sterols, while detoxifying metabolic byproducts.',
+                    fact: 'Characterized by tubular interconnected network structures.',
+                    composition: 'Tubular smooth membranes',
+                    presence: 'Both Plant & Animal Cells'
+                }
+            },
+            golgi: {
+                id: 'golgi',
+                color: 'fuchsia',
+                icon: 'fa-solid fa-boxes-packing',
+                isPlantExclusive: false,
+                svgIds: ['svg-golgi'],
+                hi: {
+                    name: 'गॉल्जी उपकरण (डिक्टियोसोम)',
+                    sciName: 'Golgi Apparatus / Dictyosome',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'कोशिका का डाकघर',
+                    func: 'यह कोशिका के पदार्थों को छाँटता है, पैक करता है और सही जगह पहुँचाने में मदद करता है।',
+                    fact: 'यह पादप और जंतु दोनों कोशिकाओं में पाया जाता है।',
+                    composition: 'चपटी झिल्लीदार थैलियाँ',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Golgi Apparatus',
+                    sciName: 'Golgi Body / Dictyosome',
+                    badge: 'Universal Organelle',
+                    nickname: 'The Cell Post Office & Dispatcher',
+                    func: 'Modifies, sorts, and packages proteins and lipids received from the ER into membrane-bound vesicles for secretion or delivery.',
+                    fact: 'In plant cells, Golgi units are dispersed as smaller subunits termed Dictyosomes.',
+                    composition: 'Flattened cisternae stacks & secretory vesicles',
+                    presence: 'Both Plant & Animal Cells'
+                }
+            },
+            amyloplast: {
+                id: 'amyloplast',
+                color: 'slate',
+                icon: 'fa-solid fa-cookie',
+                isPlantExclusive: true,
+                svgIds: ['svg-amyloplast'],
+                hi: {
+                    name: 'एमाइलोप्लास्ट (एक प्रकार का ल्यूकोप्लास्ट)',
+                    sciName: 'Amyloplast',
+                    badge: 'पौधों में पाया जाने वाला भाग',
+                    nickname: 'भोजन जमा करने वाला भाग',
+                    func: 'यह ल्यूकोप्लास्ट का एक प्रकार है, जो पौधे की कुछ कोशिकाओं में पाया जाता है। इसमें स्टार्च जमा रहता है। यह आलू जैसे भागों में मिलता है।',
+                    fact: 'आलू में स्टार्च जमा रहता है।',
+                    composition: 'स्टार्च के कण',
+                    presence: 'पौधों के कुछ भागों में'
+                },
+                en: {
+                    name: 'Amyloplast',
+                    sciName: 'Amyloplast',
+                    badge: 'Plant Leucoplast',
+                    nickname: 'The Starch Storage Vault',
+                    func: 'A non-pigmented plastid responsible for the synthesis and long-term storage of starch granules from excess photosynthetic glucose.',
+                    fact: 'In roots, specialized amyloplasts act as statoliths to detect gravity.',
+                    composition: 'Starch granules enclosed within plastid envelope',
+                    presence: 'Plant storage tissues (tubers, roots, seeds)'
+                }
+            },
+            ribosomes: {
+                id: 'ribosomes',
+                color: 'slate',
+                icon: 'fa-solid fa-ellipsis',
+                isPlantExclusive: false,
+                svgIds: ['svg-ribosomes'],
+                hi: {
+                    name: 'राइबोसोम (Ribosomes)',
+                    sciName: 'Ribosomes (80S)',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'प्रोटीन बनाने वाले छोटे कण',
+                    func: 'ये बहुत छोटे कण हैं। ये कोशिका के लिए प्रोटीन बनाते हैं।',
+                    fact: 'राइबोसोम कोशिका के अंदर खुले रूप में या खुरदरी जालिका पर लगे हो सकते हैं।',
+                    composition: 'RNA और प्रोटीन',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Ribosomes',
+                    sciName: 'Ribosomes (80S)',
+                    badge: 'Universal Machine',
+                    nickname: 'Cellular Protein Factories',
+                    func: 'Nanomachines that translate genetic messages encoded in messenger RNA into polypeptides and functional proteins.',
+                    fact: 'Unlike most organelles, ribosomes are not enclosed by any lipid membrane.',
+                    composition: 'Ribosomal RNA (rRNA) & Ribosomal proteins',
+                    presence: 'Universal to all living cells'
+                }
+            },
+            cytoplasm: {
+                id: 'cytoplasm',
+                color: 'emerald',
+                icon: 'fa-solid fa-water',
+                isPlantExclusive: false,
+                svgIds: [],
+                hi: {
+                    name: 'कोशिकाद्रव्य (साइटोप्लाज्म)',
+                    sciName: 'Cytoplasm / Cytosol',
+                    badge: 'दोनों कोशिकाओं में',
+                    nickname: 'कोशिका के अंदर जेली जैसा पदार्थ',
+                    func: 'यह कोशिका के अंदर जेली जैसा पदार्थ है। कोशिका के कई भाग इसी में मौजूद रहते हैं।',
+                    fact: 'कोशिकाद्रव्य पादप और जंतु दोनों कोशिकाओं में पाया जाता है।',
+                    composition: 'मुख्य रूप से पानी और दूसरे पदार्थ',
+                    presence: 'पादप और जंतु दोनों में'
+                },
+                en: {
+                    name: 'Cytoplasm',
+                    sciName: 'Cytosol',
+                    badge: 'Universal Medium',
+                    nickname: 'The Metabolic Arena',
+                    func: 'The gelatinous fluid matrix enclosed by the plasma membrane that suspends all organelles and hosts core metabolic pathways such as glycolysis.',
+                    fact: 'Exhibits internal cytoplasmic streaming (cyclosis) to distribute nutrients.',
+                    composition: 'Water (~80%), dissolved enzymes, salts, sugars',
+                    presence: 'Both Plant & Animal Cells'
+                }
+            }
+        };
+
+        // Render Bottom Key Selector Buttons (Matching Cardboard layout)
+        function renderOrganelleKeyButtons() {
+            const container = document.getElementById('organelle-buttons-grid');
+            container.innerHTML = '';
+
+            Object.keys(organelles).forEach(key => {
+                const item = organelles[key];
+                const btn = document.createElement('button');
+                btn.id = `btn-key-${key}`;
+                btn.onclick = () => selectOrganelle(key);
+                btn.className = `p-2 rounded-xl text-left border text-xs font-semibold flex items-center justify-between transition-all ${
+                    selectedOrganelleKey === key
+                        ? 'bg-emerald-600 border-emerald-400 text-white shadow-md'
+                        : 'bg-slate-800 hover:bg-slate-700/80 border-slate-700 text-slate-300'
+                }`;
+
+                const plantDot = item.isPlantExclusive 
+                    ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1 inline-block" title="केवल पादप कोशिका"></span>' 
+                    : '';
+
+                btn.innerHTML = `
+                    <span class="truncate flex items-center">${item[currentLang].name} ${plantDot}</span>
+                    <i class="${item.icon} text-[10px] ml-1 opacity-70"></i>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // Accurate educational cutaway diagrams for selected organelles.
+        // These are schematic cross-sections, not microscope photographs.
+        const microDetails = {
+          chloroplast: {title:'हरितलवक (Chloroplast) — अंदर की संरचना',desc:'हरितलवक दोहरी झिल्ली से घिरा होता है। इसके अंदर तरल स्ट्रोमा में थायलाकोइड नामक चपटी झिल्लीदार थैलियाँ होती हैं। थायलाकोइड के ढेर को ग्रेनम (बहुवचन: ग्राना) कहते हैं।',parts:[['बाहरी व भीतरी झिल्ली','हरितलवक की दोहरी सीमा बनाती हैं।'],['स्ट्रोमा','भीतर का द्रव; इसमें एंजाइम, DNA और राइबोसोम होते हैं।'],['थायलाकोइड','क्लोरोफिल युक्त चपटी झिल्लीदार थैली।'],['ग्रेनम / ग्राना','एक ग्रेनम थायलाकोइडों का ढेर है; ग्राना बहुवचन है। स्ट्रोमा लैमेली अलग-अलग ग्राना को जोड़ सकती हैं।']],svg:`<svg viewBox="0 0 520 270" class="w-full max-w-xl" role="img" aria-label="Chloroplast internal structure"><ellipse cx="250" cy="132" rx="205" ry="105" fill="#14532d" stroke="#86efac" stroke-width="5"/><ellipse cx="250" cy="132" rx="193" ry="94" fill="#a3e635" stroke="#365314" stroke-width="3"/><g fill="#166534" stroke="#dcfce7" stroke-width="2">${[0,1,2,3].map((v)=>`<g transform="translate(${120+v*83},${100+(v%2)*30})">${[0,1,2,3,4].map((n)=>`<rect x="0" y="${n*9}" width="49" height="7" rx="3"/>`).join('')}</g>`).join('')}</g><g stroke="#365314" stroke-width="3" fill="none"><path d="M168 125 Q205 80 245 126 T330 125"/><path d="M170 155 Q210 185 260 150 T350 155"/></g><g font-size="14" fill="#fff" font-weight="bold"><text x="25" y="24">दोहरी झिल्ली</text><path d="M115 28 L90 58" stroke="#fff"/><text x="395" y="58">ग्राना</text><path d="M415 65 L360 105" stroke="#fff"/><text x="390" y="220">स्ट्रोमा</text><path d="M390 205 L330 180" stroke="#fff"/><text x="15" y="238">थायलाकोइड के ढेर</text><path d="M160 225 L170 160" stroke="#fff"/></g></svg>`},
+          mitochondria:{title:'माइटोकॉन्ड्रिया — अंदर की संरचना',desc:'माइटोकॉन्ड्रिया दोहरी झिल्ली वाला कोशिकांग है। भीतरी झिल्ली अंदर की ओर मुड़कर क्रिस्टी बनाती है। अंदर का भाग मैट्रिक्स कहलाता है।',parts:[['बाहरी झिल्ली','बाहरी सीमा बनाती है।'],['भीतरी झिल्ली','अंदर मुड़कर क्रिस्टी बनाती है।'],['क्रिस्टी','भीतरी झिल्ली की तहें; ATP निर्माण से जुड़ी प्रक्रियाएँ होती हैं।'],['मैट्रिक्स','भीतर का द्रव; इसमें एंजाइम, अपना DNA और राइबोसोम होते हैं।']],svg:`<svg viewBox="0 0 520 270" class="w-full max-w-xl" role="img" aria-label="Mitochondrion internal structure"><path d="M65 135 C65 48 175 32 270 48 C390 20 465 85 450 145 C440 220 330 238 230 220 C120 238 55 205 65 135Z" fill="#7f1d1d" stroke="#fca5a5" stroke-width="6"/><path d="M85 135 C85 70 180 60 260 70 C370 48 430 95 425 145 C415 195 320 210 230 198 C135 215 80 185 85 135Z" fill="#fca5a5" stroke="#7f1d1d" stroke-width="4"/><path d="M105 120 Q135 75 155 125 T205 125 T255 125 T305 125 T355 125 T405 125 M105 160 Q135 205 155 155 T205 155 T255 155 T305 155 T355 155 T405 155" fill="none" stroke="#7f1d1d" stroke-width="9"/><g fill="#fff" font-size="15" font-weight="bold"><text x="15" y="25">बाहरी झिल्ली</text><path d="M110 30 L80 65" stroke="#fff"/><text x="365" y="35">क्रिस्टी</text><path d="M400 40 L355 110" stroke="#fff"/><text x="370" y="250">मैट्रिक्स</text><path d="M390 230 L320 180" stroke="#fff"/></g></svg>`},
+          golgi:{title:'गॉल्जी उपकरण — अंदर की संरचना',desc:'गॉल्जी उपकरण चपटी झिल्लीदार थैलियों के समूह से बना होता है। ये थैलियाँ सिस्टर्नी कहलाती हैं। इसके किनारों पर छोटी परिवहन वेसिकल्स बनती और जुड़ती हैं।',parts:[['सिस्टर्नी','एक-दूसरे के ऊपर व्यवस्थित चपटी थैलियाँ।'],['सिस फेस','आमतौर पर पदार्थ प्राप्त करने वाला भाग।'],['ट्रांस फेस','पदार्थों को छाँटकर आगे भेजने वाला भाग।'],['वेसिकल्स','छोटी झिल्लीदार थैलियाँ; पदार्थों का परिवहन करती हैं।']],svg:`<svg viewBox="0 0 520 260" class="w-full max-w-xl" role="img" aria-label="Golgi apparatus structure"><g fill="#7c3aed" stroke="#ddd6fe" stroke-width="3">${[0,1,2,3,4].map((n)=>`<path d="M125 ${65+n*27} Q255 ${35+n*27} 385 ${65+n*27} Q395 ${78+n*27} 375 ${82+n*27} Q255 ${55+n*27} 135 ${82+n*27} Q115 ${78+n*27} 125 ${65+n*27}Z"/>`).join('')}</g><g fill="#c4b5fd" stroke="#fff" stroke-width="2"><circle cx="105" cy="75" r="12"/><circle cx="95" cy="112" r="8"/><circle cx="405" cy="75" r="13"/><circle cx="425" cy="120" r="9"/><circle cx="400" cy="190" r="11"/></g><g fill="#fff" font-size="15" font-weight="bold"><text x="12" y="28">सिस फेस</text><path d="M85 32 L130 70" stroke="#fff"/><text x="390" y="28">वेसिकल</text><path d="M425 35 L408 62" stroke="#fff"/><text x="200" y="245">सिस्टर्नी</text><path d="M255 225 L255 185" stroke="#fff"/><text x="390" y="235">ट्रांस फेस</text></g></svg>`},
+          nucleus:{title:'केंद्रक — अंदर की संरचना',desc:'केंद्रक दोहरी केंद्रकीय झिल्ली से घिरा रहता है। झिल्ली में छिद्र होते हैं। अंदर न्यूक्लियोप्लाज्म, क्रोमैटिन और केंद्रिका पाई जाती है।',parts:[['केंद्रकीय झिल्ली','दोहरी झिल्ली; इसमें केंद्रकीय छिद्र होते हैं।'],['केंद्रकीय छिद्र','RNA और अन्य अणुओं के आवागमन में मदद।'],['क्रोमैटिन','DNA और प्रोटीन का पदार्थ।'],['केंद्रिका','राइबोसोम के उपघटकों के निर्माण में भूमिका।']],svg:`<svg viewBox="0 0 520 260" class="w-full max-w-xl" role="img" aria-label="Nucleus structure"><ellipse cx="250" cy="130" rx="150" ry="100" fill="#312e81" stroke="#a5b4fc" stroke-width="8"/><ellipse cx="250" cy="130" rx="137" ry="88" fill="#818cf8" stroke="#c7d2fe" stroke-width="3"/><g fill="none" stroke="#312e81" stroke-width="5"><path d="M150 110 Q180 60 220 100 T300 95 T350 135 M150 160 Q200 200 240 150 T340 170"/></g><circle cx="270" cy="135" r="27" fill="#f472b6" stroke="#831843" stroke-width="4"/><g fill="#fff" font-size="14" font-weight="bold"><text x="15" y="28">केंद्रकीय झिल्ली</text><path d="M130 33 L110 70" stroke="#fff"/><text x="365" y="65">क्रोमैटिन</text><path d="M390 70 L325 105" stroke="#fff"/><text x="370" y="220">केंद्रिका</text><path d="M370 205 L290 150" stroke="#fff"/></g></svg>`}
+
+          ,cell_wall:{title:'कोशिका भित्ति — परतों की संरचना',desc:'पादप कोशिका की कोशिका भित्ति प्लाज्मा झिल्ली के बाहर होती है। इसकी प्राथमिक भित्ति मुख्यतः सेल्यूलोज सूक्ष्मतंतुओं, हेमिसेल्यूलोज और पेक्टिन से बनी होती है। कुछ कोशिकाओं में बाद में द्वितीयक भित्ति भी बन सकती है।',parts:[['मध्य पटल (Middle lamella)','पड़ोसी कोशिकाओं को जोड़ने वाला पेक्टिन-समृद्ध क्षेत्र।'],['प्राथमिक भित्ति','पतली और अपेक्षाकृत लचीली; बढ़ती कोशिका में पाई जाती है।'],['द्वितीयक भित्ति','कुछ कोशिकाओं में प्राथमिक भित्ति के अंदर बनती है; अक्सर अधिक मोटी होती है।'],['सेल्यूलोज सूक्ष्मतंतु','भित्ति को तन्य मजबूती प्रदान करते हैं।']],svg:`<svg viewBox="0 0 520 260" class="w-full max-w-xl" role="img" aria-label="Plant cell wall layers"><rect x="110" y="55" width="300" height="150" rx="12" fill="#854d0e" stroke="#fde68a" stroke-width="12"/><rect x="126" y="71" width="268" height="118" rx="8" fill="#a3e635" stroke="#d9f99d" stroke-width="8"/><rect x="143" y="88" width="234" height="84" rx="5" fill="#164e63" stroke="#67e8f9" stroke-width="4"/><g fill="#fff" font-size="14" font-weight="bold"><text x="15" y="30">मध्य पटल</text><path d="M100 34 L112 58" stroke="#fff"/><text x="355" y="30">प्राथमिक भित्ति</text><path d="M405 35 L390 75" stroke="#fff"/><text x="365" y="240">प्लाज्मा झिल्ली</text><path d="M380 220 L350 175" stroke="#fff"/></g></svg>`},
+          cell_membrane:{title:'कोशिका झिल्ली — Fluid Mosaic Model',desc:'प्लाज्मा झिल्ली फॉस्फोलिपिड की द्विस्तरीय परत होती है। प्रोटीन इसमें धँसे या सतह से जुड़े रहते हैं। यह चयनात्मक पारगम्य होती है और पदार्थों के आवागमन को नियंत्रित करती है।',parts:[['फॉस्फोलिपिड सिर','जल-प्रिय (hydrophilic) भाग, जलीय सतह की ओर।'],['फॉस्फोलिपिड पूँछ','जल-विमुख (hydrophobic) भाग, झिल्ली के अंदर की ओर।'],['झिल्ली प्रोटीन','चैनल, वाहक या रिसेप्टर का कार्य कर सकते हैं।'],['कार्बोहाइड्रेट श्रृंखला','कुछ झिल्लियों में पहचान और कोशिका-संकेत में सहायक।']],svg:`<svg viewBox="0 0 520 250" class="w-full max-w-xl" role="img" aria-label="Phospholipid bilayer"><g stroke="#67e8f9" stroke-width="5">${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<path d="M${75+i*32} 85 l-7 48 M${75+i*32} 85 l7 48 M${75+i*32} 165 l-7 -48 M${75+i*32} 165 l7 -48"/>`).join('')}</g><g fill="#fbbf24" stroke="#fff" stroke-width="2">${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>`<circle cx="${75+i*32}" cy="80" r="9"/><circle cx="${75+i*32}" cy="170" r="9"/>`).join('')}</g><rect x="225" y="65" width="40" height="120" rx="18" fill="#c084fc" stroke="#fff" stroke-width="3"/><g fill="#fff" font-size="14" font-weight="bold"><text x="12" y="25">फॉस्फोलिपिड द्विस्तर</text><text x="300" y="40">झिल्ली प्रोटीन</text><path d="M330 45 L255 75" stroke="#fff"/></g></svg>`},
+          vacuole:{title:'केंद्रीय रसधानी — टोनोप्लास्ट और कोशिका रस',desc:'परिपक्व पादप कोशिका में बड़ी केंद्रीय रसधानी हो सकती है। इसकी झिल्ली टोनोप्लास्ट कहलाती है। इसके भीतर कोशिका रस होता है, जिसमें पानी, आयन, शर्करा, रंगद्रव्य और अपशिष्ट पदार्थ हो सकते हैं।',parts:[['टोनोप्लास्ट','रसधानी को घेरने वाली चयनात्मक पारगम्य झिल्ली।'],['कोशिका रस','पानी में घुले आयन, शर्करा, रंगद्रव्य आदि।'],['भंडारण','पानी, पोषक/अपशिष्ट पदार्थ और कुछ रंगद्रव्य जमा हो सकते हैं।'],['तुर्गर दाब','पानी भरने से कोशिका को दृढ़ता बनाए रखने में मदद।']],svg:`<svg viewBox="0 0 520 260" class="w-full max-w-xl" role="img" aria-label="Central vacuole"><rect x="80" y="35" width="360" height="190" rx="24" fill="#0f766e" stroke="#99f6e4" stroke-width="8"/><rect x="100" y="55" width="320" height="150" rx="18" fill="#38bdf8" stroke="#e0f2fe" stroke-width="4"/><g fill="#fff" opacity=".8"><circle cx="165" cy="105" r="8"/><circle cx="300" cy="145" r="6"/><circle cx="365" cy="95" r="10"/></g><g fill="#fff" font-size="14" font-weight="bold"><text x="12" y="25">टोनोप्लास्ट</text><path d="M105 30 L90 45" stroke="#fff"/><text x="355" y="250">कोशिका रस</text><path d="M380 225 L350 180" stroke="#fff"/></g></svg>`},
+          rer:{title:'खुरदरी अंतःप्रद्रव्यी जालिका (RER)',desc:'RER झिल्लीदार नलिकाओं और चपटी थैलियों का जाल है, जिसकी सतह पर राइबोसोम लगे होते हैं। यह मुख्यतः स्रावित होने वाले, झिल्ली में लगने वाले और कुछ कोशिकांगों के प्रोटीन के निर्माण व शुरुआती संशोधन में भाग लेती है।',parts:[['सिस्टर्नी','चपटी झिल्लीदार थैलियाँ।'],['राइबोसोम','बाहरी सतह पर लगे छोटे कण; प्रोटीन संश्लेषण करते हैं।'],['ल्यूमेन','ER के अंदर का स्थान, जहाँ प्रोटीन की folding/processing हो सकती है।']],svg:`<svg viewBox="0 0 520 250" class="w-full max-w-xl" role="img" aria-label="Rough endoplasmic reticulum"><g fill="none" stroke="#60a5fa" stroke-width="12">${[0,1,2,3,4].map(i=>`<path d="M90 ${65+i*30} Q180 ${35+i*30} 270 ${65+i*30} T440 ${65+i*30}"/>`).join('')}</g><g fill="#fbbf24">${Array.from({length:42},(_,i)=>`<circle cx="${95+(i%14)*25}" cy="${55+Math.floor(i/14)*60}" r="4"/>`).join('')}</g><g fill="#fff" font-size="14" font-weight="bold"><text x="12" y="25">राइबोसोम</text><path d="M95 30 L120 55" stroke="#fff"/><text x="355" y="235">झिल्लीदार जाल</text></g></svg>`},
+          ser:{title:'चिकनी अंतःप्रद्रव्यी जालिका (SER)',desc:'SER झिल्लीदार नलिकाओं का जाल है, जिसकी सतह पर राइबोसोम नहीं होते। इसके कार्य कोशिका के प्रकार के अनुसार बदलते हैं; इसमें लिपिड संश्लेषण, कुछ पदार्थों का detoxification और कैल्शियम आयन का भंडारण शामिल हो सकता है।',parts:[['नलिकाएँ','आपस में जुड़ी झिल्लीदार नलिकाएँ।'],['राइबोसोम अनुपस्थित','इसी कारण सतह चिकनी दिखाई देती है।'],['लिपिड संश्लेषण','फॉस्फोलिपिड और कुछ अन्य लिपिड बनाने में मदद।'],['विशेष कार्य','कुछ कोशिकाओं में detoxification या कैल्शियम भंडारण।']],svg:`<svg viewBox="0 0 520 250" class="w-full max-w-xl" role="img" aria-label="Smooth endoplasmic reticulum"><g fill="none" stroke="#34d399" stroke-width="15" stroke-linecap="round"><path d="M70 130 C100 40 190 45 210 105 S300 195 330 110 S430 45 455 120"/><path d="M95 180 C140 115 175 180 235 155 S330 55 390 165"/></g><g fill="#fff" font-size="14" font-weight="bold"><text x="12" y="25">राइबोसोम नहीं</text><text x="345" y="230">चिकनी नलिकाएँ</text></g></svg>`},
+          amyloplast:{title:'एमाइलोप्लास्ट — स्टार्च संचय',desc:'एमाइलोप्लास्ट रंगहीन प्लास्टिड यानी ल्यूकोप्लास्ट का एक प्रकार है। इसमें स्टार्च के कण बनते और जमा होते हैं। यह जड़ों, कंदों और बीजों जैसे भंडारण ऊतकों में मिल सकता है।',parts:[['प्लास्टिड आवरण','दोहरी झिल्ली एमाइलोप्लास्ट को घेरती है।'],['स्ट्रोमा','प्लास्टिड के अंदर का मैट्रिक्स जैसा भाग।'],['स्टार्च कण','स्टार्च का संचय; आकार और संख्या बदल सकती है।'],['ल्यूकोप्लास्ट परिवार','एमाइलोप्लास्ट, स्टार्च जमा करने वाला ल्यूकोप्लास्ट है।']],svg:`<svg viewBox="0 0 520 250" class="w-full max-w-xl" role="img" aria-label="Amyloplast with starch grains"><ellipse cx="255" cy="125" rx="175" ry="92" fill="#d1d5db" stroke="#f8fafc" stroke-width="6"/><ellipse cx="255" cy="125" rx="163" ry="80" fill="#64748b"/><g fill="#fef3c7" stroke="#92400e" stroke-width="3"><ellipse cx="180" cy="115" rx="38" ry="25"/><ellipse cx="265" cy="145" rx="48" ry="31"/><ellipse cx="335" cy="95" rx="31" ry="22"/></g><g fill="#fff" font-size="14" font-weight="bold"><text x="12" y="25">प्लास्टिड आवरण</text><path d="M130 30 L105 65" stroke="#fff"/><text x="350" y="230">स्टार्च कण</text><path d="M370 205 L335 130" stroke="#fff"/></g></svg>`},
+          ribosomes:{title:'राइबोसोम — बड़ी और छोटी उपइकाई',desc:'राइबोसोम झिल्ली-विहीन कण हैं जो mRNA के संदेश को पढ़कर प्रोटीन बनाते हैं। यूकैरियोटिक कोशिका-द्रव्य में सामान्यतः 80S राइबोसोम होते हैं; माइटोकॉन्ड्रिया और हरितलवक के राइबोसोम अलग प्रकार के होते हैं।',parts:[['बड़ी उपइकाई','rRNA और प्रोटीन से बनी; प्रोटीन निर्माण में भाग।'],['छोटी उपइकाई','mRNA को बाँधती और पढ़ने में मदद करती है।'],['mRNA','प्रोटीन बनाने का आनुवंशिक संदेश लाता है।'],['स्थान','मुक्त रूप में या RER से जुड़े हुए मिल सकते हैं।']],svg:`<svg viewBox="0 0 520 250" class="w-full max-w-xl" role="img" aria-label="Ribosome subunits"><path d="M155 115 Q155 55 255 55 Q355 55 365 115 Q370 145 330 150 L190 150 Q150 145 155 115Z" fill="#f59e0b" stroke="#fef3c7" stroke-width="4"/><path d="M190 155 Q255 125 330 155 Q365 170 345 205 Q255 230 175 205 Q155 175 190 155Z" fill="#fb923c" stroke="#ffedd5" stroke-width="4"/><path d="M85 180 Q255 225 435 180" fill="none" stroke="#67e8f9" stroke-width="5"/><g fill="#fff" font-size="14" font-weight="bold"><text x="10" y="25">बड़ी उपइकाई</text><path d="M120 30 L180 75" stroke="#fff"/><text x="350" y="245">छोटी उपइकाई</text></g></svg>`},
+          cytoplasm:{title:'कोशिकाद्रव्य — कोशिका का आंतरिक माध्यम',desc:'कोशिकाद्रव्य में साइटोसोल और उसमें मौजूद कोशिकांग/अन्य संरचनाएँ शामिल होती हैं। साइटोसोल जलीय जेल जैसा माध्यम है, जिसमें अनेक जैव-रासायनिक अभिक्रियाएँ होती हैं।',parts:[['साइटोसोल','पानी, आयन, प्रोटीन और अन्य घुले पदार्थों वाला द्रव।'],['कोशिकांग','केंद्रक के बाहर साइटोप्लाज्म में अनेक कोशिकांग स्थित होते हैं।'],['कोशिकीय अभिक्रियाएँ','कई चयापचयी प्रक्रियाएँ साइटोसोल में होती हैं।']],svg:`<svg viewBox="0 0 520 250" class="w-full max-w-xl" role="img" aria-label="Cytoplasm with organelles"><rect x="55" y="35" width="410" height="180" rx="30" fill="#0f766e" stroke="#99f6e4" stroke-width="5"/><g fill="#a78bfa" stroke="#ede9fe" stroke-width="3"><ellipse cx="180" cy="120" rx="45" ry="30"/><ellipse cx="310" cy="95" rx="55" ry="22"/><circle cx="365" cy="165" r="22"/></g><circle cx="180" cy="120" r="12" fill="#f9a8d4"/><g fill="#fff" font-size="14" font-weight="bold"><text x="12" y="25">साइटोसोल में कोशिकांग</text><text x="350" y="240">योजनात्मक चित्र</text></g></svg>`}
+
+        };
+        function updateMicroDetails(key, org) {
+          const d = microDetails[key];
+          const title = document.getElementById('micro-title');
+          const diagram = document.getElementById('micro-diagram');
+          const desc = document.getElementById('micro-description');
+          const parts = document.getElementById('micro-parts');
+          if (d) {
+            title.textContent = d.title; diagram.innerHTML = d.svg; desc.textContent = d.desc;
+            parts.innerHTML = d.parts.map(p => `<div class="bg-slate-800/70 rounded-xl p-2"><b class="text-cyan-200 text-xs">${p[0]}</b><p class="text-slate-300 text-[11px] mt-1">${p[1]}</p></div>`).join('');
+          } else {
+            const t = org[currentLang];
+            title.textContent = `${t.name} — सूक्ष्म संरचना`;
+            diagram.innerHTML = `<div class="text-center p-4"><div class="text-5xl text-cyan-300 mb-2">◉</div><p class="text-xs text-cyan-100">${t.sciName}</p><p class="text-[10px] text-slate-400 mt-1">योजनात्मक संकेत-चित्र</p></div>`;
+            desc.textContent = `${t.name} की संरचना: ${t.composition}। ${t.func}`;
+            parts.innerHTML = `<div class="bg-slate-800/70 rounded-xl p-3"><b class="text-cyan-200 text-xs">मुख्य पहचान</b><p class="text-slate-300 text-[11px] mt-1">${t.fact}</p></div><div class="bg-slate-800/70 rounded-xl p-3"><b class="text-cyan-200 text-xs">उपस्थिति</b><p class="text-slate-300 text-[11px] mt-1">${t.presence}</p></div>`;
+          }
+        }
+
+        // Select and Highlight Organelle
+        function selectOrganelle(key) {
+            playChime(640, 'sine', 0.12);
+
+            if (currentMode === 'game') {
+                verifyGameChoice(key);
+                return;
+            }
+
+            selectedOrganelleKey = key;
+            const org = organelles[key];
+            if (!org) return;
+
+            // Update Info Card
+            const t = org[currentLang];
+            document.getElementById('card-title').textContent = t.name;
+            document.getElementById('card-sci-name').textContent = t.sciName;
+            document.getElementById('card-badge').textContent = t.badge;
+            document.getElementById('card-nickname').textContent = `"${t.nickname}"`;
+            document.getElementById('card-function').textContent = t.func;
+            document.getElementById('card-fact').textContent = t.fact;
+            document.getElementById('card-composition').textContent = t.composition;
+            document.getElementById('card-presence').textContent = t.presence;
+            updateMicroDetails(key, org);
+
+            const iconEl = document.getElementById('card-icon');
+            iconEl.className = org.icon;
+
+            // Highlight Active Organelle in SVG
+            document.querySelectorAll('.cell-organelle').forEach(el => {
+                el.classList.remove('organelle-active');
+            });
+
+            if (org.svgIds && org.svgIds.length > 0) {
+                org.svgIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('organelle-active');
+                });
+            }
+
+            // Highlight button in key
+            renderOrganelleKeyButtons();
+        }
+
+        // Mode Switching System
+        function setMode(mode) {
+            playChime(500, 'triangle', 0.15);
+            currentMode = mode;
+
+            // Button Styles
+            const modes = ['explore', 'game', 'compare'];
+            modes.forEach(m => {
+                const btn = document.getElementById(`btn-mode-${m}`);
+                if (m === mode) {
+                    btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-md bg-emerald-500 text-slate-950";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-800 text-slate-300 hover:text-white border border-slate-700";
+                }
+            });
+
+            const banner = document.getElementById('mode-interactive-banner');
+            document.querySelectorAll('.cell-organelle').forEach(el => {
+                el.classList.remove('organelle-active', 'plant-exclusive-glow', 'dimmed-organelle');
+            });
+
+            if (mode === 'explore') {
+                banner.classList.add('hidden');
+                selectOrganelle(selectedOrganelleKey);
+            } else if (mode === 'game') {
+                banner.classList.remove('hidden');
+                startOrganelleGame();
+            } else if (mode === 'compare') {
+                banner.classList.remove('hidden');
+                applyPlantExclusiveFilter();
+            }
+        }
+
+        // MODE 2: Find the Organelle Mini Game
+        const gameQuestions = [
+            {
+                targetKey: 'mitochondria',
+                hi: 'कोशिका का बिजलीघर कौन-सा भाग है? चित्र में उसे छुओ!',
+                en: 'Which organelle is known as the "Powerhouse of the Cell"? Tap it on the cell!'
+            },
+            {
+                targetKey: 'chloroplast',
+                hi: 'पौधे के हरे भाग में भोजन कौन-सा भाग बनाता है? उसे पहचानो!',
+                en: 'Which organelle performs photosynthesis (The Kitchen)? Tap it on the diagram!'
+            },
+            {
+                targetKey: 'vacuole',
+                hi: 'पानी जमा रखने वाली बड़ी रसधानी कहाँ है? उसे पहचानो!',
+                en: 'Where is the "Large Central Vacuole" storing cell sap? Tap it!'
+            },
+            {
+                targetKey: 'nucleus',
+                hi: 'कोशिका के कामों को नियंत्रित करने वाला केंद्रक कहाँ है? उसे पहचानो!',
+                en: 'Where is the master controller of genetic information—the "Nucleus"? Tap it!'
+            },
+            {
+                targetKey: 'cell_wall',
+                hi: 'कोशिका की सबसे बाहरी मजबूत दीवार को पहचानो!',
+                en: 'Tap the outermost rigid protective layer—the "Cell Wall"!'
+            }
+        ];
+
+        let currentGameIndex = 0;
+
+        function startOrganelleGame() {
+            currentGameIndex = 0;
+            renderGamePrompt();
+        }
+
+        function renderGamePrompt() {
+            const banner = document.getElementById('mode-interactive-banner');
+            const q = gameQuestions[currentGameIndex];
+            banner.className = "p-4 rounded-2xl border border-amber-500/50 bg-amber-950/40 text-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg";
+            banner.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-base shrink-0 shadow">
+                        ${currentGameIndex + 1}/${gameQuestions.length}
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">खोजो और पहचानो चुनौती:</span>
+                        <p class="text-sm font-semibold text-white">${q[currentLang]}</p>
+                    </div>
+                </div>
+                <div class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30 whitespace-nowrap">
+                    आरेख में अंग पर क्लिक करें
+                </div>
+            `;
+        }
+
+        function verifyGameChoice(clickedKey) {
+            const currentQ = gameQuestions[currentGameIndex];
+            const banner = document.getElementById('mode-interactive-banner');
+
+            if (clickedKey === currentQ.targetKey) {
+                // Correct
+                playChime(880, 'sine', 0.25);
+                banner.className = "p-4 rounded-2xl border border-emerald-500 bg-emerald-950/60 text-emerald-200 flex items-center justify-between gap-3 shadow-lg";
+                banner.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-2xl text-emerald-400"></i>
+                        <div>
+                            <p class="text-sm font-bold text-white">शाबाश! बिल्कुल सही पहचान की 🎉</p>
+                            <p class="text-xs text-emerald-300">आपने <strong>${organelles[clickedKey][currentLang].name}</strong> को सटीक पहचाना।</p>
+                        </div>
+                    </div>
+                    <button onclick="nextGameQuestion()" class="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold transition hover:bg-emerald-400 shadow">
+                        अगला प्रश्न <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                `;
+                // Highlight the correct one
+                const org = organelles[clickedKey];
+                if (org.svgIds) {
+                    org.svgIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.add('organelle-active');
+                    });
+                }
+            } else {
+                // Incorrect
+                playChime(220, 'sawtooth', 0.25);
+                banner.className = "p-4 rounded-2xl border border-red-500 bg-red-950/60 text-red-200 flex items-center justify-between gap-3 shadow-lg";
+                banner.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-xmark text-2xl text-red-400"></i>
+                        <div>
+                            <p class="text-sm font-bold text-white">यह गलत अंग है! दोबारा प्रयास करें</p>
+                            <p class="text-xs text-red-300">आपने '${organelles[clickedKey][currentLang].name}' पर टच किया। ध्यान से देखकर सही अंग चुनें।</p>
+                        </div>
+                    </div>
+                    <button onclick="renderGamePrompt()" class="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white">
+                        दोबारा सोचें
+                    </button>
+                `;
+            }
+        }
+
+        function nextGameQuestion() {
+            currentGameIndex++;
+            if (currentGameIndex < gameQuestions.length) {
+                renderGamePrompt();
+            } else {
+                // Game Finished
+                const banner = document.getElementById('mode-interactive-banner');
+                banner.className = "p-4 rounded-2xl border border-emerald-500 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-center space-y-2 shadow-xl";
+                banner.innerHTML = `
+                    <div class="text-2xl text-amber-400"><i class="fa-solid fa-trophy"></i></div>
+                    <h4 class="text-base font-bold text-white">बधाई! आपने सभी अंग पहचान लिए</h4>
+                    <p class="text-xs text-slate-300">अब आप पादप कोशिका के सभी महत्वपूर्ण अंगों और उनके कार्यों से अच्छी तरह परिचित हो चुके हैं।</p>
+                    <button onclick="setMode('explore')" class="mt-2 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs">
+                        एक्सप्लोर मोड में लौटें
+                    </button>
+                `;
+            }
+        }
+
+        // MODE 3: Plant vs Animal Cell Filter
+        function applyPlantExclusiveFilter() {
+            const banner = document.getElementById('mode-interactive-banner');
+            banner.className = "p-4 rounded-2xl border border-blue-500/50 bg-blue-950/40 text-blue-200 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg";
+            banner.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center text-xl shrink-0 shadow">
+                        <i class="fa-solid fa-filter"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">पादप और जंतु कोशिका का अंतर:</span>
+                        <p class="text-xs sm:text-sm text-slate-200">ये 3 भाग पादप कोशिका में होते हैं और जंतु कोशिका में नहीं मिलते: कोशिका भित्ति, हरितलवक और बड़ी केंद्रीय रसधानी। इन्हें हरे रंग में दिखाया गया है।</p>
+                    </div>
+                </div>
+                <button onclick="setMode('explore')" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold whitespace-nowrap">
+                    सामान्य दृश्य
+                </button>
+            `;
+
+            // Dim everything except Plant Exclusives
+            Object.keys(organelles).forEach(k => {
+                const org = organelles[k];
+                if (org.svgIds) {
+                    org.svgIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            if (org.isPlantExclusive) {
+                                el.classList.add('plant-exclusive-glow');
+                                el.classList.remove('dimmed-organelle');
+                            } else {
+                                el.classList.add('dimmed-organelle');
+                                el.classList.remove('plant-exclusive-glow');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // QUIZ SYSTEM LOGIC
+        const quizAnswers = {
+            1: {
+                correct: 1, // Mitochondria
+                hi: {
+                    correct: "बिल्कुल सही! माइटोकॉन्ड्रिया भोजन से ऊर्जा पाने में मदद करता है। इसलिए इसे कोशिका का बिजलीघर कहते हैं।",
+                    wrong: "सही उत्तर (B) माइटोकॉन्ड्रिया है। यह कोशिका के कामों के लिए ऊर्जा उपलब्ध कराने में मदद करता है।"
+                },
+                en: {
+                    correct: "Correct! Mitochondria generates cellular energy in the form of ATP.",
+                    wrong: "Incorrect! The correct answer is (B) Mitochondria."
+                }
+            },
+            2: {
+                correct: 0, // Cellulose
+                hi: {
+                    correct: "बिल्कुल सही! पौधों की कोशिका भित्ति मुख्यतः सेल्यूलोज, हेमिसेल्यूलोज और पेक्टिन से बनी होती है।",
+                    wrong: "सही उत्तर (A) सेल्यूलोज है। यह कोशिका भित्ति को मजबूती देता है।"
+                },
+                en: {
+                    correct: "Accurate! Plant cell walls are primarily built of cellulose fibers.",
+                    wrong: "Incorrect! The correct answer is (A) Cellulose."
+                }
+            },
+            3: {
+                correct: 1, // Chloroplast
+                hi: {
+                    correct: "बिल्कुल सही! हरितलवक पौधे के हरे भागों में भोजन बनाने में मदद करता है।",
+                    wrong: "सही उत्तर (B) हरितलवक है। यह पौधे के हरे भागों में भोजन बनाने में मदद करता है।"
+                },
+                en: {
+                    correct: "Spot on! Chloroplasts are exclusive to plants and photosynthetic algae.",
+                    wrong: "Incorrect! The correct answer is (B) Chloroplast."
+                }
+            },
+            4: {
+                correct: 0, // Nucleus
+                hi: {
+                    correct: "बिल्कुल सही! केंद्रक कोशिका के कामों को नियंत्रित करता है। इसमें DNA होता है।",
+                    wrong: "सही उत्तर (A) केंद्रक है। यह कोशिका के कामों को नियंत्रित करता है।"
+                },
+                en: {
+                    correct: "Correct! The Nucleus directs protein synthesis and stores chromosomes.",
+                    wrong: "Incorrect! The correct answer is (A) Nucleus."
+                }
+            },
+            5: {
+                correct: 0, // पानी और घुले हुए पदार्थ
+                hi: {
+                    correct: "बिल्कुल सही! रसधानी में पानी और कई घुले हुए पदार्थ जमा रहते हैं।",
+                    wrong: "सही उत्तर (A) पानी और घुले पदार्थ है। रसधानी इन्हें जमा रखने में मदद करती है।"
+                },
+                en: {
+                    correct: "Correct! The vacuole stores water and dissolved substances.",
+                    wrong: "Incorrect! The correct answer is (A) Water and dissolved substances."
+                }
+            }
+        };
+
+        let userQuizResponses = {};
+        let quizScore = 0;
+
+        function handleQuizAnswer(qNum, optionIdx) {
+            if (userQuizResponses[qNum] !== undefined) return;
+
+            const qInfo = quizAnswers[qNum];
+            const isCorrect = (optionIdx === qInfo.correct);
+            userQuizResponses[qNum] = isCorrect;
+
+            if (isCorrect) {
+                quizScore++;
+                playChime(750, 'sine', 0.2);
+            } else {
+                playChime(250, 'sawtooth', 0.2);
+            }
+
+            document.getElementById('quiz-score-val').textContent = `${quizScore}/5`;
+
+            // Style buttons
+            const btns = document.querySelectorAll(`.q${qNum}-btn`);
+            btns.forEach((btn, idx) => {
+                btn.disabled = true;
+                const icon = btn.querySelector(`.q${qNum}-icon`);
+                if (idx === optionIdx) {
+                    if (isCorrect) {
+                        btn.className = `q${qNum}-btn p-3 rounded-xl bg-emerald-600 border-2 border-emerald-400 text-white font-bold flex items-center justify-between shadow-lg`;
+                        icon.className = "fa-solid fa-circle-check text-white text-base";
+                    } else {
+                        btn.className = `q${qNum}-btn p-3 rounded-xl bg-red-600 border-2 border-red-400 text-white font-bold flex items-center justify-between shadow-lg`;
+                        icon.className = "fa-solid fa-circle-xmark text-white text-base";
+                    }
+                } else if (idx === qInfo.correct) {
+                    btn.className = `q${qNum}-btn p-3 rounded-xl bg-emerald-950 border-2 border-emerald-500/80 text-emerald-300 font-bold flex items-center justify-between`;
+                    icon.className = "fa-solid fa-check text-emerald-400 text-base";
+                } else {
+                    btn.className = `q${qNum}-btn p-3 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-500 flex items-center justify-between opacity-50`;
+                }
+            });
+
+            // Feedback Box
+            const fbBox = document.getElementById(`q${qNum}-fb`);
+            fbBox.classList.remove('hidden');
+            const fbText = isCorrect ? qInfo[currentLang].correct : qInfo[currentLang].wrong;
+            if (isCorrect) {
+                fbBox.className = "p-3 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-emerald-200 text-xs";
+                fbBox.innerHTML = `<span class="font-bold text-emerald-300">✓ </span> ${fbText}`;
+            } else {
+                fbBox.className = "p-3 rounded-xl border border-red-500/50 bg-red-950/40 text-red-200 text-xs";
+                fbBox.innerHTML = `<span class="font-bold text-red-300">✗ </span> ${fbText}`;
+            }
+
+            if (Object.keys(userQuizResponses).length === 5) {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            const card = document.getElementById('quiz-final-score');
+            const text = document.getElementById('scorecard-text');
+            card.classList.remove('hidden');
+
+            if (quizScore === 5) {
+                text.innerHTML = `अद्भुत! आपने <strong>5 में से 5</strong> अंक प्राप्त किए हैं। पादप कोशिका पर आपकी पकड़ मजबूत है! ⭐⭐⭐⭐`;
+            } else if (quizScore >= 2) {
+                text.innerHTML = `अच्छा प्रयास! आपने <strong>5 में से ${quizScore}</strong> अंक प्राप्त किए। छूटे हुए प्रश्नों के उत्तर ऊपर देख सकते हैं।`;
+            } else {
+                text.innerHTML = `आपने <strong>5 में से ${quizScore}</strong> अंक प्राप्त किए। कृपया मॉडल के अंगों पर दोबारा क्लिक करके समझें।`;
+            }
+        }
+
+        function resetQuiz() {
+            userQuizResponses = {};
+            quizScore = 0;
+            document.getElementById('quiz-score-val').textContent = "0/5";
+            document.getElementById('quiz-final-score').classList.add('hidden');
+
+            for (let q = 1; q <= 5; q++) {
+                const fbBox = document.getElementById(`q${q}-fb`);
+                fbBox.classList.add('hidden');
+                fbBox.innerHTML = '';
+
+                const btns = document.querySelectorAll(`.q${q}-btn`);
+                btns.forEach((btn) => {
+                    btn.disabled = false;
+                    btn.className = `q${q}-btn p-3 rounded-xl bg-slate-900 hover:bg-slate-700 text-left border border-slate-700 transition flex items-center justify-between`;
+                    const icon = btn.querySelector(`.q${q}-icon`);
+                    icon.className = `fa-regular fa-circle text-slate-500 q${q}-icon`;
+                });
+            }
+        }
+
+        // Language Switcher Handler
+        function toggleLanguage() {
+            currentLang = currentLang === 'hi' ? 'en' : 'hi';
+            document.getElementById('lang-label').textContent = currentLang === 'hi' ? 'English' : 'हिन्दी';
+
+            // Update main labels
+            if (currentLang === 'hi') {
+                document.getElementById('txt-header-title').textContent = "पादप कोशिका (Plant Cell)";
+                document.getElementById('txt-header-sub').textContent = "कोशिका के भाग और उनके काम";
+                document.getElementById('badge-title').textContent = "गत्ते के 3D पादप कोशिका मॉडल का डिजिटल रूप";
+                document.getElementById('badge-desc').textContent = "चित्र में किसी भी भाग को छूकर उसके बारे में जानें।";
+                document.getElementById('lbl-mode-explore').textContent = "एक्सप्लोर करें";
+                document.getElementById('lbl-mode-game').textContent = "खोजो और पहचानो";
+                document.getElementById('lbl-mode-compare').textContent = "जंतु कोशिका से अंतर";
+                document.getElementById('lbl-cell-view-title').textContent = "पादप कोशिका आरेख (Plant Cell Model)";
+                document.getElementById('lbl-click-hint').textContent = "अंग पर टच करें";
+                document.getElementById('lbl-plant-exclusive-tag').textContent = "जंतु कोशिका से अलग खास भाग: भित्ति, हरितलवक व बड़ी रसधानी";
+                document.getElementById('lbl-function-title').textContent = "मुख्य काम";
+                document.getElementById('lbl-fact-title').textContent = "विशेष तथ्य:";
+                document.getElementById('lbl-composition').textContent = "किससे बना है:";
+                document.getElementById('lbl-presence').textContent = "कहाँ मिलता है:";
+                document.getElementById('lbl-organelle-list').textContent = "कोशिका के भाग";
+            } else {
+                document.getElementById('txt-header-title').textContent = "Plant Cell 3D Explorer";
+                document.getElementById('txt-header-sub').textContent = "Cell Organelles & Biological Functions";
+                document.getElementById('badge-title').textContent = "Digital Twin of Cardboard Plant Cell Model";
+                document.getElementById('badge-desc').textContent = "Tap any organelle on the SVG diagram below or switch interactive modes.";
+                document.getElementById('lbl-mode-explore').textContent = "Explore Mode";
+                document.getElementById('lbl-mode-game').textContent = "Find & Match";
+                document.getElementById('lbl-mode-compare').textContent = "Plant vs Animal";
+                document.getElementById('lbl-cell-view-title').textContent = "Interactive Plant Cell Diagram";
+                document.getElementById('lbl-click-hint').textContent = "Tap organelle";
+                document.getElementById('lbl-plant-exclusive-tag').textContent = "Plant Exclusive: Wall, Chloroplast & Vacuole";
+                document.getElementById('lbl-function-title').textContent = "Primary Function";
+                document.getElementById('lbl-fact-title').textContent = "Did You Know:";
+                document.getElementById('lbl-composition').textContent = "Composition:";
+                document.getElementById('lbl-presence').textContent = "Occurrence:";
+                document.getElementById('lbl-organelle-list').textContent = "Organelle Key Palette";
+            }
+
+            selectOrganelle(selectedOrganelleKey);
+            renderOrganelleKeyButtons();
+
+            if (currentMode === 'game') {
+                renderGamePrompt();
+            }
+        }
+
+        // Initialize on DOM ready
+        window.addEventListener('DOMContentLoaded', () => {
+            renderOrganelleKeyButtons();
+            selectOrganelle('cell_wall');
+        });
+    </script>
+</body>
+</html>
